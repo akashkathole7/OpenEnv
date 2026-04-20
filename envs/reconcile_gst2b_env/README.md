@@ -127,4 +127,4 @@ See [JUDGE_TOUR.md](JUDGE_TOUR.md) for a guided 10-minute read that hits the hig
 
 ## License
 
-MIT. See [LICENSE](../../LICENSE).
+MIT for this env contribution — see [LICENSE](LICENSE). Upstream OpenEnv repo is BSD-3-Clause at [../../LICENSE](../../LICENSE); both are compatible.
