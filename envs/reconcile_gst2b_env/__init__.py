@@ -7,10 +7,10 @@
 """Reconcile Gst2b Env Environment."""
 
 from .client import ReconcileGST2BEnv
-from .models import ReconcileGST2BAction, ReconcileGST2BObservation
+from .models import ReconcileAction, ReconcileObservation
 
 __all__ = [
-    "ReconcileGST2BAction",
-    "ReconcileGST2BObservation",
+    "ReconcileAction",
+    "ReconcileObservation",
     "ReconcileGST2BEnv",
 ]

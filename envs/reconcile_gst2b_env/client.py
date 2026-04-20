@@ -12,12 +12,10 @@ from openenv.core import EnvClient
 from openenv.core.client_types import StepResult
 from openenv.core.env_server.types import State
 
-from .models import ReconcileGST2BAction, ReconcileGST2BObservation
+from .models import ReconcileAction, ReconcileObservation
 
 
-class ReconcileGST2BEnv(
-    EnvClient[ReconcileGST2BAction, ReconcileGST2BObservation, State]
-):
+class ReconcileGST2BEnv(EnvClient[ReconcileAction, ReconcileObservation, State]):
     """
     Client for the Reconcile Gst2b Env Environment.
 
@@ -31,7 +29,7 @@ class ReconcileGST2BEnv(
         ...     result = client.reset()
         ...     print(result.observation.echoed_message)
         ...
-        ...     result = client.step(ReconcileGST2BAction(message="Hello!"))
+        ...     result = client.step(ReconcileAction(message="Hello!"))
         ...     print(result.observation.echoed_message)
 
     Example with Docker:
@@ -39,17 +37,17 @@ class ReconcileGST2BEnv(
         >>> client = ReconcileGST2BEnv.from_docker_image("reconcile_gst2b_env-env:latest")
         >>> try:
         ...     result = client.reset()
-        ...     result = client.step(ReconcileGST2BAction(message="Test"))
+        ...     result = client.step(ReconcileAction(message="Test"))
         ... finally:
         ...     client.close()
     """
 
-    def _step_payload(self, action: ReconcileGST2BAction) -> Dict:
+    def _step_payload(self, action: ReconcileAction) -> Dict:
         """
-        Convert ReconcileGST2BAction to JSON payload for step message.
+        Convert ReconcileAction to JSON payload for step message.
 
         Args:
-            action: ReconcileGST2BAction instance
+            action: ReconcileAction instance
 
         Returns:
             Dictionary representation suitable for JSON encoding
@@ -58,18 +56,18 @@ class ReconcileGST2BEnv(
             "message": action.message,
         }
 
-    def _parse_result(self, payload: Dict) -> StepResult[ReconcileGST2BObservation]:
+    def _parse_result(self, payload: Dict) -> StepResult[ReconcileObservation]:
         """
-        Parse server response into StepResult[ReconcileGST2BObservation].
+        Parse server response into StepResult[ReconcileObservation].
 
         Args:
             payload: JSON response data from server
 
         Returns:
-            StepResult with ReconcileGST2BObservation
+            StepResult with ReconcileObservation
         """
         obs_data = payload.get("observation", {})
-        observation = ReconcileGST2BObservation(
+        observation = ReconcileObservation(
             echoed_message=obs_data.get("echoed_message", ""),
             message_length=obs_data.get("message_length", 0),
             done=payload.get("done", False),

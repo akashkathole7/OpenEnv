@@ -36,18 +36,18 @@ except Exception as e:  # pragma: no cover
     ) from e
 
 try:
-    from ..models import ReconcileGST2BAction, ReconcileGST2BObservation
+    from ..models import ReconcileAction, ReconcileObservation
     from .reconcile_gst2b_environment import ReconcileGST2BEnvironment
 except ImportError:
-    from models import ReconcileGST2BAction, ReconcileGST2BObservation
+    from models import ReconcileAction, ReconcileObservation
     from server.reconcile_gst2b_environment import ReconcileGST2BEnvironment
 
 
 # Create the app with web interface and README integration
 app = create_app(
     ReconcileGST2BEnvironment,
-    ReconcileGST2BAction,
-    ReconcileGST2BObservation,
+    ReconcileAction,
+    ReconcileObservation,
     env_name="reconcile_gst2b_env",
     max_concurrent_envs=1,  # increase this number to allow more concurrent WebSocket sessions
 )

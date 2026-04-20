@@ -17,9 +17,9 @@ from openenv.core.env_server.interfaces import Environment
 from openenv.core.env_server.types import State
 
 try:
-    from ..models import ReconcileGST2BAction, ReconcileGST2BObservation
+    from ..models import ReconcileAction, ReconcileObservation
 except ImportError:
-    from models import ReconcileGST2BAction, ReconcileGST2BObservation
+    from models import ReconcileAction, ReconcileObservation
 
 
 class ReconcileGST2BEnvironment(Environment):
@@ -34,7 +34,7 @@ class ReconcileGST2BEnvironment(Environment):
         >>> obs = env.reset()
         >>> print(obs.echoed_message)  # "Reconcile Gst2b Env environment ready!"
         >>>
-        >>> obs = env.step(ReconcileGST2BAction(message="Hello"))
+        >>> obs = env.step(ReconcileAction(message="Hello"))
         >>> print(obs.echoed_message)  # "Hello"
         >>> print(obs.message_length)  # 5
     """
@@ -50,32 +50,32 @@ class ReconcileGST2BEnvironment(Environment):
         self._state = State(episode_id=str(uuid4()), step_count=0)
         self._reset_count = 0
 
-    def reset(self) -> ReconcileGST2BObservation:
+    def reset(self) -> ReconcileObservation:
         """
         Reset the environment.
 
         Returns:
-            ReconcileGST2BObservation with a ready message
+            ReconcileObservation with a ready message
         """
         self._state = State(episode_id=str(uuid4()), step_count=0)
         self._reset_count += 1
 
-        return ReconcileGST2BObservation(
+        return ReconcileObservation(
             echoed_message="Reconcile Gst2b Env environment ready!",
             message_length=0,
             done=False,
             reward=0.0,
         )
 
-    def step(self, action: ReconcileGST2BAction) -> ReconcileGST2BObservation:  # type: ignore[override]
+    def step(self, action: ReconcileAction) -> ReconcileObservation:  # type: ignore[override]
         """
         Execute a step in the environment by echoing the message.
 
         Args:
-            action: ReconcileGST2BAction containing the message to echo
+            action: ReconcileAction containing the message to echo
 
         Returns:
-            ReconcileGST2BObservation with the echoed message and its length
+            ReconcileObservation with the echoed message and its length
         """
         self._state.step_count += 1
 
@@ -85,7 +85,7 @@ class ReconcileGST2BEnvironment(Environment):
         # Simple reward: longer messages get higher rewards
         reward = length * 0.1
 
-        return ReconcileGST2BObservation(
+        return ReconcileObservation(
             echoed_message=message,
             message_length=length,
             done=False,

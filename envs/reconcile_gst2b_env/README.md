@@ -11,16 +11,20 @@ tags:
   - openenv
 ---
 
-# Reconcile Gst2b Env Environment
+# reconcile_gst2b_env — GST Input-Tax-Credit Reconciliation Environment
 
-A simple test environment that echoes back messages. Perfect for testing the env APIs as well as demonstrating environment usage patterns.
+See [scope_card.md](scope_card.md) for the v1 IN/OUT scope fence.
+
+An OpenEnv environment for reconciling a company's purchase register against
+its monthly GSTR-2B: label invoices across 5 categories, compute ITC delta,
+flag Rule 36(4) violations, detect circular-trading rings.
 
 ## Quick Start
 
 The simplest way to use the Reconcile Gst2b Env environment is through the `ReconcileGST2BEnv` class:
 
 ```python
-from reconcile_gst2b_env import ReconcileGST2BAction, ReconcileGST2BEnv
+from reconcile_gst2b_env import ReconcileAction, ReconcileGST2BEnv
 
 try:
     # Create environment from Docker image
@@ -34,7 +38,7 @@ try:
     messages = ["Hello, World!", "Testing echo", "Final message"]
 
     for msg in messages:
-        result = reconcile_gst2b_envenv.step(ReconcileGST2BAction(message=msg))
+        result = reconcile_gst2b_envenv.step(ReconcileAction(message=msg))
         print(f"Sent: '{msg}'")
         print(f"  → Echoed: '{result.observation.echoed_message}'")
         print(f"  → Length: {result.observation.message_length}")
@@ -119,11 +123,11 @@ The deployed space includes:
 ## Environment Details
 
 ### Action
-**ReconcileGST2BAction**: Contains a single field
+**ReconcileAction**: Contains a single field
 - `message` (str) - The message to echo back
 
 ### Observation
-**ReconcileGST2BObservation**: Contains the echo response and metadata
+**ReconcileObservation**: Contains the echo response and metadata
 - `echoed_message` (str) - The message echoed back
 - `message_length` (int) - Length of the message
 - `reward` (float) - Reward based on message length (length × 0.1)
@@ -150,7 +154,7 @@ reconcile_gst2b_envenv = ReconcileGST2BEnv(base_url="<ENV_HTTP_URL_HERE>")
 
 # Use as normal
 result = reconcile_gst2b_envenv.reset()
-result = reconcile_gst2b_envenv.step(ReconcileGST2BAction(message="Hello!"))
+result = reconcile_gst2b_envenv.step(ReconcileAction(message="Hello!"))
 ```
 
 Note: When connecting to an existing server, `reconcile_gst2b_envenv.close()` will NOT stop the server.
@@ -160,7 +164,7 @@ Note: When connecting to an existing server, `reconcile_gst2b_envenv.close()` wi
 The client supports context manager usage for automatic connection management:
 
 ```python
-from reconcile_gst2b_env import ReconcileGST2BAction, ReconcileGST2BEnv
+from reconcile_gst2b_env import ReconcileAction, ReconcileGST2BEnv
 
 # Connect with context manager (auto-connects and closes)
 with ReconcileGST2BEnv(base_url="http://localhost:8000") as env:
@@ -168,7 +172,7 @@ with ReconcileGST2BEnv(base_url="http://localhost:8000") as env:
     print(f"Reset: {result.observation.echoed_message}")
     # Multiple steps with low latency
     for msg in ["Hello", "World", "!"]:
-        result = env.step(ReconcileGST2BAction(message=msg))
+        result = env.step(ReconcileAction(message=msg))
         print(f"Echoed: {result.observation.echoed_message}")
 ```
 
@@ -186,8 +190,8 @@ modify `server/app.py` to use factory mode:
 # In server/app.py - use factory mode for concurrent sessions
 app = create_app(
     ReconcileGST2BEnvironment,  # Pass class, not instance
-    ReconcileGST2BAction,
-    ReconcileGST2BObservation,
+    ReconcileAction,
+    ReconcileObservation,
     max_concurrent_envs=4,  # Allow 4 concurrent sessions
 )
 ```
@@ -195,14 +199,14 @@ app = create_app(
 Then multiple clients can connect simultaneously:
 
 ```python
-from reconcile_gst2b_env import ReconcileGST2BAction, ReconcileGST2BEnv
+from reconcile_gst2b_env import ReconcileAction, ReconcileGST2BEnv
 from concurrent.futures import ThreadPoolExecutor
 
 def run_episode(client_id: int):
     with ReconcileGST2BEnv(base_url="http://localhost:8000") as env:
         result = env.reset()
         for i in range(10):
-            result = env.step(ReconcileGST2BAction(message=f"Client {client_id}, step {i}"))
+            result = env.step(ReconcileAction(message=f"Client {client_id}, step {i}"))
         return client_id, result.observation.message_length
 
 # Run 4 episodes concurrently
