@@ -40,6 +40,11 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 REPO = Path(__file__).resolve().parents[3]
+# Both paths are required:
+#   REPO        — makes `envs.reconcile_gst2b_env.*` resolvable
+#   REPO/src    — makes `openenv.core` resolvable (used by client.py via
+#                 envs/reconcile_gst2b_env/__init__.py at import time)
+sys.path.insert(0, str(REPO / "src"))
 sys.path.insert(0, str(REPO))
 
 from envs.reconcile_gst2b_env.models import ReconcileAction  # noqa: E402
