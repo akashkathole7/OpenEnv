@@ -1,0 +1,48 @@
+{
+  "9500": {
+    "seed": 9500,
+    "current_tier": "a",
+    "total": 0.3287,
+    "components": {
+      "R1": 0.1895,
+      "R2": 0.6791,
+      "R3": 0.01,
+      "R4": 0.8064
+    },
+    "steps_used": 22,
+    "termination_reason": "submitted"
+  },
+  "9501": {
+    "seed": 9501,
+    "current_tier": "b",
+    "total": 0.4623,
+    "components": {
+      "R1": 0.1108,
+      "R2": 0.3595,
+      "R3": 0.99,
+      "R4": 0.8064
+    },
+    "steps_used": 22,
+    "termination_reason": "submitted"
+  },
+  "9502": {
+    "seed": 9502,
+    "current_tier": "c",
+    "total": 0.1892,
+    "components": {
+      "R1": 0.0783,
+      "R2": 0.299,
+      "R3": 0.01,
+      "R4": 0.8064
+    },
+    "steps_used": 22,
+    "termination_reason": "submitted"
+  },
+  "ordering_check": {
+    "monotonic_easy_to_hard": false,
+    "promote_labels": false,
+    "base_model_reference": "Qwen2.5-3B-Instruct (downloaded; heuristic scaffold used for eval)",
+    "eval_policy": "prompted_policy (cpu heuristic, no LM calls)"
+  },
+  "promoted_labels": null
+}
