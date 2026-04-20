@@ -1,0 +1,71 @@
+{
+  "warmup": {
+    "n": 100,
+    "distinct_totals": 67,
+    "std": 0.5044,
+    "modal_outcome_frac": 0.17,
+    "per_component_distinct_values": {
+      "R1": 32,
+      "R2": 58,
+      "R3": 3,
+      "R4": 29
+    },
+    "done_rate": 1.0,
+    "mean_total": 0.0938,
+    "median_total": 0.3496
+  },
+  "hardened": {
+    "n": 100,
+    "distinct_totals": 67,
+    "std": 0.5035,
+    "modal_outcome_frac": 0.17,
+    "per_component_distinct_values": {
+      "R1": 27,
+      "R2": 57,
+      "R3": 3,
+      "R4": 26
+    },
+    "done_rate": 1.0,
+    "mean_total": 0.0899,
+    "median_total": 0.3496
+  },
+  "heuristic_warmup": {
+    "n": 100,
+    "distinct_totals": 96,
+    "std": 0.1384,
+    "modal_outcome_frac": 0.02,
+    "per_component_distinct_values": {
+      "R1": 63,
+      "R2": 74,
+      "R3": 2,
+      "R4": 20
+    },
+    "done_rate": 1.0,
+    "mean_total": 0.5977,
+    "median_total": 0.6205
+  },
+  "pooled_random": {
+    "n": 200,
+    "distinct_totals": 81,
+    "std": 0.5027,
+    "modal_outcome_frac": 0.17,
+    "per_component_distinct_values": {
+      "R1": 35,
+      "R2": 66,
+      "R3": 3,
+      "R4": 31
+    },
+    "done_rate": 1.0,
+    "mean_total": 0.0919,
+    "median_total": 0.3496
+  },
+  "criteria": {
+    "distinct_totals_ge_8": true,
+    "std_ge_0_08": true,
+    "modal_outcome_lt_0_40": true,
+    "per_component_ge_3_distinct": true,
+    "heuristic_beats_random_ge_0_05": true,
+    "done_rate_ge_0_95": true
+  },
+  "all_passed": true
+}

@@ -1,0 +1,473 @@
+{
+  "seed": 9000,
+  "mode": "warmup",
+  "component_rewards": {
+    "R1": 0.0914,
+    "R2": 0.3997,
+    "R3": 0.99,
+    "R4": 0.01
+  },
+  "total": 0.385,
+  "total_steps": 50,
+  "termination_reason": "step_budget_exhausted",
+  "done": true,
+  "catastrophic_corruption": false,
+  "trajectory": [
+    {
+      "step": 1,
+      "verb": "mark_only_in_books",
+      "payload": {
+        "invoice_id": "inv_0015"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 2,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0004"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 3,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0018"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 4,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0011"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 5,
+      "verb": "mark_only_in_2b",
+      "payload": {
+        "invoice_id": "inv_0015"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 6,
+      "verb": "mark_only_in_books",
+      "payload": {
+        "invoice_id": "inv_0001"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 7,
+      "verb": "mark_only_in_books",
+      "payload": {
+        "invoice_id": "inv_0010"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 8,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0009"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 9,
+      "verb": "mark_partial_match",
+      "payload": {
+        "invoice_id": "inv_0019",
+        "delta_inr": 135.18
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 10,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0006"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 11,
+      "verb": "mark_partial_match",
+      "payload": {
+        "invoice_id": "inv_0005",
+        "delta_inr": 432.57
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 12,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0011"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 13,
+      "verb": "mark_only_in_2b",
+      "payload": {
+        "invoice_id": "inv_0001"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 14,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0017"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 15,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0005"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 16,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0000"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 17,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0015"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 18,
+      "verb": "mark_partial_match",
+      "payload": {
+        "invoice_id": "inv_0003",
+        "delta_inr": 82.67
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 19,
+      "verb": "mark_mismatched",
+      "payload": {
+        "invoice_id": "inv_0013",
+        "reason": "hsn"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 20,
+      "verb": "mark_partial_match",
+      "payload": {
+        "invoice_id": "inv_0010",
+        "delta_inr": 45.56
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 21,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0007"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 22,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0016"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 23,
+      "verb": "mark_only_in_books",
+      "payload": {
+        "invoice_id": "inv_0000"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 24,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0006"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 25,
+      "verb": "mark_only_in_books",
+      "payload": {
+        "invoice_id": "inv_0001"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 26,
+      "verb": "get_schema",
+      "payload": {},
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 27,
+      "verb": "mark_only_in_2b",
+      "payload": {
+        "invoice_id": "inv_0014"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 28,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0046"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 29,
+      "verb": "mark_mismatched",
+      "payload": {
+        "invoice_id": "inv_0015",
+        "reason": "invoice_no"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 30,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0048"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 31,
+      "verb": "get_schema",
+      "payload": {},
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 32,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0023"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 33,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0051"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 34,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0045"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 35,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0051"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 36,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0029"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 37,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0056"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 38,
+      "verb": "confirm_with_user",
+      "payload": {
+        "question": "please confirm this invoice"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 39,
+      "verb": "confirm_with_user",
+      "payload": {
+        "question": "please confirm this invoice"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 40,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0011"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 41,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0027"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 42,
+      "verb": "mark_mismatched",
+      "payload": {
+        "invoice_id": "inv_0059",
+        "reason": "date"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 43,
+      "verb": "mark_only_in_books",
+      "payload": {
+        "invoice_id": "inv_0009"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 44,
+      "verb": "mark_only_in_2b",
+      "payload": {
+        "invoice_id": "inv_0009"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 45,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0004"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 46,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0019"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 47,
+      "verb": "mark_mismatched",
+      "payload": {
+        "invoice_id": "inv_0052",
+        "reason": "date"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 48,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0060"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 49,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0063"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 50,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0000"
+      },
+      "reward": 0.3849991123572438,
+      "done": true
+    }
+  ],
+  "sample_idx": 1,
+  "condition": "raw"
+}

@@ -1,0 +1,61 @@
+{
+  "baseline": {
+    "total_mean": 0.2673,
+    "r1_mean": 0.0993,
+    "weights": {
+      "R1": 0.4,
+      "R2": 0.25,
+      "R3": 0.25,
+      "R4": 0.1
+    },
+    "n_rollouts": 90
+  },
+  "ablations": {
+    "R1": {
+      "weights": {
+        "R2": 0.4167,
+        "R3": 0.4167,
+        "R4": 0.1667,
+        "R1": 0.0
+      },
+      "total_mean": 0.3794,
+      "delta_total_mean": 0.1121,
+      "r1_mean": 0.0993
+    },
+    "R2": {
+      "weights": {
+        "R1": 0.5333,
+        "R3": 0.3333,
+        "R4": 0.1333,
+        "R2": 0.0
+      },
+      "total_mean": 0.2182,
+      "delta_total_mean": -0.0491,
+      "r1_mean": 0.0993
+    },
+    "R3": {
+      "weights": {
+        "R1": 0.5333,
+        "R2": 0.3333,
+        "R4": 0.1333,
+        "R3": 0.0
+      },
+      "total_mean": 0.2987,
+      "delta_total_mean": 0.0313,
+      "r1_mean": 0.0993
+    },
+    "R4": {
+      "weights": {
+        "R1": 0.4444,
+        "R2": 0.2778,
+        "R3": 0.2778,
+        "R4": 0.0
+      },
+      "total_mean": 0.2074,
+      "delta_total_mean": -0.0599,
+      "r1_mean": 0.0993
+    }
+  },
+  "significant_drop_count": 2,
+  "done_gate_ablation_ok": true
+}

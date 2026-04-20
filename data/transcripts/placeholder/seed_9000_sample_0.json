@@ -1,0 +1,255 @@
+{
+  "seed": 9000,
+  "mode": "warmup",
+  "component_rewards": {
+    "R1": 0.05,
+    "R2": 0.1607,
+    "R3": 0.01,
+    "R4": 0.7084
+  },
+  "total": 0.1335,
+  "total_steps": 27,
+  "termination_reason": "submitted",
+  "done": true,
+  "catastrophic_corruption": false,
+  "trajectory": [
+    {
+      "step": 1,
+      "verb": "get_schema",
+      "payload": {},
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 2,
+      "verb": "mark_partial_match",
+      "payload": {
+        "invoice_id": "inv_0039",
+        "delta_inr": 0.31
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 3,
+      "verb": "list_invoices_by_supplier",
+      "payload": {
+        "gstin": ""
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 4,
+      "verb": "get_2b_row",
+      "payload": {
+        "invoice_id": "inv_0051"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 5,
+      "verb": "get_schema",
+      "payload": {},
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 6,
+      "verb": "mark_only_in_2b",
+      "payload": {
+        "invoice_id": "inv_0059"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 7,
+      "verb": "confirm_with_user",
+      "payload": {
+        "question": "please confirm this invoice"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 8,
+      "verb": "mark_matched",
+      "payload": {
+        "invoice_id": "inv_0043"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 9,
+      "verb": "get_schema",
+      "payload": {},
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 10,
+      "verb": "get_invoice",
+      "payload": {
+        "invoice_id": "inv_0013"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 11,
+      "verb": "get_invoice",
+      "payload": {
+        "invoice_id": "inv_0029"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 12,
+      "verb": "list_gstins",
+      "payload": {},
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 13,
+      "verb": "mark_only_in_books",
+      "payload": {
+        "invoice_id": "inv_0003"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 14,
+      "verb": "confirm_with_user",
+      "payload": {
+        "question": "please confirm this invoice"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 15,
+      "verb": "list_gstins",
+      "payload": {},
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 16,
+      "verb": "mark_only_in_2b",
+      "payload": {
+        "invoice_id": "inv_0031"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 17,
+      "verb": "flag_circular_ring",
+      "payload": {
+        "gstins": [
+          "36HALJA5297RFZO",
+          "15CCMJP3217HVZ2",
+          "04APZVK0594FXZC"
+        ]
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 18,
+      "verb": "mark_partial_match",
+      "payload": {
+        "invoice_id": "inv_0001",
+        "delta_inr": 470.86
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 19,
+      "verb": "mark_mismatched",
+      "payload": {
+        "invoice_id": "inv_0061",
+        "reason": "hsn"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 20,
+      "verb": "mark_only_in_2b",
+      "payload": {
+        "invoice_id": "inv_0005"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 21,
+      "verb": "mark_mismatched",
+      "payload": {
+        "invoice_id": "inv_0041",
+        "reason": "invoice_no"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 22,
+      "verb": "fuzzy_search_gstin",
+      "payload": {
+        "query": "36HALJA529"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 23,
+      "verb": "confirm_with_user",
+      "payload": {
+        "question": "please confirm this invoice"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 24,
+      "verb": "mark_mismatched",
+      "payload": {
+        "invoice_id": "inv_0028",
+        "reason": "date"
+      },
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 25,
+      "verb": "list_gstins",
+      "payload": {},
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 26,
+      "verb": "get_schema",
+      "payload": {},
+      "reward": 0.0,
+      "done": false
+    },
+    {
+      "step": 27,
+      "verb": "submit",
+      "payload": {},
+      "reward": 0.1335066415645509,
+      "done": true
+    }
+  ],
+  "sample_idx": 0,
+  "condition": "placeholder"
+}

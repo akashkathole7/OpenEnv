@@ -20,24 +20,24 @@ from uuid import uuid4
 from openenv.core.env_server.interfaces import Environment
 
 try:
-    from ..ground_truth import HSN_SLAB_TABLE, get_slab
+    from ..ground_truth import get_slab, HSN_SLAB_TABLE
     from ..models import (
         InvoiceGroundTruth,
         ReconcileAction,
         ReconcileObservation,
         ReconcileState,
     )
-    from ..rewards import MAX_STEPS, QUERY_VERBS, composite_reward
+    from ..rewards import composite_reward, MAX_STEPS, QUERY_VERBS
     from ..seed_generator import generate_episode
 except ImportError:
-    from ground_truth import HSN_SLAB_TABLE, get_slab
+    from ground_truth import get_slab, HSN_SLAB_TABLE
     from models import (
         InvoiceGroundTruth,
         ReconcileAction,
         ReconcileObservation,
         ReconcileState,
     )
-    from rewards import MAX_STEPS, QUERY_VERBS, composite_reward
+    from rewards import composite_reward, MAX_STEPS, QUERY_VERBS
     from seed_generator import generate_episode
 
 
@@ -52,6 +52,7 @@ class ReconcileGST2BEnvironment(Environment):
     """
 
     SUPPORTS_CONCURRENT_SESSIONS: bool = False
+    VALID_MODES = ("warmup", "hardened")
 
     def __init__(self) -> None:
         self._state: ReconcileState = ReconcileState(
@@ -59,6 +60,7 @@ class ReconcileGST2BEnvironment(Environment):
         )
         self._trajectory: List[ReconcileAction] = []
         self._episode: Dict[str, Any] = {}
+        self._mode: str = "warmup"
 
     # ---------- Gym interface ----------
 
@@ -66,8 +68,12 @@ class ReconcileGST2BEnvironment(Environment):
         self,
         seed: Optional[int] = None,
         episode_id: Optional[str] = None,
+        mode: str = "warmup",
         **kwargs: Any,
     ) -> ReconcileObservation:
+        if mode not in self.VALID_MODES:
+            raise ValueError(f"mode must be one of {self.VALID_MODES}, got {mode!r}")
+        self._mode = mode
         ep = generate_episode(seed if seed is not None else 0)
         self._episode = ep
         combined_invoices = list(ep["purchase_register"]) + [
@@ -141,6 +147,13 @@ class ReconcileGST2BEnvironment(Environment):
             done = True
             reward = breakdown["total"]
             termination = "step_budget_exhausted"
+        elif self._mode == "hardened" and self._rule_36_4_violated_live():
+            breakdown = composite_reward(self._state, self._trajectory)
+            self._state.reward_breakdown = breakdown
+            self._state.true_rule_36_4_violated = True
+            done = True
+            reward = breakdown["total"]
+            termination = "rule_36_4_violation_hardened"
 
         obs = ReconcileObservation(
             user_request=self._episode.get("user_request", ""),
@@ -243,6 +256,62 @@ class ReconcileGST2BEnvironment(Environment):
         return {"error": "not_in_2b", "invoice_id": invoice_id}
 
     # ---------- Helpers ----------
+
+    def _rule_36_4_violated_live(self) -> bool:
+        """Per-supplier claim > 2B cap, computed on trajectory so far."""
+        from collections import defaultdict
+
+        per_supplier_claim: Dict[str, float] = defaultdict(float)
+        partial_deltas: Dict[str, float] = {}
+        labels: Dict[str, str] = {}
+        for act in self._trajectory:
+            p = act.payload or {}
+            if act.verb == "mark_partial_match":
+                partial_deltas[p.get("invoice_id", "")] = float(p.get("delta_inr", 0.0))
+            if act.verb in (
+                "mark_matched",
+                "mark_mismatched",
+                "mark_only_in_books",
+                "mark_only_in_2b",
+                "mark_partial_match",
+            ):
+                iid = p.get("invoice_id")
+                if iid is not None:
+                    labels[iid] = {
+                        "mark_matched": "matched",
+                        "mark_mismatched": "mismatched",
+                        "mark_only_in_books": "only_in_books",
+                        "mark_only_in_2b": "only_in_2b",
+                        "mark_partial_match": "partial",
+                    }[act.verb]
+        inv_tax = {
+            inv["invoice_id"]: float(inv.get("tax_inr", 0.0))
+            for inv in self._state.gt_purchase_register
+        }
+        for inv in self._state.gt_gstr_2b:
+            inv_tax.setdefault(inv["invoice_id"], float(inv.get("tax_inr", 0.0)))
+        supplier = {
+            inv["invoice_id"]: inv.get("gstin", "")
+            for inv in self._state.gt_purchase_register
+        }
+        for inv in self._state.gt_gstr_2b:
+            supplier.setdefault(inv["invoice_id"], inv.get("gstin", ""))
+        for inv_id, lab in labels.items():
+            tax = inv_tax.get(inv_id, 0.0)
+            if lab in ("matched", "only_in_2b"):
+                per_supplier_claim[supplier.get(inv_id, "")] += tax
+            elif lab == "partial":
+                per_supplier_claim[supplier.get(inv_id, "")] += max(
+                    0.0, tax - partial_deltas.get(inv_id, 0.0)
+                )
+        per_supplier_cap: Dict[str, float] = defaultdict(float)
+        for inv in self._state.gt_gstr_2b:
+            per_supplier_cap[inv["gstin"]] += float(inv.get("tax_inr", 0.0))
+        _TOL = 1e-6
+        for s, claim in per_supplier_claim.items():
+            if claim > per_supplier_cap.get(s, 0.0) + _TOL:
+                return True
+        return False
 
     def _count_unlabeled_invoices(self) -> int:
         labeled = set()

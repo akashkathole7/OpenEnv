@@ -74,3 +74,69 @@ def test_schema_reports_all_16_verbs():
     obs = env.step(ReconcileAction(verb="get_schema", payload={}))
     verbs = obs.last_tool_result["schema"]["verbs"]
     assert len(verbs) == 16
+
+
+def test_hardened_mode_terminates_on_rule_36_4_violation():
+    """In hardened mode, exceeding a supplier's 2B cap terminates mid-episode.
+
+    Strategy: find a supplier whose books-side tax exceeds their 2B-side tax
+    (present when the generator planted a supplier_late_filing against that
+    supplier — books has the invoice, 2B doesn't). Mark the books-only invoice
+    as ``matched`` (an overclaim). Hardened mode must terminate with
+    R3 clamped to 0.01 and termination_reason="rule_36_4_violation_hardened".
+    """
+    env = ReconcileGST2BEnvironment()
+    env.reset(seed=3, mode="hardened")
+
+    books_tax_by_supplier: dict[str, float] = {}
+    twob_tax_by_supplier: dict[str, float] = {}
+    for inv in env.state.gt_purchase_register:
+        books_tax_by_supplier[inv["gstin"]] = books_tax_by_supplier.get(
+            inv["gstin"], 0.0
+        ) + float(inv["tax_inr"])
+    for inv in env.state.gt_gstr_2b:
+        twob_tax_by_supplier[inv["gstin"]] = twob_tax_by_supplier.get(
+            inv["gstin"], 0.0
+        ) + float(inv["tax_inr"])
+
+    violating_supplier = next(
+        s
+        for s, bt in books_tax_by_supplier.items()
+        if bt > twob_tax_by_supplier.get(s, 0.0) + 1e-6
+    )
+    books_invs = [
+        inv
+        for inv in env.state.gt_purchase_register
+        if inv["gstin"] == violating_supplier
+    ]
+
+    env.step(ReconcileAction(verb="get_schema", payload={}))
+    obs = None
+    for inv in books_invs:
+        obs = env.step(
+            ReconcileAction(
+                verb="mark_matched", payload={"invoice_id": inv["invoice_id"]}
+            )
+        )
+        if obs.done:
+            break
+
+    assert obs is not None
+    assert obs.done is True
+    assert obs.metadata["termination_reason"] == "rule_36_4_violation_hardened"
+    assert env.state.true_rule_36_4_violated is True
+    assert env.state.reward_breakdown["R3"] == 0.01
+
+
+def test_warmup_mode_does_not_terminate_on_rule_36_4_violation():
+    """Warmup mode tolerates per-supplier overclaim mid-episode."""
+    env = ReconcileGST2BEnvironment()
+    env.reset(seed=3, mode="warmup")
+    env.step(ReconcileAction(verb="get_schema", payload={}))
+    for inv in env.state.gt_purchase_register[:5]:
+        obs = env.step(
+            ReconcileAction(
+                verb="mark_matched", payload={"invoice_id": inv["invoice_id"]}
+            )
+        )
+        assert obs.metadata["termination_reason"] != "rule_36_4_violation_hardened"
