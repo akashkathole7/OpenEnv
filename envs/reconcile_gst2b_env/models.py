@@ -13,7 +13,7 @@ for server-only ground truth that must stay hidden from the agent.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Literal
+from typing import Any, Dict, List, Literal, Optional
 
 from openenv.core.env_server.types import Action, Observation, State
 from pydantic import BaseModel, Field
@@ -52,6 +52,15 @@ class InvoiceGroundTruth(BaseModel):
     ]
     true_itc_eligible_inr: float
     true_in_circular_ring: bool
+    true_mismatch_type: Optional[
+        Literal[
+            "gstin_typo",
+            "invoice_number_prefix_drift",
+            "tax_slab_off_by_one",
+            "supplier_late_filing",
+            "amendment_after_2b_freeze",
+        ]
+    ] = None
 
 
 class ReconcileAction(Action):
