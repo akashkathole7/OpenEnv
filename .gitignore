@@ -150,6 +150,7 @@ data/*
 !data/ablation_results.json
 !data/hero_baseline.json
 !data/training_curves.json
+!data/baseline_metrics_real.json
 !data/transcripts/
 data/transcripts/*
 !data/transcripts/raw/
