@@ -32,7 +32,10 @@ import random
 import string
 from typing import Any, Dict, List, Optional, Tuple
 
-from .ground_truth import HSN_SLAB_TABLE, gstin_checksum, validate_gstin
+try:
+    from .ground_truth import HSN_SLAB_TABLE, gstin_checksum, validate_gstin
+except ImportError:
+    from ground_truth import HSN_SLAB_TABLE, gstin_checksum, validate_gstin
 
 
 TRAIN_SEEDS = set(range(0, 500))

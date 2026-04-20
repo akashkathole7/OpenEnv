@@ -35,7 +35,10 @@ import random as _random_stdlib
 from collections import defaultdict
 from typing import Any, Dict, Iterable, List, Tuple
 
-from .ground_truth import clamp
+try:
+    from .ground_truth import clamp
+except ImportError:
+    from ground_truth import clamp  # Docker: PYTHONPATH=/app/env loads this top-level
 
 
 WEIGHTS: Dict[str, float] = {"R1": 0.40, "R2": 0.25, "R3": 0.25, "R4": 0.10}

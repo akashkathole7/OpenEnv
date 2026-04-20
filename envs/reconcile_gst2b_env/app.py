@@ -26,7 +26,10 @@ import gradio as gr
 import networkx as nx
 import plotly.graph_objects as go
 
-from .seed_generator import HERO_SEEDS, generate_episode
+try:
+    from .seed_generator import HERO_SEEDS, generate_episode
+except ImportError:
+    from seed_generator import HERO_SEEDS, generate_episode
 
 
 # -------------------- Tab 3: Circular-Ring Viewer --------------------

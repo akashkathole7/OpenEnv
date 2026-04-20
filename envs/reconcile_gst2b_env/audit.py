@@ -20,7 +20,10 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, List
 
-from .seed_generator import generate_episode
+try:
+    from .seed_generator import generate_episode
+except ImportError:
+    from seed_generator import generate_episode
 
 
 _HEAD = """<!doctype html>
