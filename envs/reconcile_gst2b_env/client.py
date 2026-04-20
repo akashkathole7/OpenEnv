@@ -4,94 +4,64 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-"""Reconcile Gst2b Env Environment Client."""
+"""HTTP/WebSocket client for the reconcile_gst2b_env environment."""
 
-from typing import Dict
+from __future__ import annotations
+
+from typing import Any, Dict
 
 from openenv.core import EnvClient
 from openenv.core.client_types import StepResult
-from openenv.core.env_server.types import State
 
-from .models import ReconcileAction, ReconcileObservation
+from .models import ReconcileAction, ReconcileObservation, ReconcileState
 
 
-class ReconcileGST2BEnv(EnvClient[ReconcileAction, ReconcileObservation, State]):
-    """
-    Client for the Reconcile Gst2b Env Environment.
-
-    This client maintains a persistent WebSocket connection to the environment server,
-    enabling efficient multi-step interactions with lower latency.
-    Each client instance has its own dedicated environment session on the server.
+class ReconcileGST2BEnv(
+    EnvClient[ReconcileAction, ReconcileObservation, ReconcileState]
+):
+    """Client for the GST Input-Tax-Credit reconciliation environment.
 
     Example:
-        >>> # Connect to a running server
-        >>> with ReconcileGST2BEnv(base_url="http://localhost:8000") as client:
-        ...     result = client.reset()
-        ...     print(result.observation.echoed_message)
-        ...
-        ...     result = client.step(ReconcileAction(message="Hello!"))
-        ...     print(result.observation.echoed_message)
-
-    Example with Docker:
-        >>> # Automatically start container and connect
-        >>> client = ReconcileGST2BEnv.from_docker_image("reconcile_gst2b_env-env:latest")
-        >>> try:
-        ...     result = client.reset()
-        ...     result = client.step(ReconcileAction(message="Test"))
-        ... finally:
-        ...     client.close()
+        >>> with ReconcileGST2BEnv(base_url="http://localhost:8000") as env:
+        ...     obs = env.reset(seed=0).observation
+        ...     obs = env.step(ReconcileAction(verb="get_schema", payload={})).observation
+        ...     obs = env.step(ReconcileAction(verb="submit", payload={})).observation
     """
 
-    def _step_payload(self, action: ReconcileAction) -> Dict:
-        """
-        Convert ReconcileAction to JSON payload for step message.
+    def _step_payload(self, action: ReconcileAction) -> Dict[str, Any]:
+        return {"verb": action.verb, "payload": action.payload}
 
-        Args:
-            action: ReconcileAction instance
-
-        Returns:
-            Dictionary representation suitable for JSON encoding
-        """
-        return {
-            "message": action.message,
-        }
-
-    def _parse_result(self, payload: Dict) -> StepResult[ReconcileObservation]:
-        """
-        Parse server response into StepResult[ReconcileObservation].
-
-        Args:
-            payload: JSON response data from server
-
-        Returns:
-            StepResult with ReconcileObservation
-        """
-        obs_data = payload.get("observation", {})
+    def _parse_result(
+        self, payload: Dict[str, Any]
+    ) -> StepResult[ReconcileObservation]:
+        obs_data = payload.get("observation", {}) or {}
         observation = ReconcileObservation(
-            echoed_message=obs_data.get("echoed_message", ""),
-            message_length=obs_data.get("message_length", 0),
-            done=payload.get("done", False),
+            user_request=obs_data.get("user_request", ""),
+            last_tool_result=obs_data.get("last_tool_result", {}) or {},
+            step_budget=int(obs_data.get("step_budget", 0)),
+            invoices_remaining_count=int(obs_data.get("invoices_remaining_count", 0)),
             reward=payload.get("reward"),
-            metadata=obs_data.get("metadata", {}),
+            done=bool(payload.get("done", False)),
+            metadata=obs_data.get("metadata", {}) or {},
         )
-
         return StepResult(
             observation=observation,
             reward=payload.get("reward"),
-            done=payload.get("done", False),
+            done=bool(payload.get("done", False)),
         )
 
-    def _parse_state(self, payload: Dict) -> State:
-        """
-        Parse server response into State object.
-
-        Args:
-            payload: JSON response from state request
-
-        Returns:
-            State object with episode_id and step_count
-        """
-        return State(
+    def _parse_state(self, payload: Dict[str, Any]) -> ReconcileState:
+        return ReconcileState(
             episode_id=payload.get("episode_id"),
-            step_count=payload.get("step_count", 0),
+            step_count=int(payload.get("step_count", 0)),
+            env_version=payload.get("env_version", "gst2b-v1.0"),
+            env_schema=payload.get("env_schema", {}) or {},
+            invoices=payload.get("invoices", []) or [],
+            reward_breakdown=payload.get("reward_breakdown", {}) or {},
+            gt_invoices=payload.get("gt_invoices", []) or [],
+            gt_purchase_register=payload.get("gt_purchase_register", []) or [],
+            gt_gstr_2b=payload.get("gt_gstr_2b", []) or [],
+            gt_company_gstin=payload.get("gt_company_gstin", ""),
+            true_itc_claimed_inr=float(payload.get("true_itc_claimed_inr", 0.0)),
+            true_rule_36_4_violated=bool(payload.get("true_rule_36_4_violated", False)),
         )

@@ -43,8 +43,14 @@ Verb = Literal[
 
 
 class InvoiceGroundTruth(BaseModel):
-    """Hidden ground truth for a single invoice. Server-only."""
+    """Hidden ground truth for a single invoice. Server-only.
 
+    ``invoice_id`` is a non-``true_*`` key used by the reward scorer to join
+    ground-truth rows against the agent's per-invoice labels; it does not
+    count toward the "5 true_* fields" constraint.
+    """
+
+    invoice_id: str
     true_gstin_valid: bool
     true_hsn_slab: Literal[0, 0.25, 3, 5, 12, 18, 28, 40]
     true_label: Literal[
@@ -96,5 +102,8 @@ class ReconcileState(State):
     reward_breakdown: Dict[str, float] = Field(default_factory=dict)
 
     gt_invoices: List[InvoiceGroundTruth] = Field(default_factory=list)
+    gt_purchase_register: List[Dict[str, Any]] = Field(default_factory=list)
+    gt_gstr_2b: List[Dict[str, Any]] = Field(default_factory=list)
+    gt_company_gstin: str = ""
     true_itc_claimed_inr: float = 0.0
     true_rule_36_4_violated: bool = False
