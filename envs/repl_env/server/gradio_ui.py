@@ -38,7 +38,8 @@ def _format_repl_response(data: Dict[str, Any]) -> str:
     available_variables = observation.get("available_variables") or []
     if available_variables:
         sections.append(
-            "**Available Variables:** " + ", ".join(f"`{name}`" for name in available_variables)
+            "**Available Variables:** "
+            + ", ".join(f"`{name}`" for name in available_variables)
         )
 
     if result.get("locals_snapshot"):
