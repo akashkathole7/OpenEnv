@@ -60,8 +60,15 @@ from envs.reconcile_gst2b_env.server.reconcile_gst2b_environment import (  # noq
 
 MODEL_NAME = "Qwen/Qwen3-0.6B"
 LORA_RANK = 16
-LORA_TARGETS = ["q_proj", "v_proj"]
-LEARNING_RATE = 5e-6
+# q/v only covers ~half of attention's learnable surface. Adding k/o lets
+# the adapter shift key projections (affects what the model attends to)
+# and output projections (affects how attended info flows forward),
+# roughly doubling the representational surface at small VRAM cost.
+LORA_TARGETS = ["q_proj", "k_proj", "v_proj", "o_proj"]
+# 5e-6 × 150 steps barely perturbs a rank-16 LoRA on Qwen3-0.6B; 1e-5 is a
+# conservative 2× bump paired with the early-stop safety net (if totals
+# collapse > 0.10 below step-0, training halts with exit code 2).
+LEARNING_RATE = 1e-5
 TOTAL_STEPS = 150
 EVAL_EVERY = 25
 CHECKPOINT_EVERY = 50
@@ -391,7 +398,7 @@ def _parse_action_robust(gen: str) -> Optional[ReconcileAction]:
                 return ReconcileAction(verb=name, payload=args_)
         except Exception:
             pass
-    # 3. Bare single JSON object: {"verb": "...", "payload": {...}}
+    # 3. Bare single JSON object via regex: {"verb": "...", "payload": {...}}
     m = _SINGLE_OBJECT_RE.search(gen)
     if m:
         try:
@@ -402,6 +409,36 @@ def _parse_action_robust(gen: str) -> Optional[ReconcileAction]:
                 )
         except Exception:
             pass
+    # 4. Balanced-brace scan — strictly looser than fallback 3. Walks every
+    # ``{`` in the generation, tracks brace depth, and JSON-parses each
+    # balanced object whose literal text contains ``"verb"``. Catches cases
+    # where the regex fails (nested objects with quoted braces, payloads
+    # longer than one level, escape sequences), at worst-case O(n²) on
+    # short generations — fine for ≤256-token eval outputs.
+    for i, ch in enumerate(gen):
+        if ch != "{":
+            continue
+        depth = 0
+        for j in range(i, len(gen)):
+            if gen[j] == "{":
+                depth += 1
+            elif gen[j] == "}":
+                depth -= 1
+                if depth == 0:
+                    candidate = gen[i : j + 1]
+                    if '"verb"' in candidate:
+                        try:
+                            raw = json.loads(candidate)
+                            if isinstance(raw, dict) and isinstance(
+                                raw.get("verb"), str
+                            ):
+                                return ReconcileAction(
+                                    verb=raw["verb"],
+                                    payload=raw.get("payload", {}) or {},
+                                )
+                        except Exception:
+                            pass
+                    break
     return None
 
 
@@ -514,6 +551,21 @@ def _build_eval_callback(
                 f"R3={means['R3']:.3f} R4={means['R4']:.3f} total={means['total']:.3f}",
                 flush=True,
             )
+            # Collapse safety net — halt if eval regresses > 0.10 below the
+            # step-0 baseline. Onsite demo failure has no retry; better to
+            # exit(2) with the 30-step backup intact than to push through and
+            # ship a collapsed curve. Step-0 is always index 0 of curves.
+            if len(curves["total"]) >= 2:
+                step0 = curves["total"][0]
+                latest = curves["total"][-1]
+                if latest < step0 - 0.10:
+                    print(
+                        f"\n[FATAL] training collapsed: eval total {latest:.3f} < "
+                        f"step-0 {step0:.3f} − 0.10. "
+                        f"30-step backup preserved.",
+                        flush=True,
+                    )
+                    sys.exit(2)
 
         def on_train_begin(self, args, state, control, **kwargs):
             if self._did_step_zero:
@@ -524,6 +576,25 @@ def _build_eval_callback(
                 self._run_and_log(0, model)
 
         def on_step_end(self, args, state, control, **kwargs):
+            # Step-1 gradient-flow sanity: if grad_norm is 0 at the first
+            # logged step, gradients aren't reaching the LoRA params at all
+            # (wrong target_modules, frozen adapter, etc.). Halt immediately
+            # — 150 steps with zero gradient is a wasted Kaggle slot.
+            # logging_steps=1 guarantees step-1 is in state.log_history.
+            if state.global_step == 1:
+                grad_entries = [e for e in state.log_history if "grad_norm" in e]
+                if grad_entries:
+                    gn = float(grad_entries[-1]["grad_norm"])
+                    print(f"[grad sanity @ step 1] grad_norm={gn:.6f}", flush=True)
+                    if gn == 0.0:
+                        print(
+                            "\n[FATAL] grad_norm=0 at step 1 — gradients not "
+                            "flowing into LoRA params. Check peft_config and "
+                            "target_modules match the model's attention module "
+                            "names.",
+                            flush=True,
+                        )
+                        sys.exit(4)
             if state.global_step == 0 or state.global_step % EVAL_EVERY != 0:
                 return
             model = kwargs.get("model")
@@ -577,6 +648,15 @@ def main() -> int:
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     (args.output_dir / "checkpoints").mkdir(parents=True, exist_ok=True)
+
+    # If a prior 30-step run produced curves.json, preserve it under a
+    # descriptive name before the new run overwrites. Onsite this is what
+    # we fall back to if the 150-step run collapses or OOMs mid-training.
+    existing_curves = args.output_dir / "curves.json"
+    if existing_curves.exists():
+        backup = args.output_dir / "curves_30step_backup.json"
+        existing_curves.rename(backup)
+        print(f"backed up prior curves.json → {backup}", flush=True)
 
     # Write an empty curves.json stub immediately so downstream plotting never
     # hits FileNotFoundError if the process dies mid-training.
@@ -690,6 +770,20 @@ def main() -> int:
         environment_factory=ReconcileToolEnv,
         peft_config=lora_cfg,
         callbacks=[eval_callback],
+    )
+
+    # Trainable-param visibility — confirms the LoRA expansion (q/k/v/o) is
+    # actually attached. A zero or suspiciously-small count means target
+    # module names didn't match the model's actual attention layers, which
+    # the step-1 grad_norm check would catch downstream but we want to see
+    # earlier in the log so the operator can bail before wasting wall-time.
+    n_trainable = sum(p.numel() for p in trainer.model.parameters() if p.requires_grad)
+    n_total = sum(p.numel() for p in trainer.model.parameters())
+    pct = 100.0 * n_trainable / n_total if n_total else 0.0
+    print(
+        f"trainable params: {n_trainable:,} / {n_total:,} ({pct:.3f}%) "
+        f"[LoRA rank {LORA_RANK}, targets {LORA_TARGETS}, lr {LEARNING_RATE}]",
+        flush=True,
     )
 
     print(f"\n=== training: {args.total_steps} steps ===", flush=True)
