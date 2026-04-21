@@ -42,7 +42,11 @@ zero_itc is a deliberate R3 blind spot — claiming 0 trivially satisfies the ca
 
 ## 6. Training dry-run — honest numbers
 
-I ran a 20-step dry-run on a free Colab T4, via the committed scaffold. The Qwen2.5-3B download + `pip install -e .` + training + checkpoint save completed in **176 seconds**. The scaffold uses a CPU heuristic for periodic eval (not the model) so per-component curves are **flat** across steps 0/5/10/15/20: R1=0.092, R2=0.402, R3=0.353, R4=0.806, total=0.306. That flatness is intentional — the GRPO weight-update step is a placeholder pending the real training run. What the dry-run proves is that the plumbing works end-to-end, including the `PeftModel.from_pretrained` reload at the end. Real training swaps in before the pitch demo.
+The 20-step GRPO dry-run on a free Colab T4 completed in **176 seconds** and reloaded a LoRA checkpoint cleanly. The curves are flat by design — the GRPO step is a placeholder, the scaffold uses a CPU heuristic at eval. That's the training side; it tells me the plumbing works but not how the model behaves.
+
+The more useful number is the real Qwen2.5-3B-Instruct baseline on the same environment: 30 heldout seeds × 2 conditions × 3 samples = 180 rollouts, Kaggle T4, `data/baseline_metrics_real.json`. Raw with a minimal "you are an agent" system prompt scored total_mean ≈ **−1.00** with **100% catastrophic_corruption_rate**: every rollout submitted without a prior query verb and took the structural −1.0. Prompted with a 106-token system prompt naming the 16 verbs, 5 labels, and reward structure scored total_mean **0.179** with **12.22% catastrophic_corruption_rate**. Delta **1.18**, 95% bootstrap CI [1.09, 1.27], excludes zero.
+
+**Honesty flag**: the 1.18 headline is partly driven by raw hitting the −1.0 floor. The per-component breakdown is the actual signal. Prompted lands R3=0.87 (Rule 36(4) compliance — the model queries before submit) and R4=0.79 (step efficiency — it doesn't burn the budget), but R1 and R2 stay at the 0.01 floor. Prompting alone fixes surface behavior. The actual reconciliation reasoning — what label to assign, what ITC to claim — has to come from GRPO updates. That R1=R2=0.01 gap is the training target, not a bug in the baseline. Real training swaps in before the pitch demo.
 
 ## 7. Known limitations
 

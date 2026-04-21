@@ -78,15 +78,18 @@ Every attack scores under 0.45. Measured on seed 0:
 
 T4 dry-run (Colab, 20 steps, Qwen2.5-3B-Instruct + LoRA rank 32 via Unsloth) completed in **176 s** and saved a loadable LoRA adapter. Scaffold path runs the same policy across all eval points — curves are flat by design; the real GRPO step is a placeholder pending the pitch-demo training run. See `notebooks/dryrun_t4.ipynb`.
 
-Baseline on 30 heldout seeds (mock proxies, real Qwen runs on Colab):
+Real baseline on 30 heldout seeds × 3 samples × 2 conditions = **180 rollouts** of Qwen2.5-3B-Instruct on a Kaggle T4 (`data/baseline_metrics_real.json`):
 
-| Condition | total_mean | catastrophic_corruption | CI95 |
-|-----------|-----------:|------------------------:|------|
-| raw | −0.1302 | 32.2% | [−0.255, −0.010] |
-| prompted | 0.2673 | 0.0% | [0.247, 0.289] |
-| placeholder | 0.2042 | 8.9% | [0.117, 0.282] |
+| Condition | total_mean | catastrophic_corruption |
+|-----------|-----------:|------------------------:|
+| raw (minimal "you are an agent" system) | **−1.00** | 100.0% |
+| prompted (106-token system prompt: 16 verbs, 5 labels, reward structure) | **0.179** | 12.22% |
 
-**prompted − raw = 0.397** (done-gate ≥ 0.05). Ablation: dropping R2 or R4 shifts total mean by ≥0.05 (done-gate ≥ 2 components).
+**prompted − raw = 1.18** (95% bootstrap CI [1.09, 1.27], excludes zero).
+
+Prompted component means: R1 ≈ 0.01, R2 ≈ 0.01, R3 ≈ 0.87, R4 ≈ 0.79. Prompting lifts behavior from 100% catastrophic corruption to 12%; R3/R4 rise to 0.87/0.79, but R1/R2 stay at floor — that's the training target.
+
+Honesty flag: raw hitting 100% catastrophic corruption (every rollout submits without a prior query and takes the structural −1.0) inflates the headline delta. Read the per-component breakdown as the real signal: prompted learns the surface protocol for free, but the reconciliation reasoning has to come from training. Ablation (mock-baseline substrate): dropping R2 or R4 shifts total mean by ≥0.05 (≥2 components).
 
 ## Differentiation
 

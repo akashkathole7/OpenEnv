@@ -20,11 +20,12 @@ MEMTRACK scores ontology-drift over turns; reconcile_gst2b_env scores content-dr
 (books vs 2B) against a regulator-published schema. Reward is arithmetic over a
 terminal label + INR delta, not trajectory-level consistency.
 
-## Probe 4: How do you know the 0.397 prompted−raw delta survives real Qwen?
+## Probe 4: How do you know the prompted−raw delta holds?
 
-You don't yet. `data/baseline_metrics_*.json` is flagged `"execution_mode": "mock"`;
-NOTES.md logs "real Qwen runs happen in Colab before the pitch demo." Dry-run
-loaded real Qwen2.5-3B in 176s as a plumbing test (notebooks/dryrun_t4.ipynb).
+Measured on Kaggle T4, 180 rollouts of Qwen2.5-3B-Instruct: delta **1.18** with
+95% bootstrap CI [1.09, 1.27] excluding zero (`data/baseline_metrics_real.json`).
+Raw's 100% catastrophic_corruption is the structural −1.0 penalty for submitting
+without querying — an honest env failure mode, not a hack.
 
 ## Probe 5: Why are hero seeds still tier_a/b/c not easy/medium/hard?
 
@@ -119,3 +120,10 @@ not a principled one.
 No — scaffold eval uses the heuristic policy at every step (`evaluate_heuristic`
 in `training.py:175`). The real GRPO step is a documented placeholder; Cell 4 of
 `notebooks/dryrun_t4.ipynb` carries "flat curves are expected" as the caption.
+
+## Probe 21: Isn't the 1.18 delta inflated by raw hitting the −1.0 structural floor?
+
+Partly — raw scores ≈ −1.00 because 100% of rollouts submit before any query and
+take the −1.0 penalty. But prompted's per-component means tell the real story:
+R3=0.87 (genuine Rule 36(4) compliance), R4=0.79 (real step efficiency), not
+artifacts of raw's floor. R1=R2=0.01 are the genuine gaps training needs to close.
