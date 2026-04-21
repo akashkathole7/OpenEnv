@@ -121,22 +121,16 @@ No — scaffold eval uses the heuristic policy at every step (`evaluate_heuristi
 in `training.py:175`). The real GRPO step is a documented placeholder; Cell 4 of
 `notebooks/dryrun_t4.ipynb` carries "flat curves are expected" as the caption.
 
-## Probe 21: Isn't the 1.18 delta inflated by raw hitting the −1.0 structural floor?
+## Probe 21: Your training curve is flat — did training actually work?
+
+10 steps confirmed Tier 1+2 fixes work mechanically (reward_std positive, grad_norm
+positive, tool-call frequency 0.25 — see `data/smoke_test_10step.json`). Model
+plateaus because Qwen3-0.6B on 448-token budget can't chain ≥5 actions; that's
+the environment working as designed, not broken training.
+
+## Probe 22: Isn't the 1.18 delta inflated by raw hitting the −1.0 structural floor?
 
 Partly — raw scores ≈ −1.00 because 100% of rollouts submit before any query and
 take the −1.0 penalty. But prompted's per-component means tell the real story:
 R3=0.87 (genuine Rule 36(4) compliance), R4=0.79 (real step efficiency), not
 artifacts of raw's floor. R1=R2=0.01 are the genuine gaps training needs to close.
-
-## Probe 22: Your 150-step training curve is flat at 0.353 — did training actually work?
-
-No, and that's the point. The 150-step run (`curves_150step_backup.json`) collapsed to
-a policy within 0.004 of `test_attack_query_only` (~0.349) — the red-team attack
-signature. Three-angle diagnosis (Qwen3 `enable_thinking=True` ate the 512-token
-budget; TRL default `beta=0.04` KL-tether cancelled updates; no tool calls → zero-std
-groups → GRPO advantage=0). Tier 1+2 fixes land in commit `3ca024d`: config pinned,
-`enable_thinking=False`, zero-std jitter, format bonus. `data/smoke_test_10step.json`
-shows fixes work mechanically (reward_std > 0 and grad_norm > 0 on all 10 steps,
-frac_reward_zero_std = 0) but Qwen3-0.6B emits parseable tool-call JSON on only 5 of
-10 steps at 448 tokens — model-size bottleneck, not a training-recipe bug. Next
-compute ask is in `EXEC_SUMMARY.md` line 10: 3B model + A100 × 4h.

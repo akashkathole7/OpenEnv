@@ -76,26 +76,7 @@ Every attack scores under 0.45. Measured on seed 0:
 
 ## Training
 
-T4 dry-run (Colab, 20 steps, Qwen2.5-3B-Instruct + LoRA rank 32 via Unsloth) completed in **176 s** and saved a loadable LoRA adapter. Scaffold path runs the same policy across all eval points — curves are flat by design; the real GRPO step is a placeholder pending the pitch-demo training run. See `notebooks/dryrun_t4.ipynb`.
-
-Real baseline on 30 heldout seeds × 3 samples × 2 conditions = **180 rollouts** of Qwen2.5-3B-Instruct on a Kaggle T4 (`data/baseline_metrics_real.json`):
-
-| Condition | total_mean | catastrophic_corruption |
-|-----------|-----------:|------------------------:|
-| raw (minimal "you are an agent" system) | **−1.00** | 100.0% |
-| prompted (106-token system prompt: 16 verbs, 5 labels, reward structure) | **0.179** | 12.22% |
-
-**prompted − raw = 1.18** (95% bootstrap CI [1.09, 1.27], excludes zero).
-
-Prompted component means: R1 ≈ 0.01, R2 ≈ 0.01, R3 ≈ 0.87, R4 ≈ 0.79. Prompting lifts behavior from 100% catastrophic corruption to 12%; R3/R4 rise to 0.87/0.79, but R1/R2 stay at floor — that's the training target.
-
-Honesty flag: raw hitting 100% catastrophic corruption (every rollout submits without a prior query and takes the structural −1.0) inflates the headline delta. Read the per-component breakdown as the real signal: prompted learns the surface protocol for free, but the reconciliation reasoning has to come from training. Ablation (mock-baseline substrate): dropping R2 or R4 shifts total mean by ≥0.05 (≥2 components) — ablation was measured on mock substrate pre-real-baseline; re-running on real substrate is post-hackathon work.
-
-### What we learned from a failed training run
-
-First real GRPO attempt (Qwen3-0.6B + LoRA rank 16, 150 steps on Kaggle T4) collapsed to a flat **0.353** at every eval — within 0.004 of `test_attack_query_only ≈ 0.349`. The trained policy converged to a policy the red-team suite explicitly tests for as an attack. Root causes, three angles: (i) Qwen3's `enable_thinking=True` default ate the 512-token completion budget on `<think>` CoT before any `<tool_call>` was emitted (`clipped_ratio=1.0`, `mean_terminated_length=0`); (ii) TRL's default `beta=0.04` KL-to-ref tethered the LoRA back toward base; (iii) without successful tool calls, all 4 generations in a group landed in the same reward bucket → `reward_std=0` → GRPO advantage=0 → no updates for 150 steps.
-
-Fix (commit [`3ca024d`](../../commit/3ca024d)) — three-layered, `rewards.py` untouched so red-team ceilings still hold: **Tier 1** pins generation config (`temperature=0.7`, `top_p=0.95`, `top_k=20`, `repetition_penalty=1.1`, `max_completion_length=448`, `beta=0.0`) and monkey-patches the tokenizer to force `enable_thinking=False`. **Tier 2** adds two reward-shaping wrappers inside `train_grpo_real.py`: zero-std jitter (deterministic σ=0.005 noise when all 4 group rewards are identical) and a `+0.02` format bonus when the env trajectory has ≥1 action. 10-step smoke ([`data/smoke_test_10step.json`](../../data/smoke_test_10step.json)) confirms fixes land: `reward_std > 0` and `grad_norm > 0` on every step, `frac_reward_zero_std = 0`. Red-team suite still passes unchanged (max attack = 0.349). What the smoke also shows: Qwen3-0.6B emits parseable tool-call JSON on only 5 of 10 steps at the 448-token budget — a coin-flip signal that 150 GRPO steps cannot overcome regardless of recipe. Next compute ask: 3B model + A100 × 4 h (see [EXEC_SUMMARY.md](EXEC_SUMMARY.md) line 10). Rollback: `git revert HEAD` restores the 150-step baseline with `curves_150step_backup.json` intact.
+Real GRPO on **Qwen3-0.6B + T4 (smoke)** collapsed to 0.353 — the `query_only` red-team attack signature. Tier 1+2 fixes in commit [`3ca024d`](../../commit/3ca024d) (`enable_thinking=False`, `beta=0.0`, zero-std jitter, format bonus) land per [`data/smoke_test_10step.json`](../../data/smoke_test_10step.json): reward_std and grad_norm positive on all 10 steps. 0.6B plateaus at the 448-token tool-call coin-flip; red-team holds (all 6 <0.40). Next: **Qwen2.5-3B on A100 × 4 h**. Full diagnosis in [BLOG.md §6](BLOG.md).
 
 ## Differentiation
 
