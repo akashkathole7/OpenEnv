@@ -89,7 +89,7 @@ Real baseline on 30 heldout seeds × 3 samples × 2 conditions = **180 rollouts*
 
 Prompted component means: R1 ≈ 0.01, R2 ≈ 0.01, R3 ≈ 0.87, R4 ≈ 0.79. Prompting lifts behavior from 100% catastrophic corruption to 12%; R3/R4 rise to 0.87/0.79, but R1/R2 stay at floor — that's the training target.
 
-Honesty flag: raw hitting 100% catastrophic corruption (every rollout submits without a prior query and takes the structural −1.0) inflates the headline delta. Read the per-component breakdown as the real signal: prompted learns the surface protocol for free, but the reconciliation reasoning has to come from training. Ablation (mock-baseline substrate): dropping R2 or R4 shifts total mean by ≥0.05 (≥2 components).
+Honesty flag: raw hitting 100% catastrophic corruption (every rollout submits without a prior query and takes the structural −1.0) inflates the headline delta. Read the per-component breakdown as the real signal: prompted learns the surface protocol for free, but the reconciliation reasoning has to come from training. Ablation (mock-baseline substrate): dropping R2 or R4 shifts total mean by ≥0.05 (≥2 components) — ablation was measured on mock substrate pre-real-baseline; re-running on real substrate is post-hackathon work.
 
 ## Differentiation
 
@@ -115,7 +115,7 @@ What's distinct here:
 - **Cut: RCM, ISD, SEZ, import, composition dealer, e-invoicing, e-way bill.** WHY: scope fence — each adds regulation complexity without proportionally increasing RL difficulty. See `scope_card.md`.
 - **Cut: Real CBIC HSN table.** WHY: CBIC rate finder is offline from the sandbox; synthetic HSN-slab mapping is labeled as such at the table head. Not a tax-advice tool.
 - **Cut: Multi-GSTIN-per-company (consolidated returns).** WHY: v1 is one GSTIN per episode; multi-GSTIN is a natural v2.
-- **Cut: Real Qwen numbers for the pitch — using heuristic-mock proxies.** WHY: 5-day build with no local GPU. Colab scaffold validated; real run happens the night before the demo.
+- **Cut: Real GRPO training run.** WHY: 5-day build, free Colab, no time for a converged training run. Prompted baseline (1.18 delta over raw) shows the reward surface has gradient; real training is the April 25–26 onsite work.
 
 ## Judge tour
 

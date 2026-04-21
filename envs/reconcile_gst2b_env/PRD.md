@@ -34,7 +34,7 @@ Not the tax-payer. Two downstream users:
 |---|-----------|-------:|---------:|----------|
 | 1 | red-team attack ceiling | < 0.45 | max 0.349 | `tests/envs/test_reconcile_gst2b_reward_hacking.py` |
 | 2 | reward diversity stdev | ≥ 0.08 | 0.50 | `data/reward_dist.json` |
-| 3 | prompted − raw baseline delta | ≥ 0.05 | 0.397 (mock) | `data/baseline_metrics_*.json` |
+| 3 | prompted − raw baseline delta | ≥ 0.05 | 1.18, CI95 [1.09, 1.27] | `data/baseline_metrics_real.json` |
 | 4 | episode done-rate | ≥ 95% | 100% | `data/reward_dist.json` |
 
 ## Non-goals

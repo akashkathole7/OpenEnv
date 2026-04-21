@@ -1,4 +1,4 @@
-# QA rehearsal — 20 judge probes + rebuttals
+# QA rehearsal — 21 judge probes + rebuttals
 
 Two lines max per rebuttal. Cite a file or a number.
 
