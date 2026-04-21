@@ -151,6 +151,7 @@ data/*
 !data/hero_baseline.json
 !data/training_curves.json
 !data/baseline_metrics_real.json
+!data/smoke_test_10step.json
 !data/transcripts/
 data/transcripts/*
 !data/transcripts/raw/
