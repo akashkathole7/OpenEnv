@@ -1,0 +1,69 @@
+{
+  "meta": {
+    "purpose": "Partial training log from Qwen3-1.7B attempt (15 of 100 steps completed before manual stop). Establishes that the 0.6B tool-call-chaining plateau is NOT a size artifact — 1.7B collapsed harder: tools/call_frequency = 0 across every recorded step vs 0.6B's bimodal 0.25 rate. Rules out the 'bigger model emits more tool calls' hypothesis at this parameter range. Entropy ≈ 0.12 indicates the policy converged to a deterministic non-tool-call output mode, confident but wrong.",
+    "model": "Qwen/Qwen3-1.7B",
+    "hardware": "Kaggle T4 (cuda:0 only; device_map='auto' kept model on first GPU)",
+    "trl_version": "1.3.0.dev0",
+    "commit_under_test": "ad9cc12 (1.7B scale-up)",
+    "steps_completed": 15,
+    "steps_planned": 100,
+    "runtime_seconds_partial": 2586,
+    "killed_reason": "All 15 training steps showed completions/clipped_ratio=1.0, tools/call_frequency=0, entropy ≈ 0.12 — degenerate non-tool-call mode with no learning signal. Continuing to step 100 would burn ~3.7 h Kaggle quota for a curve already fully characterized by the first 15 steps."
+  },
+  "config": {
+    "lora_rank": 16,
+    "lora_targets": ["q_proj", "k_proj", "v_proj", "o_proj"],
+    "lora_trainable_params": 6422528,
+    "lora_total_params": 1726997504,
+    "lora_trainable_pct": 0.372,
+    "lr": 1e-05,
+    "num_generations": 4,
+    "max_completion_length": 448,
+    "per_device_batch": 1,
+    "grad_accum": 4,
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "top_k": 20,
+    "repetition_penalty": 1.1,
+    "beta_kl": 0.0,
+    "enable_thinking": false
+  },
+  "eval_step_0": {
+    "R1": 0.01,
+    "R2": 0.01,
+    "R3": 0.99,
+    "R4": 0.99,
+    "total": 0.353,
+    "note": "Identical to 0.6B step-0 eval — confirms LoRA identity-init is working. Eval uses forced get_schema turn 1 (R3 ceiling), masking the training-rollout collapse."
+  },
+  "train_steps": [
+    {"step": 1,  "loss": -3.576e-07, "grad_norm": 0.5389, "lr": 1e-05,    "reward_mean": 0.107,  "reward_std": 0.005237, "clipped_ratio": 1.0, "mean_terminated_length": 0, "tools_call_frequency": 0.0, "entropy": 0.123,  "step_time": 151.2},
+    {"step": 2,  "loss": 1.49e-08,   "grad_norm": 0.5534, "lr": 9.9e-06,  "reward_mean": 0.1105, "reward_std": 0.005252, "clipped_ratio": 1.0, "mean_terminated_length": 0, "tools_call_frequency": 0.0, "entropy": 0.1261, "step_time": 154.1},
+    {"step": 3,  "loss": -3.129e-07, "grad_norm": 0.5248, "lr": 9.8e-06,  "reward_mean": 0.1108, "reward_std": 0.006361, "clipped_ratio": 1.0, "mean_terminated_length": 0, "tools_call_frequency": 0.0, "entropy": 0.1274, "step_time": 154.0},
+    {"step": 4,  "loss": -3.427e-07, "grad_norm": 0.5224, "lr": 9.7e-06,  "reward_mean": 0.1098, "reward_std": 0.004941, "clipped_ratio": 1.0, "mean_terminated_length": 0, "tools_call_frequency": 0.0, "entropy": 0.1121, "step_time": 153.9},
+    {"step": 5,  "loss": 8.494e-07,  "grad_norm": 0.4862, "lr": 9.6e-06,  "reward_mean": 0.1085, "reward_std": 0.002072, "clipped_ratio": 1.0, "mean_terminated_length": 0, "tools_call_frequency": 0.0, "entropy": 0.1097, "step_time": 153.9},
+    {"step": 6,  "loss": 6.482e-07,  "grad_norm": 0.4922, "lr": 9.5e-06,  "reward_mean": 0.1031, "reward_std": 0.006134, "clipped_ratio": 1.0, "mean_terminated_length": 0, "tools_call_frequency": 0.0, "entropy": 0.122,  "step_time": 154.2},
+    {"step": 7,  "loss": 7.6e-07,    "grad_norm": 0.4716, "lr": 9.4e-06,  "reward_mean": 0.1055, "reward_std": 0.005055, "clipped_ratio": 1.0, "mean_terminated_length": 0, "tools_call_frequency": 0.0, "entropy": 0.133,  "step_time": 154.3},
+    {"step": 8,  "loss": 8.941e-07,  "grad_norm": 0.443,  "lr": 9.3e-06,  "reward_mean": 0.1076, "reward_std": 0.001952, "clipped_ratio": 1.0, "mean_terminated_length": 0, "tools_call_frequency": 0.0, "entropy": 0.1371, "step_time": 153.7},
+    {"step": 9,  "loss": -8.047e-07, "grad_norm": 0.4903, "lr": 9.2e-06,  "reward_mean": 0.1144, "reward_std": 0.004522, "clipped_ratio": 1.0, "mean_terminated_length": 0, "tools_call_frequency": 0.0, "entropy": 0.131,  "step_time": 154.2},
+    {"step": 10, "loss": 6.557e-07,  "grad_norm": 0.564,  "lr": 9.1e-06,  "reward_mean": 0.1106, "reward_std": 0.005664, "clipped_ratio": 1.0, "mean_terminated_length": 0, "tools_call_frequency": 0.0, "entropy": 0.113,  "step_time": 154.1},
+    {"step": 11, "loss": 0.0,        "grad_norm": 0.5548, "lr": 9e-06,    "reward_mean": 0.1051, "reward_std": 0.001361, "clipped_ratio": 1.0, "mean_terminated_length": 0, "tools_call_frequency": 0.0, "entropy": 0.1244, "step_time": 154.2},
+    {"step": 12, "loss": -7.451e-09, "grad_norm": 0.5428, "lr": 8.9e-06,  "reward_mean": 0.1075, "reward_std": 0.004883, "clipped_ratio": 1.0, "mean_terminated_length": 0, "tools_call_frequency": 0.0, "entropy": 0.1224, "step_time": 154.1},
+    {"step": 13, "loss": 4.61e-08,   "grad_norm": 0.4729, "lr": 8.8e-06,  "reward_mean": 0.1055, "reward_std": 0.003512, "clipped_ratio": 1.0, "mean_terminated_length": 0, "tools_call_frequency": 0.0, "entropy": 0.118,  "step_time": 153.9},
+    {"step": 14, "loss": 5.364e-07,  "grad_norm": 0.5364, "lr": 8.7e-06,  "reward_mean": 0.1066, "reward_std": 0.006938, "clipped_ratio": 1.0, "mean_terminated_length": 0, "tools_call_frequency": 0.0, "entropy": 0.1357, "step_time": 154.0},
+    {"step": 15, "loss": -2.086e-07, "grad_norm": 0.5032, "lr": 8.6e-06,  "reward_mean": 0.1066, "reward_std": 0.008036, "clipped_ratio": 1.0, "mean_terminated_length": 0, "tools_call_frequency": 0.0, "entropy": 0.1324, "step_time": 153.8}
+  ],
+  "summary": {
+    "all_clipped": {"steps_at_clipped_ratio_1_0": 15, "of_total_steps": 15},
+    "all_zero_tool_calls": {"steps_at_tools_call_freq_0": 15, "of_total_steps": 15},
+    "entropy_band": {"min": 0.1097, "max": 0.1371, "interpretation": "deterministic mode collapse — 3-4x lower than Qwen3-0.6B smoke entropy (0.44)"},
+    "reward_band": {"min": 0.1031, "max": 0.1144, "interpretation": "bouncing inside the 'no query, no labels' floor (0.108 base) plus Tier-2a σ=0.005 jitter. Real variance comes entirely from the jitter — training reward signal is zero."},
+    "comparison_to_0_6b_smoke": {
+      "0.6B_tools_call_freq": "bimodal 0.00 or 0.25 across 10 smoke steps; 5 of 10 productive",
+      "1.7B_tools_call_freq": "0.00 uniformly across 15 steps; 0 of 15 productive",
+      "0.6B_entropy": "≈ 0.44 (mean)",
+      "1.7B_entropy": "≈ 0.12 (mean) — collapsed"
+    },
+    "finding": "Qwen3-1.7B with the Tier 1+2 recipe converges to zero tool-call emission, strictly worse than 0.6B. Rules out the 'size → better tool-calling' hypothesis at this parameter range and under this training recipe. The multi-turn tool-chaining bottleneck is structural — it requires either (a) larger model with stronger pre-training tool-calling prior (Qwen3-4B next), (b) tool-SFT warm-start before GRPO, or (c) reward shaping that cold-rewards the first tool call."
+  }
+}

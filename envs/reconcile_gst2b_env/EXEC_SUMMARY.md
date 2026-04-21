@@ -7,4 +7,4 @@
 7. Differentiation: not Gaia2 / AppWorld / τ-bench (general tool-use) — tests adversarial domain reasoning against hidden ground truth.
 8. Status: environment shippable (41 tests green, `openenv validate --verbose` passes); real GRPO training is the remaining work.
 9. Sharpest self-attack: R1 and R2 stay at floor (~0.01) — prompting fixes surface behavior but not reconciliation reasoning. That's the compute ask on line 10: real training to lift R1/R2.
-10. Active run: 100-step GRPO on Qwen3-1.7B (Kaggle T4x2) — ~7-8 h wall time — to lift R1/R2 off the 0.01 floor that the 0.6B smoke plateaued at.
+10. Next attempt: 60-step GRPO on Qwen3-4B across Kaggle T4x2 pipeline-parallel (`device_map="auto"`, `num_generations=2`) — 1.7B converged to zero tool-call emission (`data/training_log_qwen3_1_7b_partial.json`), ruling out "size fixes it" at this range; 4B is the last free-tier attempt before the A100 + tool-SFT path.
