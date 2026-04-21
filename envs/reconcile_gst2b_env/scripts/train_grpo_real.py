@@ -521,6 +521,56 @@ def main() -> int:
         tokenizer = AutoTokenizer.from_pretrained(args.model)
         if tokenizer.pad_token_id is None:
             tokenizer.pad_token_id = tokenizer.eos_token_id
+
+        # --- Explicit response schema for Qwen2.5 tool-call parsing ---
+        # TRL's auto-inference (``add_response_schema(processing_class)``) fails
+        # on Qwen2.5-Instruct: the template renders tool calls as
+        #   <tool_call>{"name": "...", "arguments": {...}}</tool_call>
+        # but TRL doesn't match that shape without being told. Set it
+        # explicitly. Print the chat template's tool-call markers so the
+        # Kaggle logs surface a mismatch loudly if a future Qwen version
+        # drifts the syntax.
+        _chat_tmpl = tokenizer.chat_template or ""
+        if "<tool_call>" not in _chat_tmpl or "</tool_call>" not in _chat_tmpl:
+            print(
+                "[warn] tokenizer chat_template does NOT contain "
+                "<tool_call>/</tool_call>; markers may have drifted in this "
+                "Qwen version. Inspect the template before training:",
+                flush=True,
+            )
+            print(_chat_tmpl[:2000], flush=True)
+        else:
+            print(
+                "[response_schema] tokenizer chat_template contains "
+                "<tool_call>/</tool_call> markers — good.",
+                flush=True,
+            )
+
+        try:
+            from trl.chat_template_utils import ResponseSchema  # type: ignore
+
+            tokenizer.response_schema = ResponseSchema(
+                start_token="<tool_call>",
+                end_token="</tool_call>",
+            )
+            print(
+                "[response_schema] set via trl.chat_template_utils.ResponseSchema",
+                flush=True,
+            )
+        except ImportError:
+            # TRL main has moved module paths before; fall back to a plain dict
+            # with the same shape. GRPOTrainer reads start_token/end_token by
+            # attribute access OR by key on the dict.
+            tokenizer.response_schema = {
+                "start_token": "<tool_call>",
+                "end_token": "</tool_call>",
+            }
+            print(
+                "[response_schema] set via plain-dict fallback "
+                "(trl.chat_template_utils.ResponseSchema not importable)",
+                flush=True,
+            )
+
         model = AutoModelForCausalLM.from_pretrained(
             args.model, torch_dtype="auto", device_map="auto"
         )
