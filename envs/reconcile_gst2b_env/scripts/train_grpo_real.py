@@ -7,8 +7,11 @@
 
 """Real GRPO training for reconcile_gst2b_env via TRL's environment_factory.
 
-Kaggle T4(x2) budget: target 7–8 h for 100 steps on Qwen/Qwen3-1.7B
-with LoRA rank 16 — fits inside the 9 h Kaggle GPU session quota.
+Kaggle T4x2 budget: target ~4–5 h for 60 steps on Qwen/Qwen3-4B with
+LoRA rank 16, pipeline-parallel via device_map="auto" across 2× T4
+(16 GB each, 32 GB total). NUM_GENERATIONS=2 for VRAM and wall-time
+headroom — halves the GRPO group variance signal but fits comfortably
+inside the 9 h Kaggle session quota with ~4 h of buffer.
 
 Model swap: Qwen2.5-1.5B → Qwen3-0.6B because TRL main's
 ``add_response_schema`` only supports the Qwen3 family (see TRL issue
@@ -58,31 +61,38 @@ from envs.reconcile_gst2b_env.server.reconcile_gst2b_environment import (  # noq
 )
 
 
-# Scale-up from the 0.6B plateau. 1.7B gives ~3x the representational
-# capacity at ~2.5-3x the wall-clock per step. Fits on a single Kaggle
-# T4 (15 GB) with LoRA: base bf16 ≈ 3.4 GB + LoRA adapter + optimizer
-# state + KV cache ≈ 7-8 GB total, comfortable headroom. The second T4
-# in T4x2 sits idle with device_map="auto" — that's fine, we're not
-# using DDP here (added complexity not worth it for a 150-step run).
-MODEL_NAME = "Qwen/Qwen3-1.7B"
+# Third scale-up. 0.6B: bimodal 0.25 tool-call rate, plateau 0.353.
+# 1.7B: zero tool-call rate, degenerate collapse (entropy 0.12 vs 0.6B's
+# 0.44) — see data/training_log_qwen3_1_7b_partial.json. 4B is the next
+# step because Qwen3-4B ships with documented function-calling alignment
+# in post-training, which 0.6B/1.7B instruct variants lack. Last free-
+# tier attempt before pivoting to tool-SFT warm-start + A100.
+MODEL_NAME = "Qwen/Qwen3-4B"
 LORA_RANK = 16
 # q/v only covers ~half of attention's learnable surface. Adding k/o lets
 # the adapter shift key projections (affects what the model attends to)
 # and output projections (affects how attended info flows forward),
 # roughly doubling the representational surface at small VRAM cost.
 LORA_TARGETS = ["q_proj", "k_proj", "v_proj", "o_proj"]
-# 1e-5 survived the 0.6B smoke. Keep it for 1.7B — LoRA learning rate
-# tends to be relatively model-size-insensitive, and we have the
-# absolute 0.30 collapse early-stop to catch instability.
+# 1e-5 survived 0.6B smoke and 1.7B's 15-step partial. Keep it for 4B —
+# LoRA LR tends to be relatively model-size-insensitive, and the
+# absolute 0.30 collapse early-stop catches instability.
 LEARNING_RATE = 1e-5
-# 100 steps (down from 150) — 1.7B is ~2.5-3x slower per step than 0.6B.
-# At ~250-300 s/step on T4, 100 steps = ~7-8 h wall time, within Kaggle's
-# 9 h GPU session quota with margin. Eval every 25 gives 5 eval points
-# (0/25/50/75/100) which is enough to see a trajectory.
-TOTAL_STEPS = 100
-EVAL_EVERY = 25
-CHECKPOINT_EVERY = 50
-NUM_GENERATIONS = 4
+# 60 steps — 4B pipeline-parallel across 2× T4 incurs cross-GPU comms
+# overhead. Estimate ~240-300 s/step. 60 × 270 s ≈ 4.5 h wall time,
+# leaves >4 h of Kaggle's 9 h quota as margin if per-step time comes in
+# higher. Eval every 20 gives 4 eval points (0/20/40/60).
+TOTAL_STEPS = 60
+EVAL_EVERY = 20
+CHECKPOINT_EVERY = 30
+# num_generations=2 — halves KV-cache VRAM footprint during rollout
+# generation (crucial on T4's 16 GB) AND halves per-step wall time.
+# 2 is the minimum for GRPO's group-relative advantage (only 1 pairwise
+# comparison per step vs 6 with 4 gens); higher variance but still
+# directionally correct. VRAM math: 4B bf16 = 8 GB base pipeline-split
+# across 2 T4s = 4 GB/GPU; LoRA + optimizer + 2-gen KV cache ≈ 2-3 GB
+# more per GPU; peak ~6-7 GB/GPU of the 16 GB available.
+NUM_GENERATIONS = 2
 # Tier 1: 512 → 448. With enable_thinking=False on the Qwen3 chat template
 # we no longer need budget for <think>...</think> preamble, so 448 is
 # enough for tool call + function response and gives GRPO more rollouts
@@ -92,7 +102,7 @@ MAX_COMPLETION_LENGTH = 448
 PER_DEVICE_BATCH = 1
 GRAD_ACCUM = 4
 
-TRAIN_SEEDS = list(range(0, 100))  # 100 prompt-slots, one per training step
+TRAIN_SEEDS = list(range(0, 60))  # 60 prompt-slots, one per training step
 EVAL_SEEDS = list(
     range(9030, 9040)
 )  # 10 heldout, disjoint from baseline (9000–9029) and hero (9500–9502)
