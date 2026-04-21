@@ -49,7 +49,7 @@ app = create_app(
     ReconcileAction,
     ReconcileObservation,
     env_name="reconcile_gst2b_env",
-    max_concurrent_envs=1,  # increase this number to allow more concurrent WebSocket sessions
+    max_concurrent_envs=4,  # 4-way concurrency: episode state is per-instance; see test_concurrent_episodes_are_state_isolated
 )
 
 

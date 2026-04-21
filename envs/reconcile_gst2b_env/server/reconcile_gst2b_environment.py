@@ -51,7 +51,7 @@ class ReconcileGST2BEnvironment(Environment):
     control-flow only.
     """
 
-    SUPPORTS_CONCURRENT_SESSIONS: bool = False
+    SUPPORTS_CONCURRENT_SESSIONS: bool = True
     VALID_MODES = ("warmup", "hardened")
 
     def __init__(self) -> None:

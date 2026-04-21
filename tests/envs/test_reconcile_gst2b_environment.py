@@ -64,8 +64,50 @@ def test_state_hides_ground_truth_from_observation():
     assert not any(k.startswith(("true_", "gt_")) for k in obs_data.keys())
 
 
-def test_supports_concurrent_sessions_flag_is_false():
-    assert ReconcileGST2BEnvironment.SUPPORTS_CONCURRENT_SESSIONS is False
+def test_concurrent_episodes_are_state_isolated():
+    """Two env instances reset to different hero seeds; interleaved stepping
+    must keep each instance's hidden state local to itself. This is the
+    regression detector that backs ``SUPPORTS_CONCURRENT_SESSIONS = True``.
+    """
+    import json
+
+    env_a = ReconcileGST2BEnvironment()
+    env_b = ReconcileGST2BEnvironment()
+    env_a.reset(seed=9500)
+    env_b.reset(seed=9502)
+
+    company_a = env_a.state.gt_company_gstin
+    company_b = env_b.state.gt_company_gstin
+    assert company_a, "env_a must have a non-empty company_gstin"
+    assert company_b, "env_b must have a non-empty company_gstin"
+    assert company_a != company_b, (
+        "seeds 9500 and 9502 must produce distinct company_gstins"
+    )
+
+    # 3 interleaved steps per env.
+    obs_a = None
+    obs_b = None
+    for _ in range(3):
+        obs_a = env_a.step(ReconcileAction(verb="get_schema", payload={}))
+        obs_b = env_b.step(ReconcileAction(verb="get_schema", payload={}))
+
+    # Step counts evolve independently.
+    assert env_a.state.step_count == 3
+    assert env_b.state.step_count == 3
+
+    # Each env still carries its own hidden identity.
+    assert env_a.state.gt_company_gstin == company_a
+    assert env_b.state.gt_company_gstin == company_b
+
+    # Neither observation payload contains the other env's company_gstin.
+    obs_a_blob = json.dumps(obs_a.model_dump(), default=str)
+    obs_b_blob = json.dumps(obs_b.model_dump(), default=str)
+    assert company_b not in obs_a_blob, "env_b gstin leaked into env_a observation"
+    assert company_a not in obs_b_blob, "env_a gstin leaked into env_b observation"
+
+
+def test_supports_concurrent_sessions_flag_is_true():
+    assert ReconcileGST2BEnvironment.SUPPORTS_CONCURRENT_SESSIONS is True
 
 
 def test_schema_reports_all_16_verbs():
