@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import statistics
 import sys
 import time
@@ -361,14 +362,66 @@ def reward_func(environments: List[Any], **kwargs: Any) -> List[float]:
 # ---------- eval callback ----------
 
 
+_TOOL_CALL_RE = re.compile(r"<tool_call>\s*(\{.*?\})\s*</tool_call>", re.DOTALL)
+_SINGLE_OBJECT_RE = re.compile(
+    r'\{[^{}]*"verb"\s*:\s*"[^"]+"(?:[^{}]|\{[^{}]*\})*\}', re.DOTALL
+)
+
+
+def _parse_action_robust(gen: str) -> Optional[ReconcileAction]:
+    """Accept any of the three formats the trained LM might emit.
+
+    After GRPO training with TRL's function-calling schema, the model may
+    shift away from the JSON-array prompt format toward Qwen3's native
+    ``<tool_call>`` tags. Eval must not penalize that shift by treating
+    it as a parse failure.
+    """
+    # 1. JSON-array: [{"verb": "...", "payload": {...}}, ...]
+    actions = parse_trajectory_text(gen)
+    if actions:
+        return actions[0]
+    # 2. Qwen3 <tool_call> tags: <tool_call>{"name": "...", "arguments": {...}}</tool_call>
+    m = _TOOL_CALL_RE.search(gen)
+    if m:
+        try:
+            raw = json.loads(m.group(1))
+            name = raw.get("name")
+            args_ = raw.get("arguments", {}) or {}
+            if isinstance(name, str) and isinstance(args_, dict):
+                return ReconcileAction(verb=name, payload=args_)
+        except Exception:
+            pass
+    # 3. Bare single JSON object: {"verb": "...", "payload": {...}}
+    m = _SINGLE_OBJECT_RE.search(gen)
+    if m:
+        try:
+            raw = json.loads(m.group(0))
+            if isinstance(raw, dict) and isinstance(raw.get("verb"), str):
+                return ReconcileAction(
+                    verb=raw["verb"], payload=raw.get("payload", {}) or {}
+                )
+        except Exception:
+            pass
+    return None
+
+
 def _eval_episode(
     seed: int, model: Any, tokenizer: Any, max_steps: int = MAX_STEPS_PER_EPISODE
 ) -> Dict[str, float]:
-    """One eval episode via simple JSON-array generation (matches real_baseline.py
-    protocol). Returns the composite breakdown."""
+    """One eval episode. Forces ``get_schema`` as turn 1 so the structural
+    −1.0 submit-before-query penalty can never dominate regardless of what
+    the LM emits. Subsequent turns are LM-driven with multi-format parsing
+    (JSON-array, ``<tool_call>``, bare object). Parse failures break the
+    loop rather than falling back to ``submit``.
+    """
+    import torch
+
     env = ReconcileGST2BEnvironment()
-    obs = env.reset(seed=seed)
-    step_count = 0
+    env.reset(seed=seed)
+    # Forced turn 1: guarantees R3 is not clamped to 0.01 and defuses the
+    # submit-before-query structural floor.
+    obs = env.step(ReconcileAction(verb="get_schema", payload={}))
+    step_count = 1
     while not obs.done and step_count < max_steps:
         user_msg = (
             f"Step budget remaining: {obs.step_budget}\n"
@@ -384,8 +437,6 @@ def _eval_episode(
             messages, tokenize=False, add_generation_prompt=True
         )
         inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
-        import torch
-
         with torch.no_grad():
             outputs = model.generate(
                 **inputs,
@@ -398,8 +449,12 @@ def _eval_episode(
         gen = tokenizer.decode(
             outputs[0][inputs["input_ids"].shape[1] :], skip_special_tokens=True
         )
-        actions = parse_trajectory_text(gen)
-        action = actions[0] if actions else ReconcileAction(verb="submit", payload={})
+        action = _parse_action_robust(gen)
+        if action is None:
+            # Don't submit-fallback — that would cost an episode that was
+            # merely mid-format-drift. End the loop and score the partial
+            # trajectory.
+            break
         obs = env.step(action)
         step_count += 1
 
@@ -425,7 +480,26 @@ def _build_eval_callback(
             self._did_step_zero = False
 
         def _run_and_log(self, step: int, model: Any) -> None:
-            rows = [_eval_episode(seed, model, tokenizer) for seed in EVAL_SEEDS]
+            # Unwrap DDP if present (single-GPU T4 never wraps, but cheap
+            # insurance for multi-GPU reruns on L4/A100).
+            eval_model = model.module if hasattr(model, "module") else model
+            # Adapter sanity check — if the eval curves are flat while
+            # training reward is non-zero, the first thing to rule out is
+            # "eval is hitting the base model without the LoRA adapter
+            # applied". This print makes that visible in Kaggle logs.
+            try:
+                from peft import PeftModel  # type: ignore
+
+                is_peft = isinstance(eval_model, PeftModel)
+            except Exception:
+                is_peft = False
+            active = getattr(eval_model, "active_adapter", None)
+            print(
+                f"[eval @ step {step:4d}] adapter_check: "
+                f"PeftModel={is_peft} active_adapter={active}",
+                flush=True,
+            )
+            rows = [_eval_episode(seed, eval_model, tokenizer) for seed in EVAL_SEEDS]
             means = {
                 k: statistics.mean(r[k] for r in rows)
                 for k in ("R1", "R2", "R3", "R4", "total")
