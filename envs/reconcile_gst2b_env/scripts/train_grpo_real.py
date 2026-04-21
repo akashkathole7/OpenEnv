@@ -7,12 +7,15 @@
 
 """Real GRPO training for reconcile_gst2b_env via TRL's environment_factory.
 
-Kaggle T4 budget: target 3–4 h for 150 steps on Qwen/Qwen2.5-1.5B-Instruct
-with LoRA rank 16. The 1.5B swap (from 3B in the inference baseline) is
-deliberate — GRPO stores a reference model alongside the policy, and the
-optimizer state for LoRA plus activations push a 3B model past T4's ~15 GB
-free budget. If the 1.5B still OOMs, fall back to Qwen/Qwen2.5-0.5B-Instruct
-(documented in .kaggle/kaggle_instructions.md).
+Kaggle T4 budget: target 2–3 h for 150 steps on Qwen/Qwen3-0.6B with
+LoRA rank 16.
+
+Model swap: Qwen2.5-1.5B → Qwen3-0.6B because TRL main's
+``add_response_schema`` only supports the Qwen3 family (see TRL issue
+#5460). GRPOTrainer re-runs the schema inference internally, so a manual
+``tokenizer.response_schema`` fallback gets clobbered — only Qwen3 works
+end-to-end. The size reduction is acceptable: for a demo run, training
+signal visibility matters more than absolute model scale.
 
 Pattern: TRL's ``environment_factory`` receives a class (not an instance).
 TRL creates one instance per generation, auto-discovers public methods as
@@ -22,11 +25,12 @@ as typed tool methods with docstrings. Reward is stored on ``self.reward``
 and read by the reward_func — we do NOT recompute reward in the trainer.
 
 Explicit failure-mode defenses:
-- OOM on model load → caught, stack trace printed, clean exit with swap hint.
+- OOM on model load → caught, stack trace printed with guidance to lower
+  num_generations or max_completion_length (no smaller Qwen3 exists).
 - TRL < 0.21 → hard halt with install guidance.
 - Env import failure → top-level import, fail fast.
 - Flat curves after 150 steps → still shipped as an honest finding (env
-  may be too hard for 1.5B at this scale).
+  may be too hard for 0.6B at this scale).
 """
 
 from __future__ import annotations
@@ -53,8 +57,7 @@ from envs.reconcile_gst2b_env.server.reconcile_gst2b_environment import (  # noq
 )
 
 
-MODEL_NAME = "Qwen/Qwen2.5-1.5B-Instruct"
-MODEL_FALLBACK = "Qwen/Qwen2.5-0.5B-Instruct"
+MODEL_NAME = "Qwen/Qwen3-0.6B"
 LORA_RANK = 16
 LORA_TARGETS = ["q_proj", "v_proj"]
 LEARNING_RATE = 5e-6
@@ -521,56 +524,9 @@ def main() -> int:
         tokenizer = AutoTokenizer.from_pretrained(args.model)
         if tokenizer.pad_token_id is None:
             tokenizer.pad_token_id = tokenizer.eos_token_id
-
-        # --- Explicit response schema for Qwen2.5 tool-call parsing ---
-        # TRL's auto-inference (``add_response_schema(processing_class)``) fails
-        # on Qwen2.5-Instruct: the template renders tool calls as
-        #   <tool_call>{"name": "...", "arguments": {...}}</tool_call>
-        # but TRL doesn't match that shape without being told. Set it
-        # explicitly. Print the chat template's tool-call markers so the
-        # Kaggle logs surface a mismatch loudly if a future Qwen version
-        # drifts the syntax.
-        _chat_tmpl = tokenizer.chat_template or ""
-        if "<tool_call>" not in _chat_tmpl or "</tool_call>" not in _chat_tmpl:
-            print(
-                "[warn] tokenizer chat_template does NOT contain "
-                "<tool_call>/</tool_call>; markers may have drifted in this "
-                "Qwen version. Inspect the template before training:",
-                flush=True,
-            )
-            print(_chat_tmpl[:2000], flush=True)
-        else:
-            print(
-                "[response_schema] tokenizer chat_template contains "
-                "<tool_call>/</tool_call> markers — good.",
-                flush=True,
-            )
-
-        try:
-            from trl.chat_template_utils import ResponseSchema  # type: ignore
-
-            tokenizer.response_schema = ResponseSchema(
-                start_token="<tool_call>",
-                end_token="</tool_call>",
-            )
-            print(
-                "[response_schema] set via trl.chat_template_utils.ResponseSchema",
-                flush=True,
-            )
-        except ImportError:
-            # TRL main has moved module paths before; fall back to a plain dict
-            # with the same shape. GRPOTrainer reads start_token/end_token by
-            # attribute access OR by key on the dict.
-            tokenizer.response_schema = {
-                "start_token": "<tool_call>",
-                "end_token": "</tool_call>",
-            }
-            print(
-                "[response_schema] set via plain-dict fallback "
-                "(trl.chat_template_utils.ResponseSchema not importable)",
-                flush=True,
-            )
-
+        # Response schema: TRL's add_response_schema supports the Qwen3 family
+        # natively (GRPOTrainer re-runs schema inference internally, so a manual
+        # override is clobbered — only Qwen3 works end-to-end).
         model = AutoModelForCausalLM.from_pretrained(
             args.model, torch_dtype="auto", device_map="auto"
         )
@@ -581,9 +537,12 @@ def main() -> int:
             print("\n[FATAL] CUDA OOM on model load.", flush=True)
             traceback.print_exc()
             print(
-                f"\nSwap {args.model} → {MODEL_FALLBACK} and rerun:\n"
-                f"  python -m envs.reconcile_gst2b_env.scripts.train_grpo_real "
-                f"--model {MODEL_FALLBACK}\n",
+                "\nQwen3-0.6B is the smallest TRL-supported Qwen3 for "
+                "add_response_schema. Recovery options:\n"
+                "  1) Drop num_generations from 4 to 2 in the script constants.\n"
+                "  2) Drop max_completion_length from 512 to 256.\n"
+                "  3) Switch GPU to a larger instance (Kaggle P100 16GB → "
+                "L4 24GB if available, or Colab A100 40GB).\n",
                 flush=True,
             )
             sys.exit(3)

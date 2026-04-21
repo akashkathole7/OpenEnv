@@ -70,41 +70,33 @@ cp ~/Downloads/curves.png  data/real_training/curves.png   # optional
 echo '!data/real_training/curves.json' >> .gitignore
 echo '!data/real_training/curves.png' >> .gitignore
 git add data/real_training/curves.json data/real_training/curves.png .gitignore
-git commit -m "data: real GRPO training curves (Qwen2.5-1.5B, 150 steps)"
+git commit -m "data: real GRPO training curves (Qwen3-0.6B, 150 steps)"
 git push fork scaffold/reconcile-gst2b
 ```
 
 Then paste the numbers back to Claude and ask for the README / BLOG
 update commit.
 
-## 6. OOM fallback (1.5B → 0.5B)
+## 6. OOM fallback
 
-If Cell 3 fails with:
+Qwen3-0.6B is already the smallest TRL-supported Qwen3 — there's no
+smaller model to swap to. If Cell 3 fails with `[FATAL] CUDA OOM on
+model load`, recover by reducing the training footprint:
 
-```
-[FATAL] CUDA OOM on model load.
-Swap Qwen/Qwen2.5-1.5B-Instruct → Qwen/Qwen2.5-0.5B-Instruct and rerun:
-```
+1. Open `envs/reconcile_gst2b_env/scripts/train_grpo_real.py` in a fresh
+   branch on your laptop.
+2. Change `NUM_GENERATIONS = 4` → `2`, OR `MAX_COMPLETION_LENGTH = 512` → `256`.
+3. Push, re-clone in Kaggle (Cell 2 force-refresh handles this), and
+   **Save & Run All** again.
 
-1. Edit Cell 3 in the Kaggle notebook — add `--model Qwen/Qwen2.5-0.5B-Instruct`:
-
-```python
-!PYTHONPATH=... python -m envs.reconcile_gst2b_env.scripts.train_grpo_real \
-    --model Qwen/Qwen2.5-0.5B-Instruct \
-    --output-dir=.../data/real_training \
-    --total-steps=150 --eval-every=25 --checkpoint-every=50
-```
-
-2. **Save & Run All** again.
-
-0.5B is a smaller ceiling but the curve shape is what matters for the
-pitch. If even 0.5B OOMs, lower `num_generations` from 4 to 2 in
-`envs/reconcile_gst2b_env/scripts/train_grpo_real.py` and push.
+If both fail, switch the Kaggle accelerator from T4 to L4 (24 GB) if
+your account has access, or move the run to Colab A100 (40 GB).
 
 ## 7. If training completes but curves are flat
 
 Per the script header: flat curves after 150 real steps is a REAL
-finding ("env too hard for 1.5B at this scale") and should still be
+finding ("env too hard for 0.6B at this scale") and should still be
 reported honestly. Do NOT hand-fake the plot. Update the blog's
 training-status paragraph to name this as the current state, and use
-the compute ask to argue for A100 × 10 h instead of T4 × 4 h.
+the compute ask to argue for A100 × 10 h on a larger Qwen3 instead of
+T4 × 3 h on 0.6B.
