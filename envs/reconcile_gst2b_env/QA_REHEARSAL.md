@@ -41,7 +41,7 @@ for attack_zero_itc is 0.266, well under the 0.45 ceiling.
 
 ## Probe 7: GST reconciliation is too niche for a global hackathon.
 
-150M+ GST-registered Indian businesses do this monthly; every CA firm employs
+~14M GST-registered Indian businesses do this monthly; every CA firm employs
 juniors for it. Task shape generalizes (two-sided document matching against a
 regulated schema); see README § "Differentiation" table for overlap with τ-bench.
 

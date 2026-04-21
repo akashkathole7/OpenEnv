@@ -4,7 +4,7 @@
 
 Indian GST Input-Tax-Credit reconciliation — matching a company's purchase
 register against its regulator-generated GSTR-2B monthly — is rule-heavy,
-error-sensitive, and done by hand across 150M+ registered businesses.
+error-sensitive, and done by hand across ~14M registered GST taxpayers.
 Failure modes (GSTIN typos, format drift, slab errors, late filings,
 post-freeze amendments, circular trading) are well-cataloged and the
 regulator publishes ground truth. Crisp regulated correctness at monthly
