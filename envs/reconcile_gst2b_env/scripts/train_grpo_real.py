@@ -7,8 +7,8 @@
 
 """Real GRPO training for reconcile_gst2b_env via TRL's environment_factory.
 
-Kaggle T4 budget: target 2–3 h for 150 steps on Qwen/Qwen3-0.6B with
-LoRA rank 16.
+Kaggle T4(x2) budget: target 7–8 h for 100 steps on Qwen/Qwen3-1.7B
+with LoRA rank 16 — fits inside the 9 h Kaggle GPU session quota.
 
 Model swap: Qwen2.5-1.5B → Qwen3-0.6B because TRL main's
 ``add_response_schema`` only supports the Qwen3 family (see TRL issue
@@ -58,18 +58,28 @@ from envs.reconcile_gst2b_env.server.reconcile_gst2b_environment import (  # noq
 )
 
 
-MODEL_NAME = "Qwen/Qwen3-0.6B"
+# Scale-up from the 0.6B plateau. 1.7B gives ~3x the representational
+# capacity at ~2.5-3x the wall-clock per step. Fits on a single Kaggle
+# T4 (15 GB) with LoRA: base bf16 ≈ 3.4 GB + LoRA adapter + optimizer
+# state + KV cache ≈ 7-8 GB total, comfortable headroom. The second T4
+# in T4x2 sits idle with device_map="auto" — that's fine, we're not
+# using DDP here (added complexity not worth it for a 150-step run).
+MODEL_NAME = "Qwen/Qwen3-1.7B"
 LORA_RANK = 16
 # q/v only covers ~half of attention's learnable surface. Adding k/o lets
 # the adapter shift key projections (affects what the model attends to)
 # and output projections (affects how attended info flows forward),
 # roughly doubling the representational surface at small VRAM cost.
 LORA_TARGETS = ["q_proj", "k_proj", "v_proj", "o_proj"]
-# 5e-6 × 150 steps barely perturbs a rank-16 LoRA on Qwen3-0.6B; 1e-5 is a
-# conservative 2× bump paired with the early-stop safety net (if totals
-# collapse > 0.10 below step-0, training halts with exit code 2).
+# 1e-5 survived the 0.6B smoke. Keep it for 1.7B — LoRA learning rate
+# tends to be relatively model-size-insensitive, and we have the
+# absolute 0.30 collapse early-stop to catch instability.
 LEARNING_RATE = 1e-5
-TOTAL_STEPS = 150
+# 100 steps (down from 150) — 1.7B is ~2.5-3x slower per step than 0.6B.
+# At ~250-300 s/step on T4, 100 steps = ~7-8 h wall time, within Kaggle's
+# 9 h GPU session quota with margin. Eval every 25 gives 5 eval points
+# (0/25/50/75/100) which is enough to see a trajectory.
+TOTAL_STEPS = 100
 EVAL_EVERY = 25
 CHECKPOINT_EVERY = 50
 NUM_GENERATIONS = 4
@@ -82,7 +92,7 @@ MAX_COMPLETION_LENGTH = 448
 PER_DEVICE_BATCH = 1
 GRAD_ACCUM = 4
 
-TRAIN_SEEDS = list(range(0, 150))  # 150 prompt-slots, one per training step
+TRAIN_SEEDS = list(range(0, 100))  # 100 prompt-slots, one per training step
 EVAL_SEEDS = list(
     range(9030, 9040)
 )  # 10 heldout, disjoint from baseline (9000–9029) and hero (9500–9502)
