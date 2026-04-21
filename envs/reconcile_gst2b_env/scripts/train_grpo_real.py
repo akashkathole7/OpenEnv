@@ -73,7 +73,12 @@ TOTAL_STEPS = 150
 EVAL_EVERY = 25
 CHECKPOINT_EVERY = 50
 NUM_GENERATIONS = 4
-MAX_COMPLETION_LENGTH = 512
+# Tier 1: 512 → 448. With enable_thinking=False on the Qwen3 chat template
+# we no longer need budget for <think>...</think> preamble, so 448 is
+# enough for tool call + function response and gives GRPO more rollouts
+# per wall-clock second. Directly addresses clipped_ratio=1.0 on the
+# 30-step run where the old 512 budget was exhausted on thinking tokens.
+MAX_COMPLETION_LENGTH = 448
 PER_DEVICE_BATCH = 1
 GRAD_ACCUM = 4
 
@@ -343,6 +348,13 @@ class ReconcileToolEnv:
 # ---------- reward function (read-only; no reward recomputation) ----------
 
 
+# Tier 2a — monotonic counter for deterministic zero-std jitter. Module-
+# level so `random.Random(_JITTER_CALL_IDX)` gives a distinct seed per
+# call while remaining reproducible across runs (no wall-clock entropy,
+# no hash randomization).
+_JITTER_CALL_IDX: int = 0
+
+
 def reward_func(environments: List[Any], **kwargs: Any) -> List[float]:
     """Per TRL contract: read ``env.reward`` from each environment instance.
 
@@ -354,7 +366,23 @@ def reward_func(environments: List[Any], **kwargs: Any) -> List[float]:
     Kaggle run. Finalizing here backfills composite_reward over whatever
     trajectory was collected, so every rollout produces a real score.
     Idempotent when submit was called.
+
+    Tier 2a (zero-std jitter): if every reward in the group is identical,
+    GRPO's advantage is zero and gradient is zero — the 30-step curve was
+    flat at 0.353 for exactly this reason (every rollout collapsed to the
+    `query_only` red-team attack signature). Inject σ=0.005 gaussian noise
+    with a deterministic per-call seed so the batch produces a non-zero
+    advantage. σ=0.005 means 3σ=0.015; worst red-team impact is the
+    query_only attack (0.349) → 0.349 + 0.015 = 0.364 < 0.45 ceiling.
+
+    Tier 2b (format bonus): +0.02 if the env executed ≥1 action (meaning
+    at least one tool call was parsed AND applied through env.step).
+    Stepping-stone reward that nudges the policy off the "emit nothing
+    parseable" local minimum without touching rewards.py. Bounded at
+    +0.02 so all red-team attacks remain under 0.45.
     """
+    global _JITTER_CALL_IDX
+
     rewards: List[float] = []
     for env in environments:
         try:
@@ -363,6 +391,24 @@ def reward_func(environments: List[Any], **kwargs: Any) -> List[float]:
             # Never let reward collection crash a training step.
             pass
         rewards.append(float(getattr(env, "reward", 0.0)))
+
+    # Tier 2a — zero-std jitter (deterministic).
+    if len(rewards) > 1 and max(rewards) - min(rewards) < 1e-6:
+        import random
+
+        rng = random.Random(_JITTER_CALL_IDX)
+        _JITTER_CALL_IDX += 1
+        rewards = [r + rng.gauss(0.0, 0.005) for r in rewards]
+
+    # Tier 2b — format bonus: +0.02 if env._trajectory is non-empty
+    # (i.e., at least one tool call was parsed by TRL and dispatched
+    # through env.step). Bounded at 0.999 so no attack clears 0.45.
+    for i, env in enumerate(environments):
+        inner_env = getattr(env, "_env", None)
+        traj = getattr(inner_env, "_trajectory", []) if inner_env is not None else []
+        if len(traj) > 0:
+            rewards[i] = min(rewards[i] + 0.02, 0.999)
+
     return rewards
 
 
@@ -551,21 +597,20 @@ def _build_eval_callback(
                 f"R3={means['R3']:.3f} R4={means['R4']:.3f} total={means['total']:.3f}",
                 flush=True,
             )
-            # Collapse safety net — halt if eval regresses > 0.10 below the
-            # step-0 baseline. Onsite demo failure has no retry; better to
-            # exit(2) with the 30-step backup intact than to push through and
-            # ship a collapsed curve. Step-0 is always index 0 of curves.
-            if len(curves["total"]) >= 2:
-                step0 = curves["total"][0]
-                latest = curves["total"][-1]
-                if latest < step0 - 0.10:
-                    print(
-                        f"\n[FATAL] training collapsed: eval total {latest:.3f} < "
-                        f"step-0 {step0:.3f} − 0.10. "
-                        f"30-step backup preserved.",
-                        flush=True,
-                    )
-                    sys.exit(2)
+            # Absolute collapse safety net — any eval total below 0.30
+            # means the polish run is worse than the 30-step baseline
+            # (0.353) plus margin. Onsite we'd rather ship the 150-step
+            # backup than a collapsed polish curve. ``git revert HEAD``
+            # restores the baseline commit without any data loss because
+            # ``curves_150step_backup.json`` is preserved on disk.
+            latest = curves["total"][-1] if curves["total"] else 0.0
+            if latest < 0.30:
+                print(
+                    "\npolish collapsed, 150-step backup preserved — "
+                    "revert with git revert HEAD",
+                    flush=True,
+                )
+                sys.exit(2)
 
         def on_train_begin(self, args, state, control, **kwargs):
             if self._did_step_zero:
@@ -649,14 +694,22 @@ def main() -> int:
     args.output_dir.mkdir(parents=True, exist_ok=True)
     (args.output_dir / "checkpoints").mkdir(parents=True, exist_ok=True)
 
-    # If a prior 30-step run produced curves.json, preserve it under a
-    # descriptive name before the new run overwrites. Onsite this is what
-    # we fall back to if the 150-step run collapses or OOMs mid-training.
+    # Backup the prior 150-step run before overwriting. Skip if the backup
+    # already exists — we never clobber an existing backup, since onsite
+    # the 150-step baseline is the narrative fallback if this polish run
+    # collapses (revert via ``git revert HEAD``).
     existing_curves = args.output_dir / "curves.json"
     if existing_curves.exists():
-        backup = args.output_dir / "curves_30step_backup.json"
-        existing_curves.rename(backup)
-        print(f"backed up prior curves.json → {backup}", flush=True)
+        backup = args.output_dir / "curves_150step_backup.json"
+        if not backup.exists():
+            existing_curves.rename(backup)
+            print(f"backed up prior curves.json → {backup}", flush=True)
+        else:
+            print(
+                f"{backup.name} already exists — leaving it intact; "
+                f"current curves.json will be overwritten by the new stub",
+                flush=True,
+            )
 
     # Write an empty curves.json stub immediately so downstream plotting never
     # hits FileNotFoundError if the process dies mid-training.
@@ -696,6 +749,24 @@ def main() -> int:
         tokenizer = AutoTokenizer.from_pretrained(args.model)
         if tokenizer.pad_token_id is None:
             tokenizer.pad_token_id = tokenizer.eos_token_id
+
+        # Tier 1 (CRITICAL): force ``enable_thinking=False`` on every call to
+        # ``apply_chat_template``. Qwen3 defaults this to True, inserting a
+        # ``<think>...</think>`` block before the assistant message. On a
+        # 448-token completion budget, the think block eats the entire
+        # allowance before any ``<tool_call>`` is emitted — that's what drove
+        # ``clipped_ratio=1.0`` and ``mean_terminated_length=0`` on the 30-step
+        # run. Monkeypatching here guarantees both TRL's internal rollout
+        # generation AND our ``_eval_episode`` use the non-thinking template.
+        _orig_apply_chat_template = tokenizer.apply_chat_template
+
+        def _apply_chat_template_no_think(*a: Any, **kw: Any) -> Any:
+            kw.setdefault("enable_thinking", False)
+            return _orig_apply_chat_template(*a, **kw)
+
+        tokenizer.apply_chat_template = _apply_chat_template_no_think  # type: ignore[method-assign]
+        print("tokenizer patched: enable_thinking forced to False", flush=True)
+
         # Response schema: TRL's add_response_schema supports the Qwen3 family
         # natively (GRPOTrainer re-runs schema inference internally, so a manual
         # override is clobbered — only Qwen3 works end-to-end).
@@ -751,6 +822,27 @@ def main() -> int:
         num_generations=NUM_GENERATIONS,
         max_completion_length=MAX_COMPLETION_LENGTH,
         learning_rate=LEARNING_RATE,
+        # Tier 1 generation-config fixes — every default that was silently
+        # applied on the 30-step run is now pinned. Symptoms each addresses:
+        #   temperature 1.0 → 0.7        : incoherent samples on 0.6B; 0.7
+        #                                   keeps diversity for group advantage
+        #                                   while preserving tool-call syntax.
+        #   top_p 1.0 → 0.95             : nucleus cutoff removes tail tokens
+        #                                   that derailed <tool_call> blocks.
+        #   top_k 50 → 20                : further narrows to Qwen3-trained
+        #                                   tool-format tokens.
+        #   repetition_penalty 1.0 → 1.1 : breaks the ramble-until-max loop
+        #                                   that drove clipped_ratio=1.0.
+        #   beta 0.04 → 0.0              : removes the KL-to-ref tether that
+        #                                   cancelled rare non-zero-std
+        #                                   updates. With baseline policy at
+        #                                   the red-team attack signature,
+        #                                   we need aggressive divergence.
+        temperature=0.7,
+        top_p=0.95,
+        top_k=20,
+        repetition_penalty=1.1,
+        beta=0.0,
         use_vllm=False,  # Kaggle vLLM story unreliable; HF generation
         logging_steps=1,
         save_steps=args.checkpoint_every,
