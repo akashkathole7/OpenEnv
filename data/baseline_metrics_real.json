@@ -1,54 +1,3012 @@
 {
-  "status": "placeholder — overwrite by running notebooks/real_baseline_t4.ipynb",
   "raw": {
     "summary": {
       "condition": "raw",
-      "execution_mode": "pending",
+      "execution_mode": "real",
       "model": "Qwen/Qwen2.5-3B-Instruct",
-      "n_rollouts": 0,
-      "total_mean": null,
-      "total_ci95": [null, null],
-      "total_stdev": null,
-      "catastrophic_corruption_rate": null,
+      "n_rollouts": 90,
+      "total_mean": -1.0,
+      "total_ci95": [
+        -1.0,
+        -1.0
+      ],
+      "total_stdev": 0.0,
+      "catastrophic_corruption_rate": 1.0,
       "component_summary": {
-        "R1": {"mean": null, "ci95_low": null, "ci95_high": null},
-        "R2": {"mean": null, "ci95_low": null, "ci95_high": null},
-        "R3": {"mean": null, "ci95_low": null, "ci95_high": null},
-        "R4": {"mean": null, "ci95_low": null, "ci95_high": null}
+        "R1": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0
+        },
+        "R2": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0
+        },
+        "R3": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0
+        },
+        "R4": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0
+        }
       }
     },
-    "rollouts": []
+    "rollouts": [
+      {
+        "seed": 9000,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9000,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9000,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9001,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9001,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9001,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9002,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9002,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9002,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9003,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9003,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9003,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9004,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9004,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9004,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9005,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9005,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9005,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9006,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9006,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9006,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9007,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9007,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9007,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9008,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9008,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9008,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9009,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9009,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9009,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9010,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9010,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9010,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9011,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9011,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9011,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9012,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9012,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9012,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9013,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9013,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9013,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9014,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9014,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9014,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9015,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9015,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9015,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9016,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9016,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9016,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9017,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9017,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9017,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9018,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9018,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9018,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9019,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9019,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9019,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9020,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9020,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9020,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9021,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9021,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9021,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9022,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9022,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9022,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9023,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9023,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9023,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9024,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9024,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9024,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9025,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9025,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9025,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9026,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9026,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9026,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9027,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9027,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9027,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9028,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9028,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9028,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9029,
+        "sample_idx": 0,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9029,
+        "sample_idx": 1,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9029,
+        "sample_idx": 2,
+        "condition": "raw",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      }
+    ]
   },
   "prompted": {
     "summary": {
       "condition": "prompted",
-      "execution_mode": "pending",
+      "execution_mode": "real",
       "model": "Qwen/Qwen2.5-3B-Instruct",
-      "n_rollouts": 0,
-      "total_mean": null,
-      "total_ci95": [null, null],
-      "total_stdev": null,
-      "catastrophic_corruption_rate": null,
+      "n_rollouts": 90,
+      "total_mean": 0.1795,
+      "total_ci95": [
+        0.0899,
+        0.2684
+      ],
+      "total_stdev": 0.4431,
+      "catastrophic_corruption_rate": 0.1222,
       "component_summary": {
-        "R1": {"mean": null, "ci95_low": null, "ci95_high": null},
-        "R2": {"mean": null, "ci95_low": null, "ci95_high": null},
-        "R3": {"mean": null, "ci95_low": null, "ci95_high": null},
-        "R4": {"mean": null, "ci95_low": null, "ci95_high": null}
+        "R1": {
+          "mean": 0.0088,
+          "ci95_low": 0.0081,
+          "ci95_high": 0.0094
+        },
+        "R2": {
+          "mean": 0.0088,
+          "ci95_low": 0.0081,
+          "ci95_high": 0.0094
+        },
+        "R3": {
+          "mean": 0.869,
+          "ci95_low": 0.803,
+          "ci95_high": 0.935
+        },
+        "R4": {
+          "mean": 0.7873,
+          "ci95_low": 0.7142,
+          "ci95_high": 0.8627
+        }
       }
     },
-    "rollouts": []
+    "rollouts": [
+      {
+        "seed": 9000,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9856
+        },
+        "total": 0.3526,
+        "total_steps": 6,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9000,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9000,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 4,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9001,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.8844
+        },
+        "total": 0.3424,
+        "total_steps": 17,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9001,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.6636
+        },
+        "total": 0.3204,
+        "total_steps": 29,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9001,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9676
+        },
+        "total": 0.3508,
+        "total_steps": 9,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9002,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9744
+        },
+        "total": 0.3514,
+        "total_steps": 8,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9002,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 5,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9002,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9003,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.96
+        },
+        "total": 0.35,
+        "total_steps": 10,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9003,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9856
+        },
+        "total": 0.3526,
+        "total_steps": 6,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9003,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9856
+        },
+        "total": 0.3526,
+        "total_steps": 6,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9004,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9516
+        },
+        "total": 0.3492,
+        "total_steps": 11,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9004,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 4,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9004,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9676
+        },
+        "total": 0.3508,
+        "total_steps": 9,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9005,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9005,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 3,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9005,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9006,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.01
+        },
+        "total": 0.255,
+        "total_steps": 50,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9006,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.0396
+        },
+        "total": 0.258,
+        "total_steps": 49,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9006,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.01
+        },
+        "total": 0.255,
+        "total_steps": 50,
+        "termination_reason": "step_budget_exhausted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9007,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9007,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 3,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9007,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9216
+        },
+        "total": 0.3462,
+        "total_steps": 14,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9008,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 4,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9008,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 5,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9008,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9804
+        },
+        "total": 0.352,
+        "total_steps": 7,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9009,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9856
+        },
+        "total": 0.3526,
+        "total_steps": 6,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9009,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9009,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9010,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.4524
+        },
+        "total": 0.2992,
+        "total_steps": 37,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9010,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9216
+        },
+        "total": 0.3462,
+        "total_steps": 14,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9010,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9216
+        },
+        "total": 0.3462,
+        "total_steps": 14,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9011,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 4,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9011,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9011,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9856
+        },
+        "total": 0.3526,
+        "total_steps": 6,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9012,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 5,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9012,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9012,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 3,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9013,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9804
+        },
+        "total": 0.352,
+        "total_steps": 7,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9013,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.7696
+        },
+        "total": 0.331,
+        "total_steps": 24,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9013,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.3276
+        },
+        "total": 0.2868,
+        "total_steps": 41,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9014,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 5,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9014,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9014,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9015,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9804
+        },
+        "total": 0.352,
+        "total_steps": 7,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9015,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 3,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9015,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9016,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9016,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 3,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9016,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 3,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9017,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 4,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9017,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9017,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9744
+        },
+        "total": 0.3514,
+        "total_steps": 8,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9018,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.4224
+        },
+        "total": 0.2962,
+        "total_steps": 38,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9018,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 3,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9018,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.64
+        },
+        "total": 0.318,
+        "total_steps": 30,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9019,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9019,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9676
+        },
+        "total": 0.3508,
+        "total_steps": 9,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9019,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9744
+        },
+        "total": 0.3514,
+        "total_steps": 8,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9020,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9804
+        },
+        "total": 0.352,
+        "total_steps": 7,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9020,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9020,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9021,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 4,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9021,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9021,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9022,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9022,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 4,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9022,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 4,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9023,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9023,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 3,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9023,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 3,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9024,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9024,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9324
+        },
+        "total": 0.3472,
+        "total_steps": 13,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9024,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9216
+        },
+        "total": 0.3462,
+        "total_steps": 14,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9025,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9025,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9025,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9026,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9744
+        },
+        "total": 0.3514,
+        "total_steps": 8,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9026,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.2944
+        },
+        "total": 0.2834,
+        "total_steps": 42,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9026,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9027,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9027,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 3,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9027,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 2,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9028,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.6636
+        },
+        "total": 0.3204,
+        "total_steps": 29,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9028,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 3,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9028,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.9324
+        },
+        "total": 0.3472,
+        "total_steps": 13,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9029,
+        "sample_idx": 0,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 3,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      },
+      {
+        "seed": 9029,
+        "sample_idx": 1,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.0,
+          "R2": 0.0,
+          "R3": 0.0,
+          "R4": 0.0
+        },
+        "total": -1.0,
+        "total_steps": 1,
+        "termination_reason": "submit_before_query",
+        "done": true,
+        "catastrophic_corruption": true
+      },
+      {
+        "seed": 9029,
+        "sample_idx": 2,
+        "condition": "prompted",
+        "component_rewards": {
+          "R1": 0.01,
+          "R2": 0.01,
+          "R3": 0.99,
+          "R4": 0.99
+        },
+        "total": 0.353,
+        "total_steps": 3,
+        "termination_reason": "submitted",
+        "done": true,
+        "catastrophic_corruption": false
+      }
+    ]
   },
   "delta_prompted_minus_raw": {
-    "mean": null,
-    "ci95": [null, null],
-    "passes_gate_05": null
+    "mean": 1.1795,
+    "ci95": [
+      1.0899,
+      1.2684
+    ],
+    "passes_gate_05": true
   },
   "config": {
     "n_seeds": 30,
     "n_samples": 3,
-    "seeds": "9000-9029",
+    "seeds": [
+      9000,
+      9001,
+      9002,
+      9003,
+      9004,
+      9005,
+      9006,
+      9007,
+      9008,
+      9009,
+      9010,
+      9011,
+      9012,
+      9013,
+      9014,
+      9015,
+      9016,
+      9017,
+      9018,
+      9019,
+      9020,
+      9021,
+      9022,
+      9023,
+      9024,
+      9025,
+      9026,
+      9027,
+      9028,
+      9029
+    ],
     "max_steps": 50,
     "model": "Qwen/Qwen2.5-3B-Instruct",
-    "generation": {"max_new_tokens": 256, "temperature": 0.7, "top_p": 0.9, "do_sample": true}
+    "generation": {
+      "max_new_tokens": 256,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "do_sample": true
+    }
   }
 }
