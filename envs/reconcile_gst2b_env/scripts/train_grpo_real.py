@@ -336,8 +336,26 @@ class ReconcileToolEnv:
 
 
 def reward_func(environments: List[Any], **kwargs: Any) -> List[float]:
-    """Per TRL contract: read ``env.reward`` from each environment instance."""
-    return [float(getattr(env, "reward", 0.0)) for env in environments]
+    """Per TRL contract: read ``env.reward`` from each environment instance.
+
+    CRITICAL: we force ``_finalize_reward()`` first. If the model stops
+    calling tools without invoking ``submit`` (common — it hits
+    ``max_completion_length`` or decides it's done mid-episode), the
+    underlying env never populates ``reward_breakdown`` and ``self.reward``
+    stays at 0. That caused ``frac_reward_zero_std=1`` on the first real
+    Kaggle run. Finalizing here backfills composite_reward over whatever
+    trajectory was collected, so every rollout produces a real score.
+    Idempotent when submit was called.
+    """
+    rewards: List[float] = []
+    for env in environments:
+        try:
+            env._finalize_reward()
+        except Exception:
+            # Never let reward collection crash a training step.
+            pass
+        rewards.append(float(getattr(env, "reward", 0.0)))
+    return rewards
 
 
 # ---------- eval callback ----------
