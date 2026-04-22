@@ -10,6 +10,8 @@
 
 **Event.** Meta × Scaler School of Technology Hackathon Grand Finale, Bangalore, 25–26 April 2026. Aakash is physically on-site. Scaler provides compute (expected: single A100 40GB block via Kaggle or the sponsor cluster).
 
+**Result timing — important for your pacing.** Per Scaler's finale email: results are *not* announced at the venue. Judging is asynchronous; results stream on Scaler's YouTube Live on **2026-05-02** (roughly one week after on-site). This means: there is no Day-2 submission cutoff that forces fake numbers. If a phase bricks, an honest "trained checkpoint exists but eval surface needs completion" beats a scrambled pipeline. See the emergency fallback section.
+
 **Submission slot.** Round 2, Theme #3.1 "Professional World Modeling", Scaler AI Labs sub-theme "Multi-App Enterprise Workflow". Pre-recorded 90-second demo already linked across docs: https://www.youtube.com/watch?v=rglR1hGgdb8
 
 **The project.** `reconcile_gst2b_env` — an OpenEnv RL environment for Indian GST Input-Tax-Credit reconciliation against the monthly GSTR-2B regulator return. Everything is committed, tested, and deployed to a Hugging Face Space. What remains for on-site is *real GRPO training on proper compute*, which was not possible in Round 1 (only T4 smoke runs were feasible). Your job is to shepherd that training run and update the docs with real numbers.
@@ -77,16 +79,17 @@ The pipeline is deterministic. Run phases in order. Do not parallelize phases un
 ### Phase 0 — sanity check (15 min, before any training)
 
 ```bash
-# Environment sanity
-PYTHONPATH=src:envs uv run pytest envs/reconcile_gst2b_env/tests/ -v --tb=short
+# Environment sanity (tests live at tests/envs/ from repo root, NOT envs/.../tests/)
+PYTHONPATH=src:envs uv run pytest tests/envs/test_reconcile_gst2b_*.py -v --tb=short
 # Expect: 42 tests passing. If any red-team attack test fails, STOP and diagnose.
 
-# Import sanity
+# Import sanity — the class is ReconcileGST2BEnvironment, __init__ takes no args,
+# seed goes to reset(). Do not copy-paste without this shape; prior brief had a typo.
 PYTHONPATH=src:envs uv run python -c "
-from envs.reconcile_gst2b_env.server.reconcile_gst2b_environment import ReconcileGST2BEnv
-env = ReconcileGST2BEnv(seed=42)
-obs = env.reset()
-print('env.reset OK, n_invoices =', len(obs['invoices']))
+from envs.reconcile_gst2b_env.server.reconcile_gst2b_environment import ReconcileGST2BEnvironment
+env = ReconcileGST2BEnvironment()
+obs = env.reset(seed=42, mode='warmup')
+print('env.reset OK, step_budget =', obs.step_budget)
 "
 
 # GPU sanity (on A100)
@@ -99,26 +102,35 @@ If any of these fail, STOP. Do not start Phase 1. Diagnose first.
 ### Phase 1 — generate SFT trajectories (CPU, ~2 h)
 
 ```bash
-# Smoke first (10 seeds, ~30 s)
+# Real arg names: --start-seed, --end-seed, --output-path, --min-total (NOT --seed-start etc).
+# A --dry-run flag also exists and generates 5 seeds without writing.
+
+# Smoke first (dry-run, 5 seeds, ~30 s — no file written)
 PYTHONPATH=src:envs uv run python -m \
     envs.reconcile_gst2b_env.scripts.generate_sft_trajectories \
-    --seed-start 0 --seed-end 10 \
-    --output-jsonl envs/reconcile_gst2b_env/data/sft_trajectories_smoke.jsonl \
-    --min-reward 0.40
+    --dry-run --verbose
 
-# Expect: a JSONL file with ~10 rows, each an OpenAI-style {"messages":[...]} record.
-# Inspect one row:
+# Real smoke (10 seeds to disk, verify row shape)
+PYTHONPATH=src:envs uv run python -m \
+    envs.reconcile_gst2b_env.scripts.generate_sft_trajectories \
+    --start-seed 0 --end-seed 10 \
+    --output-path envs/reconcile_gst2b_env/data/sft_trajectories_smoke.jsonl \
+    --min-total 0.40
+
+# Inspect one row (OpenAI-style {"messages":[...]} record)
 head -1 envs/reconcile_gst2b_env/data/sft_trajectories_smoke.jsonl | python -m json.tool | head -40
 
 # Full run (2000 seeds, ~2 h)
 PYTHONPATH=src:envs uv run python -m \
     envs.reconcile_gst2b_env.scripts.generate_sft_trajectories \
-    --seed-start 0 --seed-end 2000 \
-    --output-jsonl envs/reconcile_gst2b_env/data/sft_trajectories.jsonl \
-    --min-reward 0.40
+    --start-seed 0 --end-seed 2000 \
+    --output-path envs/reconcile_gst2b_env/data/sft_trajectories.jsonl \
+    --min-total 0.40
 ```
 
-**Success criteria.** `sft_trajectories.jsonl` has ≥ 1500 rows (some seeds get filtered by `--min-reward`). Mean composite reward on accepted rows should be ≥ 0.55. Distribution over the 5 labels should NOT be >80% `matched` — if the oracle is label-collapsing, Phase 2 will memorise `matched` and we'll reproduce the 0.353 plateau.
+**Success criteria.** `sft_trajectories.jsonl` has ≥ 1500 rows (some seeds get filtered by `--min-total`). Mean composite reward on accepted rows should be ≥ 0.55. Distribution over the 5 labels should NOT be >80% `matched` — if the oracle is label-collapsing, Phase 2 will memorise `matched` and we'll reproduce the 0.353 plateau.
+
+**Rollout audit (do this, not optional).** Before moving to Phase 2, manually read 5 trajectories sampled at random from the JSONL. Look for: (a) at least one mark_* action per trajectory, (b) `submit` as the final action, (c) no trajectories with only `get_schema` calls. If any of these fail, Phase 2 will train the model to mimic a bad policy. Self-serve guide Q52 calls this out explicitly: reward-rising-but-quality-not is the #1 post-training failure mode.
 
 ### Phase 2 — SFT warm-start (A100, ~4 h)
 
@@ -147,41 +159,67 @@ PYTHONPATH=src:envs uv run python -m \
 ### Phase 3 — GRPO polish (A100, ~4 h)
 
 ```bash
-# Edit scripts/train_grpo_real.py: point MODEL_NAME at the SFT checkpoint.
-# The change is a single line. Use Edit tool — do not rewrite the file.
+# Load the SFT checkpoint via --model (it's an argparse arg, default MODEL_NAME).
+# Do NOT edit the MODEL_NAME constant — pass --model on the CLI instead.
+# Real arg name is --total-steps (NOT --max-steps).
 
 # Smoke first (10 steps, confirms reward_std > 0 and grad_norm is healthy)
 PYTHONPATH=src:envs uv run python -m \
     envs.reconcile_gst2b_env.scripts.train_grpo_real \
-    --max-steps 10 \
+    --model envs/reconcile_gst2b_env/data/sft_checkpoint \
+    --total-steps 10 \
     --output-dir envs/reconcile_gst2b_env/data/grpo_smoke \
     2>&1 | tee envs/reconcile_gst2b_env/data/grpo_smoke.log
 
 # Real run (~200 steps, ~4 h)
 PYTHONPATH=src:envs uv run python -m \
     envs.reconcile_gst2b_env.scripts.train_grpo_real \
-    --max-steps 200 \
+    --model envs/reconcile_gst2b_env/data/sft_checkpoint \
+    --total-steps 200 \
     --output-dir envs/reconcile_gst2b_env/data/grpo_checkpoint \
     2>&1 | tee envs/reconcile_gst2b_env/data/grpo_run.log
 ```
 
 **Success criteria.** Eval total on hero seeds > 0.45 (clears the red-team ceiling). R1 ≥ 0.25 (up from 0.01 floor), R2 ≥ 0.30, R3 = 0.99 on at least half of hero seeds, R4 ≥ 0.40.
 
-### Phase 4 — measure and update docs (45 min)
+**Rollout audit (mandatory).** Before trusting the final metric, sample 5 rollouts from the GRPO run's last eval and read them manually. Specifically look for: does the model emit `mark_*` actions on mismatched invoices, or does it emit parseable-but-no-op `get_schema` repeatedly? Rising composite reward with exploit-style rollouts is the "worse-under-more-RL" failure (self-serve guide Q47). If you see it, STOP the run and diagnose rather than pushing through.
+
+### Phase 4 — measure and update docs (~1.5 h, includes an unavoidable code gap)
+
+**Heads-up: there is a genuine code gap here.** Neither existing baseline script can eval a trained checkpoint without edits:
+
+- `scripts/real_baseline.py` hardcodes `MODEL_NAME = "Qwen/Qwen2.5-3B-Instruct"` and has no `--model-path` flag. Args are `--condition {raw,prompted,both}`, `--n-seeds`, `--n-samples`, `--output`, `--max-steps`, `--max-new-tokens`.
+- `scripts/hero_baseline.py` has NO argparse at all. Hardcoded to seeds 9500/9501/9502, heuristic policy, writes `data/hero_baseline.json`.
+
+Your first Phase-4 action is to close that gap. Pick one of two paths:
+
+**Path A (preferred, smaller diff):** add a `--model-path` flag to `real_baseline.py` that overrides `MODEL_NAME` when set, reuses the rest of the pipeline, and writes to a caller-chosen `--output`. Gate behind TDD: write one failing test at `tests/envs/test_reconcile_gst2b_real_baseline_checkpoint.py` that constructs the script's main with a fake checkpoint path, confirm it fails, then implement. ~30 min.
+
+**Path B (cleaner separation, larger diff):** add `scripts/eval_trained.py`, a new script that loads a LoRA checkpoint via PEFT, runs the env over 30 heldout seeds × 3 samples with `model.generate`, and writes a JSON with the same schema as `baseline_metrics_real.json`. Takes `--model-path` `--base-model` `--n-seeds` `--output`. Lift the rollout loop from `real_baseline.py` to avoid drift. ~45 min.
+
+Either way, test the script against the SFT checkpoint first (fast, small) before pointing at the GRPO checkpoint. If Path A or B does not match the trained checkpoint's actual on-disk structure (LoRA adapter vs full weights — depends on how TRL saved it in Phase 3), adapt.
+
+Then:
 
 ```bash
-# Re-run the 30-heldout-seed eval with the GRPO checkpoint
+# Path A example invocation (after adding --model-path):
 PYTHONPATH=src:envs uv run python -m \
     envs.reconcile_gst2b_env.scripts.real_baseline \
-    --checkpoint envs/reconcile_gst2b_env/data/grpo_checkpoint \
+    --condition prompted \
+    --model-path envs/reconcile_gst2b_env/data/grpo_checkpoint \
     --n-seeds 30 \
-    --output-json envs/reconcile_gst2b_env/data/trained_eval.json
+    --output envs/reconcile_gst2b_env/data/trained_eval.json
 
-# Re-run hero seeds to get tier_a / tier_b / tier_c numbers
+# Hero seeds — hero_baseline.py has no argparse; the cleanest move is NOT to hack
+# it, but to reuse the new eval script restricted to hero seeds. Example:
 PYTHONPATH=src:envs uv run python -m \
-    envs.reconcile_gst2b_env.scripts.hero_baseline \
-    --checkpoint envs/reconcile_gst2b_env/data/grpo_checkpoint \
-    --output-json envs/reconcile_gst2b_env/data/trained_hero.json
+    envs.reconcile_gst2b_env.scripts.real_baseline \
+    --condition prompted \
+    --model-path envs/reconcile_gst2b_env/data/grpo_checkpoint \
+    --n-seeds 3 \
+    --output envs/reconcile_gst2b_env/data/trained_hero.json
+# and seed the script via an env var or CLI addition if --n-seeds alone doesn't
+# select 9500/9501/9502. Trace DEFAULT_SEEDS in real_baseline.py.
 ```
 
 Then edit, in this order:
@@ -259,6 +297,8 @@ These are load-bearing. Breaking any of them invalidates the submission's integr
 8. **Branch is `scaffold/reconcile-gst2b`.** Do not merge to main on-site. PRs against `main` come later.
 9. **HF Space requirements.txt has 6 pinned deps** (gradio, networkx, plotly, numpy, pandas, pydantic). If you add a runtime import to `app.py`, add it here too or the Space build breaks.
 10. **The 90-second demo URL `https://www.youtube.com/watch?v=rglR1hGgdb8`** is linked in 5+ docs. Do not change it unless Aakash uploads a new video.
+11. **QLoRA merge footgun.** If Phase 2 uses 4-bit quantization (QLoRA) and Phase 3 saves a merged model, do NOT naively upcast 4-bit → 16-bit and merge the LoRA adapters in one step — it damages model quality. Self-serve guide Q16 warns about this explicitly. Save adapters separately, or use the framework's proper merged-save path. Test generation immediately after save; do not defer post-training inference validation to end of run.
+12. **EXEC_SUMMARY.md line 8 currently says "41 tests green" — the real count is 42.** This is a pre-existing stale number. Do not fix it unilaterally on-site; flag to Aakash. If you update EXEC_SUMMARY with trained numbers in Phase 4, you can silently fix this as part of that edit.
 
 ---
 
