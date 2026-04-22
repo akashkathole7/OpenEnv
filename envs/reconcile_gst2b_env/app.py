@@ -205,8 +205,16 @@ def build_demo() -> gr.Blocks:
     with gr.Blocks(title="reconcile_gst2b_env") as demo:
         gr.Markdown(
             "# reconcile_gst2b_env\n"
-            "GST Input-Tax-Credit reconciliation environment. "
-            "See [scope_card.md](scope_card.md) for scope fence."
+            "**Multi-turn enterprise compliance workflow RL on OpenEnv.** "
+            "Instantiated on Indian GST Input-Tax-Credit reconciliation — "
+            "~14M businesses, monthly, still manual. Targeting **Scaler AI Labs — "
+            "Multi-App RL Environment for Enterprise Workflows** sub-theme.\n\n"
+            "**16 typed tool verbs · 5 labels · 4-component arithmetic reward · "
+            "6 red-team attacks CI-enforced <0.45 · 42 tests · `make reproduce` "
+            "bit-identical**\n\n"
+            "👇 **Live demo: select Tab 3 (Circular-Ring Viewer)**, pick hero seed "
+            "**9502**, click **Render** to see a planted directed-cycle fraud ring "
+            "in 3D. Full README + training evidence in the **Files** tab."
         )
 
         with gr.Tabs():
