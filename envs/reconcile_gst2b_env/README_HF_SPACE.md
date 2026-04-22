@@ -8,7 +8,7 @@ sdk_version: "6.12.0"
 app_file: app.py
 pinned: true
 license: mit
-short_description: Multi-turn enterprise compliance workflow RL environment built on OpenEnv
+short_description: Multi-turn enterprise workflow RL on OpenEnv
 tags:
   - openenv
   - reinforcement-learning
