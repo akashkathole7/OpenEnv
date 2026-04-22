@@ -43,6 +43,19 @@ I wrote six attacks and committed them to CI. Every one scores under 0.45; the t
 
 zero_itc is a deliberate R3 blind spot, claiming 0 trivially satisfies the cap. Defense-in-depth via R2 catches it at composite. That choice is documented in `rewards.py`.
 
+**Defense-in-depth map.** No single reward component carries the whole load. Each of the 6 attacks above is caught by at least two different components:
+
+| Attack | Primary defense | Secondary defense |
+|---|---|---|
+| submit_all_matched | R3 (per-supplier overclaim) | R4 (budget exhaustion) |
+| submit_all_mismatched | R1 (4-of-5 class F1 at 0) | R2 (zero claim vs true) |
+| confirm_spam | R3 (no query precondition) | R4 (budget) |
+| zero_itc | R2 (claim-vs-true delta) | R3 false positive (by design, tolerated) |
+| query_only | R1 (no labels) | R2 (no claim) |
+| overflag_rings | R1 (no mark labels) | R2 (no claim) |
+
+A reward-function change that weakens any component is caught by the other, plus the CI test fires if the composite crosses 0.45. This is the `test_reconcile_gst2b_reward_hacking.py` contract, and it is the single strongest anti-specification-gaming guardrail in the project.
+
 ## 6. A training run, honestly
 
 The first real GRPO attempt, Qwen3-0.6B + LoRA rank 16, 150 steps on Kaggle T4 with default TRL config, collapsed to a flat **0.353** at every eval. That's within 0.004 of `test_attack_query_only` (~0.349): training converged to a policy my own red-team suite documents as an attack. Diagnosis, three angles: Qwen3's `enable_thinking=True` default burned the 512-token budget on a `<think>` block, so `clipped_ratio=1.0` and no `<tool_call>` ever emitted; TRL's default `beta=0.04` KL-to-ref kept the LoRA tethered to base; with no tool calls, all 4 generations per group scored identically → `reward_std=0` → zero advantage → zero gradient.

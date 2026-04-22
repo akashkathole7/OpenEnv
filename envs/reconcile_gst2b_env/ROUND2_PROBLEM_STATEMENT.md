@@ -49,6 +49,7 @@ Built on **OpenEnv** (Meta PyTorch, latest release) as a first-class typed envir
 - **ReconcileAction** (Pydantic): one of 16 verbs with typed payloads. Unknown verbs rejected at the env boundary.
 - **ReconcileObservation** (Pydantic): invoices-remaining count, step budget, last tool result, user request. **Zero `true_*` fields**, hidden ground truth is a unit-tested invariant (`test_state_hides_ground_truth_from_observation`).
 - **ReconcileGST2BEnvironment**: 16 verbs split 7 query / 7 mutate / 2 meta. Two modes: `warmup` (lenient) and `hardened` (mid-episode termination on Rule 36(4) violation).
+- **RLVE-aligned** (Reinforcement Learning with Verifiable Environments): `generate_episode(seed)` is procedurally generative, 20-100 invoices per episode gives natural difficulty scaling, warmup vs hardened mode supports curriculum learning. Reward is verifier-based (arithmetic, no learned reward model), so the environment itself is the ground truth.
 - **Concurrent sessions** supported (`SUPPORTS_CONCURRENT_SESSIONS = True`), verified by `test_concurrent_episodes_are_state_isolated`.
 - **Deterministic in seed.** `generate_episode(seed)` produces identical purchase register + 2B + ground truth across processes. `make reproduce` is bit-identical.
 

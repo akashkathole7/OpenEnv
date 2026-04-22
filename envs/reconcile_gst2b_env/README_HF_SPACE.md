@@ -64,6 +64,8 @@ This environment captures that workflow as a partially observable, multi-turn, t
 
 **Episode**: 20–100 invoices, 50-step action budget. Deterministic in seed. `make reproduce` is bit-identical across processes.
 
+**RLVE-aligned (Reinforcement Learning with Verifiable Environments)**: `generate_episode(seed)` procedurally generates fresh episodes over an unbounded seed space; the 20-100 invoice range and warmup vs hardened mode give natural curriculum difficulty scaling; reward is verifier-based (arithmetic, no learned reward model), so the environment itself is the ground truth. This is the pattern recent RLVE literature argues prevents training-distribution saturation.
+
 **Five mismatch types** with weights `(1, 1, 1, 3, 3)`:
 - `gstin_typo`, 1-char PAN edit with recomputed Luhn-like checksum
 - `invoice_number_prefix_drift`, `INV/24-25/001` vs `INV-24-25-001`
