@@ -55,6 +55,46 @@ ls envs/reconcile_gst2b_env/data/
 
 ---
 
+## Theme and rubric crosswalk — load this before doing anything
+
+**Theme slot.** Round 2 Theme **#3.1 Professional Tasks** (World Modeling super-theme) with the **Scaler AI Labs** sub-theme "Multi-App RL Environment for Enterprise Workflows". Bonus-prize eligible. If a judge asks "which theme?" the one-sentence answer is: *"Theme 3.1 — professional world modeling, Scaler AI Labs sub-theme for enterprise workflow RL; GST reconciliation is the canonical enterprise workflow for ~14M Indian businesses."*
+
+**How each theme-3.1 criterion maps to our artifacts** (commit this to memory):
+
+| Theme #3.1 criterion | Artifact |
+|---|---|
+| Real interaction with tools / APIs / dynamic systems | 16 typed verbs (7 query + 7 mutate + 2 meta) |
+| "Real hard work instead of exploiting short-cuts" | 6 red-team attacks all < 0.45, CI-enforced |
+| Consistent internal state across a trajectory | `_state` + `_trajectory` in env server, 50-step budget |
+| Orchestrate multi-step workflows | query → identify → label → submit loop |
+| Causal reasoning + persistent world model | supplier graph, 2B-freeze dates, Rule 36(4) per-supplier cap |
+| Partially observable | ground truth hidden from agent (`ground_truth.py` oracle-only) |
+| Scaler sub-theme: enterprise workflow | monthly ITC reconciliation, CA-firm production workflow |
+
+**Round 1 rubric weights** (from Scaler email; assume Round 2 uses similar structure unless told otherwise on-site):
+
+| Criterion | Weight | Our standing |
+|---|---:|---|
+| Environment Innovation | 40% | Strong. Rings, five-mismatch generator, defense-in-depth reward, RLVE-aligned. |
+| Storytelling | 30% | Strong. BLOG, PITCH, QA, JUDGE_TOUR, 90s video, HF Space. |
+| **Showing Improvement in Rewards** | **20%** | **Weakest cell.** Prompting baseline (delta 1.18) only; trained numbers gated on Phase 2+3. **On-site priority is to lift this cell, not polish docs.** |
+| Reward + Pipeline setup | 10% | Strong. 4-component clamped reward, Tier 1+2 GRPO fixes, 42 tests. |
+
+**Practical implication.** If on-site time forces a tradeoff between running real training (closes cell 3) vs. writing more narrative (pads cell 2), **always pick training.** Cell 2 is already saturated; cell 3 is the lever.
+
+**Minimum requirements — verify all four are still satisfied before pitch:**
+1. OpenEnv latest release: check `pyproject.toml` and `openenv.yaml` on-site.
+2. Minimal TRL training script in Colab: `scripts/train_grpo_real.py` exists, runs on T4.
+3. Mini-blog OR <2min YouTube video: both exist (BLOG.md + https://www.youtube.com/watch?v=rglR1hGgdb8).
+4. OpenEnv-compliant env on HF Spaces: live; verify the Space loads on Day 1 before demo.
+
+**Unsloth honesty note.** Docs say "Unsloth drop-in ready for Phase 2 SFT / Phase 3 GRPO efficiency." The pre-staged scripts currently use HF transformers + PEFT + TRL, NOT Unsloth. If a judge presses, the truthful answer is: *"Unsloth is drop-in compatible via a single import swap in the trainer; we intentionally did not wire it in Round 1 to keep the pipeline minimal and debuggable. On-site we will wire it if A100 memory is tight."* Do not claim Unsloth is currently in the loop.
+
+**Known stale numbers to silently fix when you edit EXEC_SUMMARY in Phase 4:**
+- `EXEC_SUMMARY.md` line 8: "41 tests green" — real count is **42** (verify with `pytest tests/envs/test_reconcile_gst2b_*.py --collect-only -q`).
+
+---
+
 ## Files to read first (in order, before doing anything)
 
 1. **`envs/reconcile_gst2b_env/EXEC_SUMMARY.md`** — 13 numbered bullets. The judge-facing summary. Every claim in this file must survive Q&A.
