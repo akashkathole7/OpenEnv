@@ -17,6 +17,8 @@ tags:
 
 **Running at [huggingface.co/spaces/akashkathole/reconcile_gst2b_env](https://huggingface.co/spaces/akashkathole/reconcile_gst2b_env)** — try `reset` → `step` with `verb=get_schema` to see the environment respond.
 
+🎥 **[90-second demo video](https://www.youtube.com/watch?v=rglR1hGgdb8)** — hero seed 9502 circular-trading ring + reward breakdown + triple-failure-mode evidence.
+
 > Scope fence: see [scope_card.md](scope_card.md). **IN**: B2B domestic supply of goods, GST 2.0 slabs, GSTR-2B matching. **OUT**: RCM, ISD, SEZ, imports, composition dealers, e-invoicing, e-way bill.
 
 An OpenEnv environment for training an agent to reconcile a company's purchase register against its monthly **GSTR-2B** return: label each invoice across 5 categories, compute ITC delta in INR, flag Rule 36(4) violations, and detect planted circular-trading rings — all with a 16-verb tool surface and a 4-component arithmetic reward.

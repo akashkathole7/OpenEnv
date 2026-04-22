@@ -1,5 +1,8 @@
 # ReconcileEnv-GST2B: training a 3B model to do India's monthly ITC reconciliation, on a free Colab T4
 
+> 📹 **90-second demo**: https://www.youtube.com/watch?v=rglR1hGgdb8
+> &nbsp;&nbsp;Ring viewer · hero metrics · triple-failure-mode evidence across three Qwen3 scales.
+
 ## 1. The problem, for a non-Indian reader
 
 India's Goods and Services Tax (GST) is a federal value-added tax. Every registered business with B2B purchases has to match two documents every month: its own **purchase register** (what it claims it bought) and a regulator-generated document called **GSTR-2B** (what its suppliers claimed they sold to it, after cross-filing). Where the two agree, the business can claim back the GST its suppliers paid — "input tax credit" or ITC. Where they disagree — typos, date drift, tax-slab errors, late supplier filings, or outright fraud — the business either over-claims and gets a notice, or under-claims and forfeits money. In practice this is done by hand, by CA-firm juniors, on millions of invoices a month. It is rule-heavy, error-sensitive, and boring. An excellent target for RL.

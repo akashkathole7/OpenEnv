@@ -5,6 +5,7 @@
 **Submission author:** Aakash Kathole (solo)
 **Repo:** [github.com/akashkathole7/OpenEnv](https://github.com/akashkathole7/OpenEnv) · branch `scaffold/reconcile-gst2b`
 **Live Space:** [huggingface.co/spaces/akashkathole/reconcile_gst2b_env](https://huggingface.co/spaces/akashkathole/reconcile_gst2b_env)
+**90-second demo video:** [youtube.com/watch?v=rglR1hGgdb8](https://www.youtube.com/watch?v=rglR1hGgdb8)
 
 ---
 
@@ -21,6 +22,7 @@
 | Prompted vs raw baseline delta on Qwen2.5-3B-Instruct | **1.18** (95% CI [1.09, 1.27], 180 rollouts) | `data/baseline_metrics_real.json` |
 | Pre-onsite training attempts | **3** (0.6B / 1.7B / 4B) with distinct failure-mode documentation | `data/training_log_qwen3_*.json` |
 | `make reproduce` | **bit-identical** against committed artifacts | `Makefile:30` |
+| 90-second demo video | 🎥 [youtube.com/watch?v=rglR1hGgdb8](https://www.youtube.com/watch?v=rglR1hGgdb8) | — |
 
 ---
 

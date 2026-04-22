@@ -166,7 +166,7 @@ make reproduce
 - 📝 **Full blog + dev diary**: [`BLOG.md`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/BLOG.md)
 - 📋 **Round 2 problem statement**: [`ROUND2_PROBLEM_STATEMENT.md`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/ROUND2_PROBLEM_STATEMENT.md)
 - 📊 **Judge tour (10-min guided read)**: [`JUDGE_TOUR.md`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/JUDGE_TOUR.md)
-- 🎥 **90-second demo video**: *upload pending — will be linked here after onsite recording*
+- 🎥 **90-second demo video**: https://www.youtube.com/watch?v=rglR1hGgdb8
 - 🧪 **Red-team test file**: [`test_reconcile_gst2b_reward_hacking.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/tests/envs/test_reconcile_gst2b_reward_hacking.py)
 
 ---
