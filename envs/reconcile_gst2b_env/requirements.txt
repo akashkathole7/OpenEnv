@@ -1,0 +1,9 @@
+# HF Space runtime dependencies for reconcile_gst2b_env Gradio app.
+# Mirrors the [project.dependencies] block in pyproject.toml. Pinned
+# loosely to avoid resolver headaches on HF's build container.
+gradio>=4.0.0
+networkx>=3.0
+plotly>=5.18.0
+numpy
+pandas
+pydantic>=2.5
