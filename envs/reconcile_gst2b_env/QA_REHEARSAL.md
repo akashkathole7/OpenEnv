@@ -1,4 +1,4 @@
-# QA rehearsal — 22 judge probes + rebuttals
+# QA rehearsal, 22 judge probes + rebuttals
 
 Two lines max per rebuttal. Cite a file or a number.
 
@@ -10,9 +10,9 @@ failure mode for LLM-rubric rewards. `rewards.py` is 180 lines of arithmetic;
 
 ## Probe 2: Your HSN → slab table is wrong on entry X.
 
-Probably. `ground_truth.py` line 96 tags it `# synthetic training data only — not a
+Probably. `ground_truth.py` line 96 tags it `# synthetic training data only, not a
 tax-advice tool`; `scope_card.md` carries the same disclaimer. This is an RL
-reconciliation env — the regulator is in the reward shape, not in the HSN table.
+reconciliation env, the regulator is in the reward shape, not in the HSN table.
 
 ## Probe 3: How is this different from MEMTRACK?
 
@@ -25,12 +25,12 @@ terminal label + INR delta, not trajectory-level consistency.
 Measured on Kaggle T4, 180 rollouts of Qwen2.5-3B-Instruct: delta **1.18** with
 95% bootstrap CI [1.09, 1.27] excluding zero (`data/baseline_metrics_real.json`).
 Raw's 100% catastrophic_corruption is the structural −1.0 penalty for submitting
-without querying — an honest env failure mode, not a hack.
+without querying, an honest env failure mode, not a hack.
 
 ## Probe 5: Why are hero seeds still tier_a/b/c not easy/medium/hard?
 
 Measured totals on 9500/9501/9502 are 0.33 / 0.46 / 0.19 (`data/hero_baseline.json`).
-Ordering is 9501 > 9500 > 9502, not monotonic — done-gate #4 says promote only on
+Ordering is 9501 > 9500 > 9502, not monotonic, done-gate #4 says promote only on
 monotonicity. Spec-correct behavior; commit 2e336e7.
 
 ## Probe 6: zero_itc lets R3 hit 0.99 by claiming 0 ITC. Is that a bug?
@@ -47,14 +47,14 @@ regulated schema); see README § "Differentiation" table for overlap with τ-ben
 
 ## Probe 8: If the HSN table is synthetic, why trust anything downstream?
 
-The HSN table is exposed via `get_hsn_slab` as an agent tool — the agent uses
+The HSN table is exposed via `get_hsn_slab` as an agent tool, the agent uses
 whatever the env returns. Ground-truth labels are derived from the same table, so
 the reward is internally consistent regardless of whether CBIC would ratify the map.
 
 ## Probe 9: Why is `env_name="reconcile_gst2b_env"` not `"reconcile_gst2b"` per spec?
 
 Consistency with `openenv.yaml` `name:` field beats spec literalism; logged in
-NOTES.md § "Section D — deviations". `openenv validate` passes with this choice.
+NOTES.md § "Section D, deviations". `openenv validate` passes with this choice.
 
 ## Probe 10: `InvoiceGroundTruth` has 6 `true_*` fields, not 5. Spec violation?
 
@@ -64,7 +64,7 @@ join key required by the reward scorer.
 
 ## Probe 11: Why "50 queries exhaust budget" for no-op instead of "1 query + submit"?
 
-Literal "1 query + submit" computes to 0.353 — outside the done-gate's
+Literal "1 query + submit" computes to 0.353, outside the done-gate's
 [0.20, 0.32] band with the spec's R3/R4 formulas. "50 queries → budget exhaust"
 yields 0.255 ∈ band; flagged in NOTES.md and accepted by user.
 
@@ -78,9 +78,9 @@ shows the constraint-satisfaction math; user approved pre-commit.
 
 Hero seeds have fixed small mismatch counts (2/5/8) for pitch-demo reproducibility;
 the 60–80% band is a property of the training distribution, not hero demos.
-NOTES.md § "Section C — Hero seed matched-share" logs this explicitly.
+NOTES.md § "Section C, Hero seed matched-share" logs this explicitly.
 
-## Probe 14: R1 counts unlabeled invoices as FN but never FP. Asymmetric — bug?
+## Probe 14: R1 counts unlabeled invoices as FN but never FP. Asymmetric, bug?
 
 Real weakness; logged as NOTES.md § "Section E watch list" item 1. An agent that
 only labels when confident can over-score vs an all-wrong agent. Ablation target
@@ -88,11 +88,11 @@ for a future high-precision-lazy-labeler baseline.
 
 ## Probe 15: Looping `get_schema` 50 times satisfies R3's query gate. Exploitable?
 
-Yes — `attack_query_only` scores 0.349 (closest to the 0.45 ceiling). NOTES.md §
+Yes, `attack_query_only` scores 0.349 (closest to the 0.45 ceiling). NOTES.md §
 "Section E watch list" item 2 flags this; fix is require ≥2 distinct query verbs,
 deferred until ablation data shows it matters.
 
-## Probe 16: You added an `only_in_2b` planter — not in the original 5 types.
+## Probe 16: You added an `only_in_2b` planter, not in the original 5 types.
 
 Required to populate the 5th label. Scales with `n_mismatches` (`round(n_mismatches
 * uniform(0.2, 0.4))`); logged as deviation #3 in NOTES.md § "Section C".
@@ -109,32 +109,32 @@ They pass the algorithm documented in `ground_truth.py:45` (base-36 Luhn-like,
 right-to-left, weights 2/1). `27AAPFU0939F1ZV` is a public test vector used as
 the algorithm anchor; all 4 synthetic entries recompute to a valid checksum.
 
-## Probe 19: Python pinned to ≥3.11 — why not 3.12?
+## Probe 19: Python pinned to ≥3.11, why not 3.12?
 
 3.11 is what Colab T4 ships with; 3.12 would force us to either roll our own
-Colab image or lose the free-tier demo. Colab default wins — pragmatic choice,
+Colab image or lose the free-tier demo. Colab default wins, pragmatic choice,
 not a principled one.
 
 ## Probe 20: Training curves are flat across 20 steps. Is training actually happening?
 
-No — scaffold eval uses the heuristic policy at every step (`evaluate_heuristic`
+No, scaffold eval uses the heuristic policy at every step (`evaluate_heuristic`
 in `training.py:175`). The real GRPO step is a documented placeholder; Cell 4 of
 `notebooks/dryrun_t4.ipynb` carries "flat curves are expected" as the caption.
 
-## Probe 21: Your training curve is flat — did training actually work?
+## Probe 21: Your training curve is flat, did training actually work?
 
 Three Qwen3 scales, three distinct failure modes: 0.6B pins R1/R2 (bimodal
 tool-call rate, see `data/smoke_test_10step.json`); 1.7B pins all components
 in training (entropy collapse to 0.12, `data/training_log_qwen3_1_7b_partial.json`);
 4B pins R4 (over-queries to budget exhaustion, baseline 0.255 in
 `data/training_log_qwen3_4b_partial.json`). Different reward components defend
-against different failure modes — env is working as designed. Tier 1+2 fixes
+against different failure modes, env is working as designed. Tier 1+2 fixes
 (commit 3ca024d) land mechanically; real fix requires tool-SFT warm-start +
 larger model on A100 compute.
 
 ## Probe 22: Isn't the 1.18 delta inflated by raw hitting the −1.0 structural floor?
 
-Partly — raw scores ≈ −1.00 because 100% of rollouts submit before any query and
+Partly, raw scores ≈ −1.00 because 100% of rollouts submit before any query and
 take the −1.0 penalty. But prompted's per-component means tell the real story:
 R3=0.87 (genuine Rule 36(4) compliance), R4=0.79 (real step efficiency), not
 artifacts of raw's floor. R1=R2=0.01 are the genuine gaps training needs to close.

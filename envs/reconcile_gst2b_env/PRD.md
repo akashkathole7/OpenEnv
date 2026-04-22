@@ -1,9 +1,9 @@
-# reconcile_gst2b_env — PRD
+# reconcile_gst2b_env, PRD
 
 ## Problem
 
-Indian GST Input-Tax-Credit reconciliation — matching a company's purchase
-register against its regulator-generated GSTR-2B monthly — is rule-heavy,
+Indian GST Input-Tax-Credit reconciliation, matching a company's purchase
+register against its regulator-generated GSTR-2B monthly, is rule-heavy,
 error-sensitive, and done by hand across ~14M registered GST taxpayers.
 Failure modes (GSTIN typos, format drift, slab errors, late filings,
 post-freeze amendments, circular trading) are well-cataloged and the
@@ -26,7 +26,7 @@ Not the tax-payer. Two downstream users:
 - **Labels** = 5 (matched, mismatched, only_in_books, only_in_2b, partial).
 - **Budget** = 50 steps. Submit before ≥1 query → structural −1.0.
 - **Modes** = warmup (default) and hardened (terminates mid-episode on Rule 36(4) per-supplier cap violation).
-- **Hidden state** = ground-truth labels, books, 2B, company_gstin — never surfaced in `ReconcileObservation`.
+- **Hidden state** = ground-truth labels, books, 2B, company_gstin, never surfaced in `ReconcileObservation`.
 
 ## Success criteria
 
@@ -51,7 +51,7 @@ Not the tax-payer. Two downstream users:
 
 ## Verifiers
 
-- **Reward (programmatic, no LLM)** — `rewards.py`, ~180 lines of arithmetic, auditable top-to-bottom.
-- **Adversarial ceiling (CI-enforced)** — `tests/envs/test_reconcile_gst2b_reward_hacking.py`, 6 attacks each asserted < 0.45.
-- **Bit-identical regeneration** — `make reproduce` runs all scripts and byte-compares outputs against committed JSONs.
-- **Human spot-check** — `data/audit.html`, 10 seeds side-by-side; hand-audited on seeds 3, 5, 9 before freeze.
+- **Reward (programmatic, no LLM)**, `rewards.py`, ~180 lines of arithmetic, auditable top-to-bottom.
+- **Adversarial ceiling (CI-enforced)**, `tests/envs/test_reconcile_gst2b_reward_hacking.py`, 6 attacks each asserted < 0.45.
+- **Bit-identical regeneration**, `make reproduce` runs all scripts and byte-compares outputs against committed JSONs.
+- **Human spot-check**, `data/audit.html`, 10 seeds side-by-side; hand-audited on seeds 3, 5, 9 before freeze.
