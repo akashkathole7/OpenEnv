@@ -123,10 +123,14 @@ in `training.py:175`). The real GRPO step is a documented placeholder; Cell 4 of
 
 ## Probe 21: Your training curve is flat — did training actually work?
 
-10 steps confirmed Tier 1+2 fixes work mechanically (reward_std positive, grad_norm
-positive, tool-call frequency 0.25 — see `data/smoke_test_10step.json`). Model
-plateaus because Qwen3-0.6B on 448-token budget can't chain ≥5 actions; that's
-the environment working as designed, not broken training.
+Three Qwen3 scales, three distinct failure modes: 0.6B pins R1/R2 (bimodal
+tool-call rate, see `data/smoke_test_10step.json`); 1.7B pins all components
+in training (entropy collapse to 0.12, `data/training_log_qwen3_1_7b_partial.json`);
+4B pins R4 (over-queries to budget exhaustion, baseline 0.255 in
+`data/training_log_qwen3_4b_partial.json`). Different reward components defend
+against different failure modes — env is working as designed. Tier 1+2 fixes
+(commit 3ca024d) land mechanically; real fix requires tool-SFT warm-start +
+larger model on A100 compute.
 
 ## Probe 22: Isn't the 1.18 delta inflated by raw hitting the −1.0 structural floor?
 

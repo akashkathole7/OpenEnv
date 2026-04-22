@@ -153,6 +153,7 @@ data/*
 !data/baseline_metrics_real.json
 !data/smoke_test_10step.json
 !data/training_log_qwen3_1_7b_partial.json
+!data/training_log_qwen3_4b_partial.json
 !data/transcripts/
 data/transcripts/*
 !data/transcripts/raw/
