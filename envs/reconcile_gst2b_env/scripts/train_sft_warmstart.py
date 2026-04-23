@@ -127,8 +127,17 @@ def main() -> int:
     parser.add_argument(
         "--max-seq-length",
         type=int,
-        default=4096,
-        help="Per-example max length. Multi-turn conversations can run 2-3K tokens.",
+        default=2048,
+        help="Per-example max length. Multi-turn conversations can run 3-6K tokens; "
+        "truncating at 2048 keeps per-step wall time tractable on T4. "
+        "Larger values are viable on A100 (see ONSITE_BRIEFING.md Phase 2).",
+    )
+    parser.add_argument(
+        "--precision",
+        choices=("fp16", "bf16"),
+        default="fp16",
+        help="Mixed-precision mode. fp16 is correct for T4 (Turing tensor cores are "
+        "fp16-only, bf16 falls back to slow CUDA-core compute). Use bf16 on Ampere+.",
     )
     parser.add_argument(
         "--warmup-ratio",
@@ -243,6 +252,8 @@ def main() -> int:
         task_type="CAUSAL_LM",
     )
 
+    use_bf16 = args.precision == "bf16"
+    use_fp16 = args.precision == "fp16"
     sft_cfg = SFTConfig(
         output_dir=str(args.output_dir),
         num_train_epochs=args.epochs,
@@ -253,7 +264,8 @@ def main() -> int:
         logging_steps=args.logging_steps,
         save_steps=args.save_steps,
         save_total_limit=2,
-        bf16=True,
+        bf16=use_bf16,
+        fp16=use_fp16,
         max_length=args.max_seq_length,
         packing=False,  # multi-turn convos: don't concat across examples
         report_to="none",
