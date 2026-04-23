@@ -162,6 +162,14 @@ def main() -> int:
         action="store_true",
         help="Load 5 examples, instantiate trainer, exit before train(). CPU-runnable.",
     )
+    parser.add_argument(
+        "--limit-rows",
+        type=int,
+        default=None,
+        help="Cap the dataset to the first N rows. Use for smoke cycles "
+        "(e.g. --limit-rows 300) to verify the training loop reaches the "
+        "first loss log before committing to a full run.",
+    )
     args = parser.parse_args()
 
     if not args.input_jsonl.exists():
@@ -238,6 +246,13 @@ def main() -> int:
     if args.dry_run:
         ds = ds.select(range(min(5, len(ds))))
         print(f"[dry-run] using {len(ds)} examples", flush=True)
+    elif args.limit_rows is not None:
+        ds = ds.select(range(min(args.limit_rows, len(ds))))
+        print(
+            f"[--limit-rows {args.limit_rows}] using {len(ds)} training examples "
+            f"(smoke-cycle subset)",
+            flush=True,
+        )
     else:
         print(f"loaded {len(ds)} training examples", flush=True)
 
@@ -254,6 +269,11 @@ def main() -> int:
 
     use_bf16 = args.precision == "bf16"
     use_fp16 = args.precision == "fp16"
+    # Do not pass dataset_text_field. In TRL >=1.0 the default ("text") plus
+    # the collator's own messages-column auto-detect is what actually routes
+    # chat-format data; passing None in 1.x was observed to stall silently
+    # between __init__ and the first step (no progress bar, ~1.5h silence
+    # on Kaggle T4 with Qwen3-1.7B). See RCA 2026-04-23.
     sft_cfg = SFTConfig(
         output_dir=str(args.output_dir),
         num_train_epochs=args.epochs,
@@ -269,9 +289,6 @@ def main() -> int:
         max_length=args.max_seq_length,
         packing=False,  # multi-turn convos: don't concat across examples
         report_to="none",
-        # SFTTrainer reads the "messages" column from JSONL and auto-applies
-        # the chat template (which we patched above to skip enable_thinking).
-        dataset_text_field=None,  # signals "use messages format"
     )
 
     trainer = SFTTrainer(
