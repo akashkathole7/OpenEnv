@@ -74,6 +74,7 @@ sys.path.insert(0, str(REPO))
 # Reuse the GRPO script's TRL version check so SFT and GRPO phases
 # enforce the same TRL >= 0.21 invariant.
 from envs.reconcile_gst2b_env.scripts.train_grpo_real import (  # noqa: E402
+    LORA_ALPHA,
     LORA_RANK,
     LORA_TARGETS,
     _assert_trl_version,
@@ -235,7 +236,7 @@ def main() -> int:
     # SFT checkpoint slots cleanly into the GRPO phase without re-init.
     lora_cfg = LoraConfig(
         r=LORA_RANK,
-        lora_alpha=LORA_RANK,
+        lora_alpha=LORA_ALPHA,
         lora_dropout=0.05,  # higher than GRPO's 0.0; SFT has more data, regularize more
         target_modules=LORA_TARGETS,
         bias="none",

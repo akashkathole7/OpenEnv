@@ -69,11 +69,24 @@ from envs.reconcile_gst2b_env.server.reconcile_gst2b_environment import (  # noq
 # tier attempt before pivoting to tool-SFT warm-start + A100.
 MODEL_NAME = "Qwen/Qwen3-4B"
 LORA_RANK = 16
-# q/v only covers ~half of attention's learnable surface. Adding k/o lets
-# the adapter shift key projections (affects what the model attends to)
-# and output projections (affects how attended info flows forward),
-# roughly doubling the representational surface at small VRAM cost.
-LORA_TARGETS = ["q_proj", "k_proj", "v_proj", "o_proj"]
+# alpha=2*rank per Thinking Machines "LoRA Without Regret" (Daniel Han,
+# referenced in the 2026-04-22 Scaler workshop). Default alpha=rank is
+# the naive PEFT setting; 2x gives the adapter more expressive scale
+# without inflating parameter count.
+LORA_ALPHA = LORA_RANK * 2
+# attention-only (q/k/v/o) leaves MLP capacity on the table. Daniel's
+# lecture flagged this as the #1 silent underperformance in LoRA setups.
+# gate_proj + up_proj + down_proj cover the MLP block. Small VRAM cost,
+# measurable quality lift per the Thinking Machines blog.
+LORA_TARGETS = [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj",  # attention
+    "gate_proj",
+    "up_proj",
+    "down_proj",  # MLP (per Daniel Han, 2026-04-22)
+]
 # 1e-5 survived 0.6B smoke and 1.7B's 15-step partial. Keep it for 4B —
 # LoRA LR tends to be relatively model-size-insensitive, and the
 # absolute 0.30 collapse early-stop catches instability.
@@ -814,7 +827,7 @@ def main() -> int:
     # LoRA config.
     lora_cfg = LoraConfig(
         r=LORA_RANK,
-        lora_alpha=LORA_RANK,
+        lora_alpha=LORA_ALPHA,
         lora_dropout=0.0,
         target_modules=LORA_TARGETS,
         bias="none",
