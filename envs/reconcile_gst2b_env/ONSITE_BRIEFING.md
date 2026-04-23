@@ -250,6 +250,10 @@ PYTHONPATH=src:envs uv run python -m \
 
 **Rollout audit (mandatory).** Before trusting the final metric, sample 5 rollouts from the GRPO run's last eval and read them manually. Specifically look for: does the model emit `mark_*` actions on mismatched invoices, or does it emit parseable-but-no-op `get_schema` repeatedly? Rising composite reward with exploit-style rollouts is the "worse-under-more-RL" failure (self-serve guide Q47). If you see it, STOP the run and diagnose rather than pushing through.
 
+**Rollout-length canary (better than manual reads).** Per Lewis Tunstall (Scaler workshop 2026-04-22): "if rollouts are going to infinity, reward is exploiting peculiar tokens." Add a per-step metric: mean rollout length averaged over the batch. Our step budget is 50; a healthy policy should stabilize between 8-20 steps per episode. If `mean_rollout_length` climbs monotonically toward 50 across training, the model is hacking — reward may be going up on paper but the policy is exploiting budget-exhaust patterns. This is a quantitative signal you can chart, unlike manual reading. If you wire TrackIO (see below), expose this metric on the dashboard.
+
+**Optional: TrackIO dashboard for Phase 2/3 (judge-visible storytelling).** Lewis's live demo showed TrackIO auto-creating an HF Space with the training dashboard. One-liner wire-in to TRL's trainer config. If added before Phase 2 starts, you get a live-looking reward curve during the pitch — much stronger than a pasted PNG. This adds to the 30% storytelling cell of the rubric at near-zero cost. Skip if you are time-squeezed; add if Phase 2 smoke passes with margin.
+
 ### Phase 4 — measure and update docs (~1.5 h, includes an unavoidable code gap)
 
 **Heads-up: there is a genuine code gap here.** Neither existing baseline script can eval a trained checkpoint without edits:
@@ -318,9 +322,10 @@ Then redeploy the HF Space (Aakash has the git remote URL for the Space clone in
 
 | Symptom | Action |
 |---|---|
-| `sft_trajectories.jsonl` empty or <100 rows | Lower `--min-reward` to 0.30. Oracle policy may be scoring lower than expected on fresh seed ranges. |
+| `sft_trajectories.jsonl` empty or <100 rows | Lower `--min-total` to 0.30. Oracle policy may be scoring lower than expected on fresh seed ranges. |
 | Label distribution >80% single class | Increase mismatch weights in `seed_generator.py`: the `(1,1,1,3,3)` weight tuple. DO NOT edit `rewards.py`. |
-| CPU run exceeds 4 h | Kill, reduce `--seed-end` to 1000. 1000 filtered trajectories is enough for Phase 2. |
+| CPU run exceeds 4 h | Kill, reduce `--end-seed` to 1000. 1000 filtered trajectories is enough for Phase 2. |
+| Trajectory count too low AND trajectories that exist look correct | **Extend the oracle.** Per David (Scaler workshop 2026-04-22), environments are synthetic-data generators, not only RL substrates. Add heuristic variants to `scripts/_policies.py`: e.g., a "second-opinion" policy that tags by HSN+slab mismatch first, or a "supplier-late-first" policy. Generate trajectories from each variant, union the JSONLs. This lifts row count *and* label diversity without touching the env. |
 
 ### Phase 2 failures
 
@@ -344,7 +349,8 @@ Then redeploy the HF Space (Aakash has the git remote URL for the Space clone in
 
 If the A100 is only available for, say, a 2-hour block instead of the planned 8-hour window:
 
-- **Skip Phase 2**, run Phase 3 GRPO directly from base Qwen3-4B for 60–100 steps. We already know it fails (4B over-queries, budget-exhausts), but a partial run with the Tier 1+2 fixes applied may still lift R1/R2 off the 0.01 floor.
+- **Phase 2 is not optional under normal time — it is load-bearing.** Per David (Scaler workshop 2026-04-22) and Daniel's P(good answer) law: if P(good answer) = 0, RL never learns. Our 4B-over-queries failure mode is exactly this: the base model never chains `mark_*` actions correctly, so GRPO has no positive gradient to climb. Skipping Phase 2 means GRPO explores a mostly-zero reward surface.
+- **Only as absolute last resort** (compute block <2h and falling), skip Phase 2 and run Phase 3 GRPO directly from base Qwen3-4B for 60–100 steps. **Expected outcome: trained total lower than the prompting baseline (0.18).** This is not a recovery path, it is a "produce a non-empty training log for the record" path. Document it as such in the commit message.
 - **Do NOT** fake numbers. If trained numbers are worse than the prompting baseline, the honest story is: "we ran out of compute on-site; the pre-staged SFT warm-start script is in the repo for post-hackathon validation." Judges reward honesty per the collapse narrative already in `BLOG.md` §6.
 
 ---
@@ -363,7 +369,7 @@ These are load-bearing. Breaking any of them invalidates the submission's integr
 8. **Branch is `scaffold/reconcile-gst2b`.** Do not merge to main on-site. PRs against `main` come later.
 9. **HF Space requirements.txt has 6 pinned deps** (gradio, networkx, plotly, numpy, pandas, pydantic). If you add a runtime import to `app.py`, add it here too or the Space build breaks.
 10. **The 90-second demo URL `https://www.youtube.com/watch?v=rglR1hGgdb8`** is linked in 5+ docs. Do not change it unless Aakash uploads a new video.
-11. **QLoRA merge footgun.** If Phase 2 uses 4-bit quantization (QLoRA) and Phase 3 saves a merged model, do NOT naively upcast 4-bit → 16-bit and merge the LoRA adapters in one step — it damages model quality. Self-serve guide Q16 warns about this explicitly. Save adapters separately, or use the framework's proper merged-save path. Test generation immediately after save; do not defer post-training inference validation to end of run.
+11. **QLoRA merge footgun — quantified ~30% quality damage.** If Phase 2 uses 4-bit quantization (QLoRA) and Phase 3 saves a merged model, do NOT naively upcast 4-bit → 16-bit and merge the LoRA adapters in one step. Daniel Han (Unsloth; Scaler workshop 2026-04-22) put the damage at **~30%** of model quality. The correct flow: download the original 16-bit base weights, merge the LoRA adapter into *those*, not into the dequantized 4-bit copy. Unsloth handles this automatically; vanilla PEFT does not. **Phase 4 guard rail:** before running your eval script on the GRPO checkpoint, run it once on the SFT checkpoint and sanity-check output generations — not just "does it load". A broken merge produces outputs that parse-as-JSON but are semantically garbage, which the env scorer will read as low R1/R2 and you will mis-attribute as "training failed" rather than "merge broke the model". Self-serve guide Q16 covers this too.
 12. **EXEC_SUMMARY.md line 8 currently says "41 tests green" — the real count is 42.** This is a pre-existing stale number. Do not fix it unilaterally on-site; flag to Aakash. If you update EXEC_SUMMARY with trained numbers in Phase 4, you can silently fix this as part of that edit.
 
 ---
@@ -392,7 +398,23 @@ Memorise. If a judge asks "what's the baseline?" the answer is **#5**. If a judg
 8. **42 tests** green. `openenv validate --verbose` passes.
 9. **0.30 probability** of a directed 3-cycle ring being planted per episode.
 10. **Three distinct Qwen3 failure modes** across 0.6B / 1.7B / 4B: pin R1+R2 / pin all / pin R4. Environment is correctly hard.
-11. **Stack compliance**: OpenEnv + TRL + PEFT. Unsloth drop-in ready. RLVR-style reward (verifier-based, no learned reward model).
+11. **Stack compliance**: OpenEnv + TRL + PEFT. Unsloth drop-in ready. RLVR-style reward (verifier-based, no learned reward model). LoRA config: rank 16, alpha 32 (2×rank per Thinking Machines direction), target_modules span both attention (q/k/v/o) and MLP (gate/up/down) per Daniel Han workshop guidance.
+
+---
+
+## Judge Q&A — framing ammunition from the Scaler workshop (2026-04-22)
+
+Use these only if asked. Do not volunteer them; they are insurance.
+
+- **"Why fixed reward weights 0.40/0.25/0.25/0.10 instead of dynamic/curriculum weighting?"** Daniel Han specifically recommended time-varying weights (length penalty high at start, decay to zero) at the workshop. Our answer: *"We prioritized auditability of the reward contract over training efficiency. The CI-enforced red-team tests (tests/envs/test_reconcile_gst2b_reward_hacking.py) require a stable reward definition so we can make the defense-in-depth guarantee load-bearing. Dynamic weighting is a natural v2 extension once the static baseline is proven."* This is a defensible position, not a mistake.
+
+- **"Is this really hard, or is your model just small?"** Frame with Lewis Tunstall's *"jagged intelligence"* concept: frontier models are spiky on in-distribution tasks and fail stupidly off-axis. Our triple Qwen3 failure mode across 0.6B/1.7B/4B matches Daniel's formal failure-mode taxonomy (deterministic collapse / length collapse / over-exploration) — standard RL pathology, not a bug in our env. GST reconciliation is a real capability gap, not a toy.
+
+- **"How do you know your rewards aren't gamed?"** Setup: *"Search will give you exactly what you asked for, which may or may not be what you wanted"* (David, workshop). Payoff: the Delhi cobras analogy — British colonial government paid a bounty for dead cobras; people bred cobras for bounties; outcome was more cobras. That is what a naively designed reward does. Our defense: 6 red-team attacks all scoring under 0.45, CI-enforced, each caught by at least two components (defense-in-depth table in BLOG.md §5).
+
+- **"Why not vLLM for rollouts?"** Our `train_grpo_real.py` has `use_vllm=False`. Answer: *"Daniel Han's workshop called out the vLLM/trainer precision-mismatch failure where the vLLM rollout policy silently diverges from the TRL update policy. By using HF generation we avoid the trap at the cost of some throughput. Once we have a reproducible reward curve we can swap in vLLM with matched precision."* This turns a pragmatic choice into a considered one.
+
+- **"Why LoRA, not full fine-tuning?"** Hook: Thinking Machines' "LoRA Without Regret" direction. We target both attention (q/k/v/o) and MLP (gate/up/down) projections with alpha=2*rank, which per Daniel is the setup that matches full fine-tuning quality in practice on small-to-medium models. Not "we cheaped out", but "we picked the LoRA configuration that has the research backing".
 
 ---
 
