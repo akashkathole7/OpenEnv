@@ -1,6 +1,28 @@
-# ONSITE_BRIEFING.md — handoff prompt for a fresh Claude session at Bangalore on-site
+# ONSITE_BRIEFING.md — handoff prompt for a fresh Claude session (pre-onsite or on-site)
 
-> **How to use this file.** On April 25, 2026 (on-site Day 1 at Bangalore), paste this entire document as the first message to a new Claude Code session opened inside `/home/aakash/Videos/ReconcileEnv-GST2B`. Everything below is written *as a direct prompt to that Claude*. No pre-amble, no introductions, no recap. Read the "Files to read first" section, then execute the pipeline in order.
+> **How to use this file.** Paste this entire document as the first message to a new Claude Code session opened inside `/home/aakash/Videos/ReconcileEnv-GST2B`. Everything below is written *as a direct prompt to that Claude*. No pre-amble, no introductions, no recap. First read the "Mode" section below to set context, then the "Files to read first" list, then execute the pipeline in order.
+
+---
+
+## Mode — pre-onsite (Kaggle T4×2) vs on-site (Bangalore A100)
+
+**Ask Aakash which mode you are in before executing any training phase.** The two modes differ on compute and model choice:
+
+| Setting | Pre-onsite (Apr 22-24, Kaggle T4×2) | On-site (Apr 25-26, Bangalore A100) |
+|---|---|---|
+| Compute | Kaggle T4×2 (2× 16GB = 32GB VRAM total) | Single A100 40GB block |
+| Phase 1 trajectory gen | Aakash's laptop CPU (same, ~2h) | Aakash's laptop CPU (same, ~2h) |
+| Phase 2 SFT model | **`Qwen/Qwen3-1.7B`** (4B is too tight on T4×2 with GRPO rollouts) | **`Qwen/Qwen3-4B`** (default) |
+| Phase 3 GRPO model | Same 1.7B SFT checkpoint | Same 4B SFT checkpoint |
+| Phase 2/3 batch config | `--batch-size 1 --grad-accum 8`; if OOM, drop `grad-accum` to 4 | `--batch-size 1 --grad-accum 8` |
+| Phase 3 `num_generations` | 2 (already T4 default in `train_grpo_real.py`) | Can keep 2, or bump to 4 if A100 memory permits |
+| Pass criterion | Any trained total > 0.30 on 30 heldout seeds is a shippable pre-onsite result. Push to HF Space before automated screen runs. | Scale up from the 1.7B pre-onsite result: either re-SFT on 4B or continue-train from 1.7B checkpoint. Target: > 0.45. |
+
+**Motivation for running pre-onsite.** Team email (2026-04-22) confirms initial screening is automated with ~800 submissions; only top teams get the 20-30 min human review. Trained numbers on the Space before the screen runs = higher chance of reaching human review. On-site is for scaling up, not first-run.
+
+**Where to substitute in commands below.** Everywhere the Phase 2 / Phase 3 blocks say `--model Qwen/Qwen3-4B` or reference "A100 40GB", swap in the pre-onsite values from the table above when running on Kaggle. All other commands (Phase 0, Phase 1, Phase 4) are identical in both modes.
+
+**Kaggle notebook skeleton.** If Aakash asks for a Kaggle notebook for Phase 2 or 3, these are the cells you need: (a) `git clone` the fork at `scaffold/reconcile-gst2b`, (b) `uv sync --all-extras` or `pip install -e .` + `pip install 'trl>=0.21' peft accelerate bitsandbytes`, (c) upload `sft_trajectories.jsonl` via Kaggle Datasets and symlink into `envs/reconcile_gst2b_env/data/`, (d) run the Phase 2 or 3 command with `Qwen/Qwen3-1.7B` substituted in, (e) save the output directory back to `/kaggle/working/` for download. Ask Aakash to paste the notebook if one already exists.
 
 ---
 
@@ -172,7 +194,9 @@ PYTHONPATH=src:envs uv run python -m \
 
 **Rollout audit (do this, not optional).** Before moving to Phase 2, manually read 5 trajectories sampled at random from the JSONL. Look for: (a) at least one mark_* action per trajectory, (b) `submit` as the final action, (c) no trajectories with only `get_schema` calls. If any of these fail, Phase 2 will train the model to mimic a bad policy. Self-serve guide Q52 calls this out explicitly: reward-rising-but-quality-not is the #1 post-training failure mode.
 
-### Phase 2 — SFT warm-start (A100, ~4 h)
+### Phase 2 — SFT warm-start (A100 ~4h on-site, OR T4×2 ~2-3h pre-onsite)
+
+**Mode substitution reminder:** pre-onsite on Kaggle T4×2 → replace `Qwen/Qwen3-4B` with `Qwen/Qwen3-1.7B` below. See the Mode section at the top.
 
 ```bash
 # Smoke first (dry run, CPU, ~30 s — verifies code path loads)
@@ -196,7 +220,9 @@ PYTHONPATH=src:envs uv run python -m \
 
 **Success criteria.** Final train loss < 0.8. No OOM. A checkpoint directory at `data/sft_checkpoint/` containing `adapter_model.safetensors`. A quick eval over 30 heldout seeds should show tool-call rate > 0.8 per rollout (compared to 0.25 bimodal at 0.6B pre-fix, 0.00 at 1.7B, 1.0 but never-commits at 4B).
 
-### Phase 3 — GRPO polish (A100, ~4 h)
+### Phase 3 — GRPO polish (A100 ~4h on-site, OR T4×2 ~3-4h pre-onsite)
+
+**Mode substitution reminder:** pre-onsite, `--model` points at the 1.7B SFT checkpoint produced by Phase 2, not a 4B one.
 
 ```bash
 # Load the SFT checkpoint via --model (it's an argparse arg, default MODEL_NAME).
