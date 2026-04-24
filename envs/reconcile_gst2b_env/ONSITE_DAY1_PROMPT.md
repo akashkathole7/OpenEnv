@@ -16,7 +16,12 @@ You are continuing **Aakash Kathole's hackathon project** (solo entrant, Meta ×
 
 1. **`envs/reconcile_gst2b_env/ONSITE_BRIEFING.md`** — the original briefing, 444 lines. Mode table, rubric crosswalk, Phase 0-4 commands, 12 invariants, 11 numbers Aakash defends in Q&A, judge Q&A ammo, emergency fallback. Written 2026-04-22, updated through 2026-04-22.
 2. **`envs/reconcile_gst2b_env/LESSONS_LEARNED.md`** — 6-section engineering retrospective of the pre-onsite Kaggle attempts (written 2026-04-24). Covers: which training logs survived commit (0.6B only), five Kaggle env brittleness failures, two distinct training hangs, what ships, what's corrected for on-site. Read this before touching the training pipeline.
-3. **`git log --oneline -20`** — the commit trail. Most recent commits as of 2026-04-24 end-of-day:
+3. **`git log --oneline -20`** — the commit trail. Most recent commits as of 2026-04-24 end-of-day (pre-onsite hotel window in Bangalore, after the polish sprints + tab-live sprints):
+   - `503d9c0 feat: make Gradio tab 4 'Baseline Comparison' live` ← **Tab 4 now shows a composite-reward bar chart**
+   - `a051a7b fix: app.py oracle uses SimpleNamespace + rewards directly (no openenv)` ← **app.py has NO openenv import, uses stubs + composite_reward directly**
+   - `5cb88ad feat: make Gradio tab 2 'Rollout Replay' live with oracle trace (F7)` ← **Tab 2 runs oracle episodes, shows verb trace + reward breakdown**
+   - `fd601d4 docs: tighten training plots for thumbnail legibility (F1 fix)` ← **data/figures/three_scales_*.png rewritten at dpi=200 with cleaner attack-range band**
+   - `906284e docs: add ONSITE_DAY1_PROMPT.md handoff` ← **(this file's first version)**
    - `2595df5 docs: add LESSONS_LEARNED.md`
    - `afade93 docs: concretize README Rubric-mapping section with real OpenEnv API`
    - `c6cf710 docs: rewrite README top for 3-5 min judge flow`
@@ -28,6 +33,25 @@ You are continuing **Aakash Kathole's hackathon project** (solo entrant, Meta ×
    - `7ffc164 fix: restore CUDA torch` (Kaggle-only, irrelevant on A100)
    - `723d2c3 fix: switch SFT to fp16 + max_seq 2048` (T4-specific; A100 can use bf16)
    - `9ab9e4e fix: force Kaggle cells 10/12 to single GPU` (Kaggle-only)
+
+### HF Space tab state (what's already live, do NOT rebuild)
+
+As of this handoff, the deployed Hugging Face Space [huggingface.co/spaces/akashkathole/reconcile_gst2b_env](https://huggingface.co/spaces/akashkathole/reconcile_gst2b_env) has:
+
+- **Tab 1 Schema + Label Diff** — placeholder (honest scope; judges see "coming after on-site training")
+- **Tab 2 Rollout Replay** — LIVE, runs oracle on any seed, shows verb trace + 4-component reward breakdown
+- **Tab 3 Circular-Ring Viewer** — LIVE, 3D supplier graph with planted fraud rings
+- **Tab 4 Baseline Comparison** — LIVE, composite-reward bar chart with oracle (mean over 5 seeds with min-max error bar), 6 red-team attacks, prompted Qwen2.5-3B baseline (0.18), trained target placeholder (gray bar at 0.50 with `_TRAINED_PLACEHOLDER` constant in app.py), and 0.45 red-team ceiling dashed line
+
+After Action 7 (training lands), Tab 4's gray placeholder bar gets updated by changing `_TRAINED_PLACEHOLDER` in `app.py` to the measured trained number and swapping the gray color to a solid one. The bar chart regenerates on next Space reload.
+
+### Training-figure regeneration
+
+`envs/reconcile_gst2b_env/scripts/make_training_figures.py` regenerates both embedded PNGs (`data/figures/three_scales_reward.png` and `data/figures/three_scales_components.png`) from the underlying JSON. Run it after training lands to refresh the plots:
+```bash
+PYTHONPATH=src:envs uv run python -m \
+    envs.reconcile_gst2b_env.scripts.make_training_figures
+```
 
 ## Mode
 
@@ -44,11 +68,13 @@ git status
 git branch --show-current       # expect: scaffold/reconcile-gst2b
 git log fork/scaffold/reconcile-gst2b..HEAD --oneline   # expect: empty (everything pushed)
 git log --oneline -5
+# Expect HEAD at 503d9c0 (Tab 4 live) unless Aakash pushed more overnight.
 
-# 2. Confirm Path B fix is in place (dataset_text_field is NOT passed to SFTConfig)
+# 2. Confirm Path B fix is in place (dataset_text_field is NOT actively passed to SFTConfig)
 grep -n "dataset_text_field" envs/reconcile_gst2b_env/scripts/train_sft_warmstart.py
-# expect: no matches, OR only a comment explaining the removal.
-# If the line 'dataset_text_field=None' exists active inside SFTConfig(...), STOP and re-apply the fix.
+# expect: only a comment line (~line 272) explaining the removal.
+# If the line 'dataset_text_field=None,' exists as an active SFTConfig arg,
+# STOP and re-apply the fix (see LESSONS_LEARNED.md §3).
 
 # 3. Confirm Phase 1 data file exists and has 3000 rows
 wc -l envs/reconcile_gst2b_env/data/sft_trajectories.jsonl
@@ -63,9 +89,25 @@ e = ReconcileGST2BEnvironment(); o = e.reset(seed=42, mode='warmup')
 print('env OK, step_budget =', o.step_budget)
 import torch; print('cuda:', torch.cuda.is_available(), torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'NO GPU')
 "
+
+# 5. Confirm Space tabs 2/4 still live (app.py has the SimpleNamespace oracle path)
+grep -n "SimpleNamespace\|_oracle_trajectory\|_baseline_comparison_figure\|_TRAINED_PLACEHOLDER" envs/reconcile_gst2b_env/app.py | head -10
+# expect: matches for SimpleNamespace import + 3 function defs + _TRAINED_PLACEHOLDER constant.
+# If missing, the Space tabs are broken — do NOT push any change that breaks
+# the currently-deployed Space without restoring these first.
+
+# 6. Confirm embedded figures exist + regenerator is callable
+ls -la envs/reconcile_gst2b_env/data/figures/
+# expect: three_scales_reward.png + three_scales_components.png
+PYTHONPATH=src:envs uv run python -c "
+from envs.reconcile_gst2b_env.scripts.make_training_figures import _attack_scores
+s = _attack_scores()
+print('red-team attack scores recomputed:', {k: v['total'] for k, v in s.items()})
+# expect: query_only=0.3492, submit_all_matched=0.3075, etc. (matches CI test file)
+"
 ```
 
-If any of 2, 3, 4 fail, STOP and ask Aakash. Do not "fix" invariants unilaterally.
+If any of 2, 3, 4, 5, 6 fail, STOP and ask Aakash. Do not "fix" invariants unilaterally.
 
 ## Actions
 
@@ -167,14 +209,15 @@ Then:
 5. Edit `ROUND2_PROBLEM_STATEMENT.md` at-a-glance metric
 6. Edit `BLOG.md` §6 (add closing paragraph AFTER the collapse narrative — DO NOT delete or soften collapse)
 7. Edit `README.md` and `README_HF_SPACE.md` headline-numbers table (both have TL;DR sections that mention "Training evidence from A100 Apr 25-26 lands as a follow-up commit"; replace with actual numbers)
-8. **Regenerate the figures** from the new data: `PYTHONPATH=src:envs uv run python -m envs.reconcile_gst2b_env.scripts.make_training_figures`
-9. Update `LESSONS_LEARNED.md` §5 (what's corrected for on-site): change future tense to past tense, add the actual trained numbers
-10. Git commit single: `onsite: land trained Qwen3-4B numbers (SFT + GRPO on A100)`
-11. `git push fork scaffold/reconcile-gst2b`
-12. Sync `hf_space_clone/`: `cp` the updated README_HF_SPACE.md to hf_space_clone/README.md, plus updated `data/figures/*.png`, `data/trained_eval.json`, `data/trained_hero.json`, `LESSONS_LEARNED.md`, `BLOG.md`, `EXEC_SUMMARY.md`, `ROUND2_PROBLEM_STATEMENT.md`
-13. Commit in hf_space_clone: `sync: trained numbers from on-site A100 run`
-14. `cd hf_space_clone && git push origin main`
-15. Verify Space rebuild completes green (incognito reload of the Space URL)
+8. **Regenerate the figures** from the new data: `PYTHONPATH=src:envs uv run python -m envs.reconcile_gst2b_env.scripts.make_training_figures`. This updates `data/figures/three_scales_reward.png` and `three_scales_components.png` so the README's embedded plots refresh. Both are referenced via `raw.githubusercontent.com/akashkathole7/OpenEnv/...` URLs so they'll auto-render on the Space after fork push.
+9. **Update Tab 4 placeholder in `app.py`**: change the constant `_TRAINED_PLACEHOLDER = 0.50` to the measured trained number, and in `_baseline_comparison_figure()` change the placeholder row's `"color": "#bbbbbb"` (gray) to a solid color (suggest `"#9467bd"` purple or `"#17becf"` teal to distinguish from oracle/baseline/attack colors), change the `"label"` to drop "(target, on-site Apr 25-26)" and add the new measured context, and remove the `text_pos: "inside"` special case so the number renders outside-bar like the others. This makes the Tab 4 chart reflect actual trained performance instead of the target placeholder.
+10. Update `LESSONS_LEARNED.md` §5 (what's corrected for on-site): change future tense to past tense, add the actual trained numbers. Also update §1 to note which Phase ran on-site and any live-observed behavior (entropy, tool-call frequency).
+11. Git commit single: `onsite: land trained Qwen3-4B numbers (SFT + GRPO on A100)`
+12. `git push fork scaffold/reconcile-gst2b`
+13. Sync `hf_space_clone/`: copy the updated `app.py` (Tab 4 placeholder → real), `README.md` (from `README_HF_SPACE.md`), `LESSONS_LEARNED.md`, `BLOG.md`, `EXEC_SUMMARY.md`, `ROUND2_PROBLEM_STATEMENT.md`, plus `data/trained_eval.json`, `data/trained_hero.json`. **Do NOT copy `data/figures/*.png` into `hf_space_clone/`** — HF Spaces requires binary files go through Xet storage, and the README references them via raw.githubusercontent from the fork which resolves fine.
+14. Commit in hf_space_clone: `sync: trained numbers from on-site A100 run`
+15. `cd hf_space_clone && git push origin main`
+16. Verify Space rebuild completes green (incognito reload of the Space URL). Click Tab 4 — the placeholder bar should now be the measured trained number, not gray. Click Tab 2 — still works. Click Tab 3 — still works.
 
 ## Guardrails (invariants, do NOT violate)
 
@@ -191,6 +234,9 @@ Then:
 11. **QLoRA merge footgun.** If Phase 2 ends up using 4-bit quantization, download original 16-bit base weights and merge the LoRA into THOSE, not the dequantized 4-bit copy. ~30% quality damage from the naive path per Daniel Han.
 12. **No fake numbers.** Emergency fallback is honest-partial ("trained checkpoint exists, eval surface needs completion") over vaporware. Judges reward honesty per the collapse narrative.
 13. **Kaggle is out of scope on Day 1.** `scripts/kaggle_phase2_sft.ipynb` is a historical artifact. Do not re-attempt Kaggle runs; on-site A100 is the clean environment.
+14. **Tab 4 placeholder constant.** `app.py` has `_TRAINED_PLACEHOLDER = 0.50` used only to draw the gray bar in Baseline Comparison. Update it to the measured trained number in Action 7 step 9. Until then, leave it at 0.50 so the Space keeps rendering a valid chart.
+15. **HF Space has NO openenv package installed.** `app.py` deliberately uses `SimpleNamespace` stubs + `composite_reward` directly — do NOT add imports of `models.py` or `server/*` into `app.py` unless you also pip-install openenv in `hf_space_clone/requirements.txt`. The current 6 deps (gradio, networkx, plotly, numpy, pandas, pydantic) are sufficient and pinned.
+16. **HF Space does NOT accept binary files in git.** Pushing any `*.png` / `*.jpg` / etc. to `hf_space_clone/` will be rejected by HF's pre-receive hook (Xet storage required). README references images via `raw.githubusercontent.com/akashkathole7/OpenEnv/...` from the fork, which is sufficient. Only text files go to `hf_space_clone/`.
 
 ## Judge demo windows
 
@@ -208,13 +254,15 @@ Then:
 
 ## Close: state-readout request
 
-**After reading the files above and running the State-verification block, report back to Aakash with exactly these 5 bullets** (one line each, factual, no narration):
+**After reading the files above and running the State-verification block, report back to Aakash with exactly these 7 bullets** (one line each, factual, no narration):
 
 1. Git state: `<HEAD hash and branch>`, `<n unpushed commits to fork>`, `<n untracked files>`.
 2. Tests: `<pass/fail count>` from `PYTHONPATH=src:envs uv run pytest tests/envs/test_reconcile_gst2b_*.py --tb=line | tail -1`.
 3. Path B fix: `<present / missing>` (grep check on `dataset_text_field` in `train_sft_warmstart.py`).
 4. Phase 1 data: `<row count>` in `data/sft_trajectories.jsonl`, `<mean total>` from the verification snippet.
 5. Compute: `<A100 / other GPU / CPU only>` from `torch.cuda.get_device_name(0)`, and `<Scaler compute UI confirmed yes/no>` from Aakash.
+6. Space tabs: `<live / broken>` based on verification step 5 (SimpleNamespace oracle + Tab 4 figure function + _TRAINED_PLACEHOLDER constant all present).
+7. Figures: `<both PNGs present / missing>` and red-team recompute matches CI (query_only=0.349, submit_all_matched=0.308, overflag_rings=0.283, submit_all_mismatched=0.266, zero_itc=0.266, confirm_spam=0.010).
 
 Do not begin any training action until Aakash acknowledges the state-readout.
 

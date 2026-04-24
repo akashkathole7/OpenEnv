@@ -7,15 +7,24 @@
 """Gradio UI for reconcile_gst2b_env.
 
 Four tabs:
-  1. Schema + Label Diff       — placeholder
+  1. Schema + Label Diff       — placeholder (honest: lands with on-site
+                                 trained-checkpoint eval, see
+                                 ONSITE_DAY1_PROMPT.md)
   2. Rollout Replay            — LIVE: runs a ground-truth-aware oracle
                                  against the env and shows the full verb
                                  trace + final reward breakdown. Lets
                                  judges see the 16-verb surface + the
                                  4-component composite in action without
                                  leaving the Space.
-  3. Circular-Ring Viewer      — video centerpiece
-  4. Baseline Comparison       — placeholder
+  3. Circular-Ring Viewer      — LIVE: 3D supplier graph with planted
+                                 directed-cycle fraud rings; video centerpiece.
+  4. Baseline Comparison       — LIVE: composite-reward bar chart across
+                                 oracle + 6 red-team attacks + prompted
+                                 baseline + trained target placeholder.
+                                 The 0.45 ceiling line is the CI-enforced
+                                 red-team ceiling. Oracle is live-computed
+                                 at module load; trained bar replaces the
+                                 0.50 placeholder after on-site A100 run.
 
 Launch locally:
     PYTHONPATH=src:envs uv run python envs/reconcile_gst2b_env/app.py
