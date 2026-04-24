@@ -128,7 +128,15 @@ def _attack_scores() -> dict:
 
 
 def plot_reward(attacks: dict) -> Path:
-    """Fig 1: training reward + red-team ceilings over training-step axis."""
+    """Fig 1: training reward + red-team attack band over training-step axis.
+
+    Prior version drew each of the 6 attacks as a dotted horizontal line
+    with a labeled endpoint, but submit_all_mismatched and zero_itc share
+    an identical 0.266 score which made the right-edge labels collide
+    illegibly at thumbnail size. Now rendered as a shaded band (min..max
+    across the 6 attacks) + one arrow annotation calling out the top
+    attack and the trained-plateau delta. Cleaner at any scale.
+    """
     import matplotlib
 
     matplotlib.use("Agg")
@@ -143,16 +151,30 @@ def plot_reward(attacks: dict) -> Path:
     eval_steps = curves["steps"]
     eval_total = curves["total"]
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(11, 6.5))
+
+    # Red-team attack band: shaded region covering min..max of the 6 attacks.
+    attack_totals = [s["total"] for s in attacks.values()]
+    att_min, att_max = min(attack_totals), max(attack_totals)
+    ax.axhspan(
+        att_min,
+        att_max,
+        color="#888888",
+        alpha=0.18,
+        zorder=0,
+        label=f"red-team attack range (6 attacks, {att_min:.3f}-{att_max:.3f})",
+    )
 
     # Per-step training reward (the bimodal 0.174 / 0.107 signature).
     ax.plot(
         train_steps,
         train_reward,
         marker="o",
-        linewidth=2,
+        linewidth=2.2,
+        markersize=7,
         color="#1f77b4",
         label="Qwen3-0.6B per-step training reward (10-step smoke)",
+        zorder=3,
     )
 
     # Eval composite total across 150 steps (the flat 0.353 plateau).
@@ -161,57 +183,59 @@ def plot_reward(attacks: dict) -> Path:
         eval_total,
         marker="s",
         linestyle="-",
-        linewidth=2,
+        linewidth=2.2,
+        markersize=7,
         color="#ff7f0e",
         label="Qwen3-0.6B eval composite total (150-step run, flat at 0.353)",
+        zorder=3,
     )
 
     # Red-team ceiling (CI-enforced).
     ax.axhline(
         0.45,
-        color="red",
+        color="#d62728",
         linestyle="--",
-        linewidth=1.5,
+        linewidth=1.8,
         label="red-team attack ceiling (0.45, CI-enforced)",
+        zorder=2,
     )
 
-    # Individual red-team attack scores as reference lines.
-    palette = ["#555555", "#888888", "#aaaaaa", "#bbbbbb", "#cccccc", "#dddddd"]
-    sorted_attacks = sorted(attacks.items(), key=lambda kv: -kv[1]["total"])
-    for (name, s), color in zip(sorted_attacks, palette):
-        ax.axhline(
-            s["total"],
-            color=color,
-            linestyle=":",
-            linewidth=1.0,
-            alpha=0.9,
-        )
-        ax.text(
-            max(eval_steps) + 2,
-            s["total"],
-            f"{name} = {s['total']:.3f}",
-            fontsize=8,
-            va="center",
-            color=color,
-        )
+    # Single summary annotation: max attack vs trained plateau.
+    top_name, top = max(attacks.items(), key=lambda kv: kv[1]["total"])
+    ax.annotate(
+        f"max attack: {top_name} = {top['total']:.3f}\n"
+        f"trained plateau: 0.353 (delta +0.004)",
+        xy=(max(eval_steps), top["total"]),
+        xytext=(max(eval_steps) - 80, 0.20),
+        fontsize=10,
+        color="#333333",
+        arrowprops=dict(arrowstyle="->", color="#666666", lw=1.2),
+        bbox=dict(
+            boxstyle="round,pad=0.35",
+            facecolor="white",
+            edgecolor="#888888",
+            alpha=0.92,
+        ),
+    )
 
-    ax.set_xlabel("training step (GRPO optimizer step)")
-    ax.set_ylabel("composite reward (0.0-1.0, higher is better)")
+    ax.set_xlabel("training step (GRPO optimizer step)", fontsize=11)
+    ax.set_ylabel("composite reward (0.0-1.0, higher is better)", fontsize=11)
     ax.set_title(
         "Qwen3-0.6B GRPO on T4: trained policy plateaus at the query_only "
         "red-team attack signature (0.353 ≈ 0.349)\n"
         "single-scale evidence; 1.7B and 4B logs lost across Kaggle resets "
         "(see LESSONS_LEARNED.md)",
-        fontsize=10,
+        fontsize=11,
     )
     ax.set_ylim(0.0, 0.55)
-    ax.set_xlim(-5, max(eval_steps) + 35)
+    ax.set_xlim(-5, max(eval_steps) + 15)
     ax.grid(alpha=0.3)
-    ax.legend(loc="upper left", fontsize=9)
+    ax.tick_params(labelsize=10)
+    ax.legend(loc="upper left", fontsize=10, framealpha=0.92)
 
     fig.tight_layout()
     out = FIG_DIR / "three_scales_reward.png"
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=200)
     plt.close(fig)
     return out
 
@@ -298,7 +322,7 @@ def plot_components(attacks: dict) -> Path:
 
     fig.tight_layout()
     out = FIG_DIR / "three_scales_components.png"
-    fig.savefig(out, dpi=150)
+    fig.savefig(out, dpi=200)
     plt.close(fig)
     return out
 
