@@ -143,13 +143,21 @@ What's distinct here:
 
 ## How our reward maps to OpenEnv Rubrics
 
-OpenEnv's composable-rubrics philosophy says "one reward function is one brittle contract; multiple independent rubrics composed into a composite are auditable and defensible." Our [`rewards.py`](rewards.py) implements this pattern through composition rather than class inheritance:
+OpenEnv ships a first-class composable-reward API ([`src/openenv/core/rubrics/`](../../src/openenv/core/rubrics/), RFC 004): `Rubric` base class with `WeightedSum`, `Sequential`, `Gate`, `RubricList`, and `LLMJudge` containers. The design point is that composite rewards should be built from independent, auditable sub-rubrics rather than a single monolithic scorer.
 
-- Each of R1-R4 is a pure function `(state, trajectory) -> float` with a weight and an independent clamp.
-- `composite_reward()` composes them into a weighted sum with per-component breakdown persisted for audit.
-- The red-team battery tests each component's independence (attack X tanks component Y, attack Z tanks component W).
+Our [`rewards.py`](rewards.py) implements exactly that pattern, in functional form:
 
-We compose rewards as clamped, weighted independent components — the Rubric pattern in spirit if not yet in class-inheritance form. A v2 could wrap each component in an OpenEnv `Rubric` subclass for framework-native composition; functional behavior is identical.
+| Our function | One-line semantics | Equivalent OpenEnv Rubric idiom |
+|---|---|---|
+| `r1_reconciliation_f1(state, traj)` | macro-F1 over 5 label classes | `class ReconciliationF1Rubric(Rubric): def forward(...)` |
+| `r2_itc_delta_accuracy(state, traj)` | `1 − min(1, \|claimed − true\| / max(true, 1))` | `class ITCDeltaAccuracyRubric(Rubric): def forward(...)` |
+| `r3_rule_36_4_compliance(state, traj)` | `0.99` iff per-supplier cap AND ≥1 query | `Sequential(Gate(HasQueryVerb()), PerSupplierCap())` |
+| `r4_step_efficiency(state, traj)` | `1 − (steps / 50)²` | `class StepEfficiencyRubric(Rubric): def forward(...)` |
+| `composite_reward(state, traj)` | weighted sum with independent clamping | `WeightedSum([R1, R2, R3, R4], weights=[0.40, 0.25, 0.25, 0.10])` |
+
+The structural `−1.0` for submit-before-query lives outside the composite (it's a terminal penalty applied by the env server, not a rubric score), which matches the OpenEnv pattern where terminal reward and per-step rubric can diverge.
+
+**Why functional composition and not class inheritance (yet):** the per-component clamp to `[0.01, 0.99]` was the hardest design decision in this submission (0.0/1.0 boundaries fail many validators, and the clamp is what makes the red-team battery defensible under the CI contract). A v2 refactor into `Rubric` subclasses is mechanical and preserves behavior bit-for-bit; we avoided it in this round because `rewards.py` is invariant #1 in [`ONSITE_BRIEFING.md`](ONSITE_BRIEFING.md) (any change risks regressing the 6 red-team test ceilings). The composable-rubrics philosophy is honored in the component independence (each R1-R4 is a pure function of `(state, trajectory)` with no shared state), in the per-component audit trail (`composite_reward()` returns `{"R1": ..., "R2": ..., "R3": ..., "R4": ..., "total": ...}`), and in the CI contract (6 red-team attacks each verify that at least two independent components carry the defense).
 
 ## Scope fence (what I deliberately cut)
 
