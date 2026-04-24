@@ -24,7 +24,7 @@ tags:
 
 > 🎮 **Try the live demo below.** Scroll past this README, select the **"Circular-Ring Viewer"** tab, pick a hero seed (9500 easy / 9501 medium / 9502 hard), click **Render** to see a 3D supplier graph with a planted directed-cycle fraud ring highlighted in red.
 
-🎥 [90-second demo video](https://www.youtube.com/watch?v=rglR1hGgdb8) · 🧑‍💻 [GitHub repo](https://github.com/akashkathole7/OpenEnv/tree/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env) · 📝 [BLOG.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/BLOG.md) · 📋 [ROUND2_PROBLEM_STATEMENT.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/ROUND2_PROBLEM_STATEMENT.md) · 🧪 [JUDGE_TOUR.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/JUDGE_TOUR.md)
+🎥 [90-second demo video](https://www.youtube.com/watch?v=rglR1hGgdb8) · 🧑‍💻 [GitHub repo](https://github.com/akashkathole7/OpenEnv/tree/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env) · 📝 [BLOG.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/BLOG.md) · 📋 [ROUND2_PROBLEM_STATEMENT.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/ROUND2_PROBLEM_STATEMENT.md) · 🧪 [JUDGE_TOUR.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/JUDGE_TOUR.md) · 📓 [Training notebook](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/kaggle_phase2_sft.ipynb) ([Colab](https://colab.research.google.com/github/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/kaggle_phase2_sft.ipynb))
 
 ---
 
@@ -68,6 +68,10 @@ Every registered Indian business with B2B purchases reconciles its purchase regi
 ![Per-component R1/R2/R3/R4 breakdown: trained 0.6B vs top red-team attacks](https://raw.githubusercontent.com/akashkathole7/OpenEnv/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/figures/three_scales_components.png)
 
 *Defense-in-depth visualized: trained Qwen3-0.6B pins R1 and R2 at clamp floor 0.01, same cells as `submit_all_matched`. Each red-team attack pins a different component subset; no single-component exploit clears the 0.45 composite ceiling, and the CI test battery fails any future reward change that would.*
+
+![Qwen3-0.6B 10-step SFT smoke run loss trajectory](https://raw.githubusercontent.com/akashkathole7/OpenEnv/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/figures/loss_curve.png)
+
+*Qwen3-0.6B 10-step SFT smoke run loss trajectory; full training logs in [data/training_log_qwen3_\*_partial.json](https://github.com/akashkathole7/OpenEnv/tree/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data). TRL GRPO policy-gradient-style loss oscillates near zero (advantage-weighted log-prob deltas), with the step-8 excursion reflecting a high-variance rollout batch. Source: [data/smoke_test_10step.json](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/smoke_test_10step.json).*
 
 ---
 

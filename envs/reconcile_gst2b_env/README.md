@@ -15,7 +15,7 @@ tags:
 
 **An OpenEnv environment for the monthly GSTR-2B reconciliation that ~14M Indian businesses perform by hand. 16 typed tool verbs, 4-component arithmetic reward, 6 red-team attacks all scoring under a CI-enforced 0.45 ceiling.**
 
-🎥 [90-second demo video](https://www.youtube.com/watch?v=rglR1hGgdb8) · 🚀 [Live HF Space](https://huggingface.co/spaces/akashkathole/reconcile_gst2b_env) · 📝 [BLOG.md](BLOG.md) · 📋 [ROUND2_PROBLEM_STATEMENT.md](ROUND2_PROBLEM_STATEMENT.md) · 🧪 [JUDGE_TOUR.md](JUDGE_TOUR.md)
+🎥 [90-second demo video](https://www.youtube.com/watch?v=rglR1hGgdb8) · 🚀 [Live HF Space](https://huggingface.co/spaces/akashkathole/reconcile_gst2b_env) · 📝 [BLOG.md](BLOG.md) · 📋 [ROUND2_PROBLEM_STATEMENT.md](ROUND2_PROBLEM_STATEMENT.md) · 🧪 [JUDGE_TOUR.md](JUDGE_TOUR.md) · 📓 [Training notebook](scripts/kaggle_phase2_sft.ipynb) ([Colab](https://colab.research.google.com/github/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/kaggle_phase2_sft.ipynb))
 
 ---
 
@@ -45,6 +45,10 @@ In India alone, ~14M GST-registered businesses run this loop monthly. The task i
 ![Per-component R1/R2/R3/R4 breakdown: trained 0.6B vs top red-team attacks](data/figures/three_scales_components.png)
 
 *The defense-in-depth reward contract visualized. Trained Qwen3-0.6B pins R1 (reconciliation_f1) and R2 (itc_delta_accuracy) at the clamp floor 0.01: structurally the same cells as `submit_all_matched`. Because each red-team attack pins a different subset of components, no single-component exploit clears the 0.45 composite ceiling, and the CI test battery fails any future reward change that would.*
+
+![Qwen3-0.6B 10-step SFT smoke run loss trajectory](data/figures/loss_curve.png)
+
+*Qwen3-0.6B 10-step SFT smoke run loss trajectory; full training logs in [data/training_log_qwen3_\*_partial.json](data/). TRL GRPO policy-gradient-style loss oscillates near zero (advantage-weighted log-prob deltas), with the step-8 excursion reflecting a high-variance rollout batch. Source: [data/smoke_test_10step.json](data/smoke_test_10step.json).*
 
 ### Headline numbers
 
