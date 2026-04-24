@@ -20,10 +20,20 @@ tags:
 
 # reconcile_gst2b_env
 
-**OpenEnv environment for multi-turn enterprise compliance workflows.**
-Instantiated on Indian GST Input-Tax-Credit reconciliation, a two-sided document-matching task against a regulator-published schema. Targeting the **Scaler AI Labs, Multi-App RL Environment for Enterprise Workflows** sub-theme at the Meta × Scaler Hackathon, Bangalore 2026.
+**An OpenEnv environment for the monthly GSTR-2B reconciliation that ~14M Indian businesses perform by hand. Multi-turn, partially observable, arithmetic reward, 6 CI-enforced red-team attacks all scoring under 0.45.** Targeting the **Scaler AI Labs, Multi-App RL Environment for Enterprise Workflows** sub-theme at the Meta × Scaler Hackathon, Bangalore 2026.
 
-> 🎮 **Try the live demo below**, scroll past this README, select the "Circular-Ring Viewer" tab, pick a hero seed (9500 / 9501 / 9502), and click **Render** to see a 3D supplier graph with a planted directed-cycle fraud ring highlighted in red.
+> 🎮 **Try the live demo below.** Scroll past this README, select the **"Circular-Ring Viewer"** tab, pick a hero seed (9500 easy / 9501 medium / 9502 hard), click **Render** to see a 3D supplier graph with a planted directed-cycle fraud ring highlighted in red.
+
+🎥 [90-second demo video](https://www.youtube.com/watch?v=rglR1hGgdb8) · 🧑‍💻 [GitHub repo](https://github.com/akashkathole7/OpenEnv/tree/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env) · 📝 [BLOG.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/BLOG.md) · 📋 [ROUND2_PROBLEM_STATEMENT.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/ROUND2_PROBLEM_STATEMENT.md) · 🧪 [JUDGE_TOUR.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/JUDGE_TOUR.md)
+
+---
+
+## TL;DR: what landed against the judging rubric
+
+- **Environment innovation (40%):** 16 typed verbs (7 query / 7 mutate / 2 meta), 5 planted mismatch types, 30%-probability directed 3-cycle ring fraud, partially observable, hidden ground truth unit-tested to never leak into observations.
+- **Storytelling (30%):** BLOG, 90-sec video, PITCH, QA_REHEARSAL, this Space with the 3D ring viewer you see below, README front-loads plots per judges' guidance.
+- **Training evidence (20%):** 10-step Qwen3-0.6B GRPO smoke + 150-step eval plateau with per-step metrics (see plots). Trained numbers from on-site A100 (Apr 25-26) land in a follow-up. [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md) covers the honest multi-scale attempt diagnosis.
+- **Reward & pipeline (10%):** 4-component arithmetic reward clamped to `[0.01, 0.99]`, 6 red-team attacks CI-enforced at `<0.45`, 42 tests green, Tier 1+2 GRPO fixes validated in [`data/smoke_test_10step.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/smoke_test_10step.json).
 
 ---
 
@@ -31,40 +41,79 @@ Instantiated on Indian GST Input-Tax-Credit reconciliation, a two-sided document
 
 | Metric | Value |
 |---|---:|
-| Typed tool verbs in env | **16** (7 query / 7 mutate / 2 meta) |
+| Typed tool verbs | **16** (7 query / 7 mutate / 2 meta) |
 | Label classes | **5** (matched, mismatched, only_in_books, only_in_2b, partial) |
-| Planted mismatch types | **5** + directed 3-cycle circular-trading rings (30% probability per episode) |
+| Planted mismatch types | **5** + directed 3-cycle circular-trading rings (30% per episode) |
 | Reward components | **4** arithmetic, each clamped to `[0.01, 0.99]` |
-| Red-team attacks CI-enforced `<0.45` | **6 / 6 pass** (max `query_only` = 0.349) |
+| Red-team attacks CI-enforced `<0.45` | **6 / 6 pass**, max `query_only` = 0.349 |
 | Test suite | **42 / 42 green** |
 | Prompted vs raw baseline delta on Qwen2.5-3B-Instruct | **1.18** (95% CI [1.09, 1.27], 180 rollouts) |
-| Pre-onsite training attempts | **3** (0.6B / 1.7B / 4B) with distinct failure-mode documentation |
-| `make reproduce` | Bit-identical against committed artifacts |
+| Documented pre-onsite training run | **Qwen3-0.6B, 10-step smoke + 150-step eval** (plots below) |
+| `make reproduce` | bit-identical against committed artifacts |
 
 ---
 
-## The problem
+## Why it matters (30-second hook)
 
-Every month, millions of businesses worldwide match their internal purchase registers against a regulator's cross-filed view. In India alone, **~14 million GST-registered businesses** do this monthly, rule-heavy, error-sensitive, still done by hand, across millions of invoices per company.
-
-Where books and the regulator's GSTR-2B return agree, the business claims back GST paid upstream ("input tax credit"). Where they disagree, typos, tax-slab errors, late supplier filings, post-freeze amendments, circular-trading rings, the business either **over-claims and triggers an audit** or **under-claims and forfeits money**. The task is structured, auditable, and adversarial. It is the textbook enterprise compliance workflow, and the textbook target for reinforcement-learning agents.
-
-This environment captures that workflow as a partially observable, multi-turn, tool-orchestration task with a pure-arithmetic 4-component reward (no LLM judge in the reward path) and a CI-enforced red-team ceiling (6 adversarial attacks, all scoring below 0.45).
+Every registered Indian business with B2B purchases reconciles its purchase register against the regulator-generated GSTR-2B return monthly. It's rule-heavy, error-sensitive (over-claim triggers audit; under-claim forfeits money), still done by hand by junior accountants, and the regulator publishes the correctness rules. That makes it a cleaner RL target than "general web agent": wrong answers have crisp, auditable, regulator-specified correctness. An agent that clears this generalizes to every two-sided document reconciliation against a schema.
 
 ---
 
-## Environment design
+## Results
+
+![Qwen3-0.6B training reward vs red-team attack ceilings](https://raw.githubusercontent.com/akashkathole7/OpenEnv/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/figures/three_scales_reward.png)
+
+*Qwen3-0.6B + LoRA + GRPO on Kaggle T4. Per-step training reward is bimodal around 0.174 (rollouts emitting a tool call) and 0.107 (clipped rollouts), reflecting the 0.25 tool-call frequency at this scale. 150-step eval composite pins at 0.353, within 0.004 of the `query_only` red-team attack signature (0.349). Pure GRPO drifts the policy into attack-signature territory without SFT warm-start. 1.7B and 4B runs were attempted on Kaggle but the logs were lost across session resets; see [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md).*
+
+![Per-component R1/R2/R3/R4 breakdown: trained 0.6B vs top red-team attacks](https://raw.githubusercontent.com/akashkathole7/OpenEnv/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/figures/three_scales_components.png)
+
+*Defense-in-depth visualized: trained Qwen3-0.6B pins R1 and R2 at clamp floor 0.01, same cells as `submit_all_matched`. Each red-team attack pins a different component subset; no single-component exploit clears the 0.45 composite ceiling, and the CI test battery fails any future reward change that would.*
+
+---
+
+## How to try
+
+### Right here in this Space (no install)
+
+Scroll past this README → **"Circular-Ring Viewer"** tab → pick a hero seed → click **Render**. Red nodes are GSTINs detected as members of a directed 3-cycle ring, the env's structural fraud signature.
+
+### Locally (~2 minutes)
+
+```bash
+git clone -b scaffold/reconcile-gst2b https://github.com/akashkathole7/OpenEnv.git
+cd OpenEnv
+uv sync --all-extras
+PYTHONPATH=src:envs uv run pytest tests/envs/test_reconcile_gst2b_*.py -v
+```
+
+Expected: 42 tests pass in ~3 seconds, including the 6 red-team attack ceilings.
+
+---
+
+## Deep dive (reviewer matrix)
+
+| You are | Read this |
+|---|---|
+| Screener with 3-5 minutes | This README + the two plots above |
+| Reviewer with 10 minutes | [JUDGE_TOUR.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/JUDGE_TOUR.md) |
+| Reviewer with 30 minutes | [BLOG.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/BLOG.md) + [ROUND2_PROBLEM_STATEMENT.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/ROUND2_PROBLEM_STATEMENT.md) |
+| Researcher | [rewards.py](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/rewards.py) + [tests/envs/](https://github.com/akashkathole7/OpenEnv/tree/scaffold/reconcile-gst2b/tests/envs) |
+| Fellow finalist | [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md) |
+
+---
+
+## Environment design (below the fold)
 
 **`ReconcileAction`**, typed Pydantic action with 16 verbs:
-- **Query (7, read-only)**: `get_schema`, `list_gstins`, `fuzzy_search_gstin`, `get_invoice`, `list_invoices_by_supplier`, `get_2b_row`, `get_hsn_slab`
-- **Mutate (7, state-changing)**: `mark_matched`, `mark_mismatched`, `mark_only_in_books`, `mark_only_in_2b`, `mark_partial_match`, `flag_circular_ring`, `request_amendment`
-- **Meta (2)**: `confirm_with_user`, `submit`
+- **Query (7, read-only):** `get_schema`, `list_gstins`, `fuzzy_search_gstin`, `get_invoice`, `list_invoices_by_supplier`, `get_2b_row`, `get_hsn_slab`
+- **Mutate (7, state-changing):** `mark_matched`, `mark_mismatched`, `mark_only_in_books`, `mark_only_in_2b`, `mark_partial_match`, `flag_circular_ring`, `request_amendment`
+- **Meta (2):** `confirm_with_user`, `submit`
 
-**`ReconcileObservation`**, contains `invoices_remaining_count`, `step_budget`, `last_tool_result`, `user_request`. **Hidden ground truth is a first-class invariant**, zero `true_*` / `gt_*` fields, unit-tested to never leak.
+**`ReconcileObservation`**: `invoices_remaining_count`, `step_budget`, `last_tool_result`, `user_request`. **Hidden ground truth is a first-class invariant**: zero `true_*` / `gt_*` fields, unit-tested to never leak.
 
-**Episode**: 20–100 invoices, 50-step action budget. Deterministic in seed. `make reproduce` is bit-identical across processes.
+**Episode:** 20-100 invoices, 50-step action budget. Deterministic in seed. `make reproduce` is bit-identical across processes.
 
-**RLVE-aligned (Reinforcement Learning with Verifiable Environments)**: `generate_episode(seed)` procedurally generates fresh episodes over an unbounded seed space; the 20-100 invoice range and warmup vs hardened mode give natural curriculum difficulty scaling; reward is verifier-based (arithmetic, no learned reward model), so the environment itself is the ground truth. This is the pattern recent RLVE literature argues prevents training-distribution saturation.
+**RLVE-aligned:** `generate_episode(seed)` procedurally generates fresh episodes over an unbounded seed space; the 20-100 invoice range and warmup vs hardened mode give natural curriculum difficulty scaling; reward is verifier-based (arithmetic, no learned reward model).
 
 **Five mismatch types** with weights `(1, 1, 1, 3, 3)`:
 - `gstin_typo`, 1-char PAN edit with recomputed Luhn-like checksum
@@ -73,26 +122,26 @@ This environment captures that workflow as a partially observable, multi-turn, t
 - `supplier_late_filing`, present in books, absent from 2B
 - `amendment_after_2b_freeze`, value edited after the 2B snapshot
 
-**Circular-trading rings**: with probability 0.3, a directed 3-cycle A→B→C→A is planted across three invoices' counterparty GSTINs. Detectable only via `networkx.simple_cycles` over the supplier graph, not via naive GSTIN reassignment. The Ring Viewer tab in this Space shows this live.
+**Circular-trading rings:** with probability 0.3, a directed 3-cycle A→B→C→A is planted across three invoices' counterparty GSTINs. Detectable only via `networkx.simple_cycles` over the supplier graph, not via naive GSTIN reassignment. The Ring Viewer tab in this Space shows this live.
 
 ---
 
-## Reward design, four arithmetic components
+## Reward design
 
-Each clamped to `[0.01, 0.99]`:
+Four components, every one clamped to `[0.01, 0.99]`:
 
 | Component | Weight | Formula | Defends against |
 |---|---:|---|---|
-| **R1 reconciliation_f1** | 0.40 | Macro-F1 over 5 labels | "label all matched" cheat (accuracy trick) |
+| **R1 reconciliation_f1** | 0.40 | Macro-F1 over 5 labels | "label all matched" accuracy trick |
 | **R2 itc_delta_accuracy** | 0.25 | `1 − min(1, |claimed − true| / max(true, 1))` | 2× over-claim AND zero-claim both tank to 0 |
-| **R3 rule_36_4_compliance** | 0.25 | `0.99` iff per-supplier cap honored AND ≥1 query verb called | "confirm spam", mutate without inspecting |
+| **R3 rule_36_4_compliance** | 0.25 | `0.99` iff per-supplier cap honored AND ≥1 query verb called | `confirm_spam`, mutate without inspecting |
 | **R4 step_efficiency** | 0.10 | `1 − (steps / 50)²` | Query-flooding to game budget |
 
-Plus a **structural `−1.0` penalty** (not clamped) for `submit` before any query verb has been called.
+Plus a **structural `−1.0` penalty** (not clamped) for `submit` before any query verb.
 
-### Red-team CI battery
+### Red-team CI battery (2026-04-24 recompute)
 
-Every pull request runs [`test_reconcile_gst2b_reward_hacking.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/tests/envs/test_reconcile_gst2b_reward_hacking.py), six attack trajectories asserted to score `<0.45`:
+Every PR runs [`test_reconcile_gst2b_reward_hacking.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/tests/envs/test_reconcile_gst2b_reward_hacking.py). Six attacks, all asserted `<0.45`:
 
 | Attack | Score | Caught by |
 |---|---:|---|
@@ -107,29 +156,17 @@ Any reward-function change that lifts any attack above 0.45 fails CI. The test i
 
 ---
 
-## Training evidence, three distinct failure modes across three model scales
+## Pre-onsite training evidence
 
-Pre-onsite, I ran GRPO training across three Qwen3 variants on Kaggle T4 / T4x2. The reward design surfaces three structurally different failure modes, each pinning a **different reward component** to floor. No model in this range passes 0.45 by accident.
+Qwen3-0.6B + LoRA rank 16 + GRPO on Kaggle T4. 10-step smoke + 150-step eval, plotted above. Trained policy plateaus at 0.353, within 0.004 of the `query_only` red-team attack signature. Pure GRPO without SFT warm-start drifts into attack-signature territory at this scale.
 
-| Model | Observed behavior | Component pinned | Artifact |
-|---|---|---|---|
-| **Qwen3-0.6B** (10-step smoke) | Bimodal tool-call rate ~0.25 per rollout; can't reliably chain ≥5 `mark_*` actions | R1, R2 | [`data/smoke_test_10step.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/data/smoke_test_10step.json) |
-| **Qwen3-1.7B** (15-step partial) | Entropy collapsed to 0.12 (vs 0.44 on 0.6B); zero tool calls emitted; deterministic mode | All | [`data/training_log_qwen3_1_7b_partial.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/data/training_log_qwen3_1_7b_partial.json) |
-| **Qwen3-4B** (step-0 eval only) | Opposite failure: ~1.0 parseable tool-call rate, but over-queries until the 50-step budget exhausts | R4 | [`data/training_log_qwen3_4b_partial.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/data/training_log_qwen3_4b_partial.json) |
+Two additional attempts on Kaggle (Qwen3-1.7B 15-step partial, Qwen3-4B step-0 eval) were observed live with the reported qualitative signatures (1.7B: zero tool-call entropy collapse; 4B: budget-exhausting over-query). The corresponding JSON logs were lost across Kaggle session resets and were never committed. See [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md) for the honest diagnosis and what changes for the on-site A100 run.
 
-The environment is **structurally hard across model sizes**, not a training-recipe bug. This is exactly the property you want in an RL benchmark: no shortcut behavior clears the bar.
+## On-site training strategy (Apr 25-26, Scaler HF compute credits)
 
----
-
-## On-site training strategy, tool-SFT warm-start → GRPO polish
-
-Empirical motivation: three partial-training artifacts prove pure GRPO from a base Qwen3 instruct checkpoint fails to chain label actions at ≤4B scale. The on-site plan (25–26 April 2026, using HF compute credits):
-
-1. **Synthetic expert trajectories** (2 h, CPU). Use the existing heuristic policy (`evaluate_heuristic` in `training.py:175`) as an oracle against the env's hidden ground truth. Generate ~500 trajectories across seeds 100–599.
-2. **Tool-SFT warm-start** (4 h, A100). LoRA-SFT Qwen3-4B (or Qwen3-8B if compute permits) on the synthetic trajectories. Target: teach `mark_*` action preference over `get_*` exploration.
-3. **GRPO polish** (4 h, A100). Continue training from the SFT checkpoint using the existing [`train_grpo_real.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/train_grpo_real.py) recipe (Tier 1+2 reward shaping already baked in). Target: composite total > 0.50 on held-out seeds 9030–9039.
-
-Success metric: trained policy clearly separates from both the `query_only` red-team attack signature (0.349) and the prompted baseline (0.179).
+1. **Synthetic expert trajectories** (2 h, CPU). Use the ground-truth-aware heuristic policy as an oracle; 3 policy variants already staged in [`scripts/_policies.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/_policies.py).
+2. **Tool-SFT warm-start** (4 h, A100). LoRA-SFT Qwen3-4B (or 1.7B fallback) on the 3000-row balanced union. Target: teach `mark_*` action preference over `get_*` exploration.
+3. **GRPO polish** (4 h, A100). Continue training from the SFT checkpoint using [`train_grpo_real.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/train_grpo_real.py) (Tier 1+2 reward shaping already baked in). Target: composite total > 0.45 on held-out seeds 9030-9039, clearly separating from both the `query_only` attack (0.349) and the prompted baseline (0.179).
 
 ---
 
@@ -139,49 +176,21 @@ Success metric: trained policy clearly separates from both the `query_only` red-
 - ✅ TRL GRPO training script (`environment_factory` pattern)
 - ✅ Hosted live on Hugging Face Spaces (this page)
 - ✅ `openenv validate --verbose` passes
-- ✅ Hidden ground truth invariant (unit-tested)
+- ✅ Hidden ground truth invariant (unit-tested via `test_state_hides_ground_truth_from_observation`)
 - ✅ Rewards inside the environment (not external)
 - ✅ Client-server separation enforced
 - ✅ `SUPPORTS_CONCURRENT_SESSIONS = True` (regression-tested)
 - ✅ 42-test suite, including red-team CI battery
-
----
-
-## Try it
-
-**In this Space:** select the **"Circular-Ring Viewer"** tab below. Pick a hero seed (9500, 9501, or 9502) or any custom seed. Click **Render**. Rotate the 3D plot. Red nodes are GSTINs detected as members of a directed 3-cycle ring, the env's structural fraud signature.
-
-**Locally:**
-```bash
-git clone -b scaffold/reconcile-gst2b https://github.com/akashkathole7/OpenEnv
-cd OpenEnv
-uv sync --all-extras
-PYTHONPATH=src:envs uv run pytest tests/envs/test_reconcile_gst2b_*.py -v
-make reproduce
-```
-
----
-
-## Links
-
-- 🧑‍💻 **Repo**: https://github.com/akashkathole7/OpenEnv (branch `scaffold/reconcile-gst2b`)
-- 📝 **Full blog + dev diary**: [`BLOG.md`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/BLOG.md)
-- 📋 **Round 2 problem statement**: [`ROUND2_PROBLEM_STATEMENT.md`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/ROUND2_PROBLEM_STATEMENT.md)
-- 📊 **Judge tour (10-min guided read)**: [`JUDGE_TOUR.md`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/JUDGE_TOUR.md)
-- 🎥 **90-second demo video**: https://www.youtube.com/watch?v=rglR1hGgdb8
-- 🧪 **Red-team test file**: [`test_reconcile_gst2b_reward_hacking.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/tests/envs/test_reconcile_gst2b_reward_hacking.py)
+- ✅ Reward follows OpenEnv's composable-rubrics pattern in spirit: each R1-R4 is an independent clamped function, `composite_reward()` composes them with weights + per-component audit breakdown
 
 ---
 
 ## Submission context
 
-**Author**: Aakash Kathole ([@akashkathole7](https://github.com/akashkathole7)), solo finalist
-**Event**: Meta × Scaler Hackathon, Bangalore 2026
-**Round 1 theme** (if kept same): selectable
-**Round 2 theme target**: #3.1 Professional Tasks / World Modeling
-**Round 2 sub-theme (bonus prize target)**: **Scaler AI Labs, Multi-App RL Environment for Enterprise Workflows**
-
----
+- **Author**: Aakash Kathole ([@akashkathole7](https://github.com/akashkathole7)), solo finalist
+- **Event**: Meta × Scaler Hackathon, Bangalore 2026 (on-site Apr 25-26)
+- **Round 2 theme**: #3.1 Professional Tasks / World Modeling
+- **Sub-theme (bonus prize target)**: Scaler AI Labs, Multi-App RL Environment for Enterprise Workflows
 
 ## License
 
