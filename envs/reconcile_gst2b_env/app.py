@@ -25,20 +25,25 @@ Deployed to HF Spaces via `openenv push --enable-interface`.
 
 from __future__ import annotations
 
+from types import SimpleNamespace
 from typing import Any, Dict, List, Tuple
 
 import gradio as gr
 import networkx as nx
 import plotly.graph_objects as go
 
+# IMPORTANT: we deliberately do NOT import models.py or the env server in
+# app.py. Both pull openenv.core transitively, which is not installed in the
+# HF Space container (requirements.txt holds only 6 pinned runtime deps).
+# The oracle rollout uses seed_generator + rewards directly with
+# SimpleNamespace stubs for State/Action, which keeps the Space container
+# self-contained and avoids a git+openenv install.
 try:
-    from .models import ReconcileAction
+    from .rewards import composite_reward
     from .seed_generator import generate_episode, HERO_SEEDS
-    from .server.reconcile_gst2b_environment import ReconcileGST2BEnvironment
 except ImportError:
-    from models import ReconcileAction
+    from rewards import composite_reward
     from seed_generator import generate_episode, HERO_SEEDS
-    from server.reconcile_gst2b_environment import ReconcileGST2BEnvironment
 
 
 # -------------------- Tab 3: Circular-Ring Viewer --------------------
@@ -207,40 +212,52 @@ _MARK_VERB_FOR_LABEL = {
 
 def _oracle_trajectory(
     seed: int,
-) -> Tuple[List[ReconcileAction], Dict[str, float], int]:
-    """Run one ground-truth-aware oracle episode.
+) -> Tuple[List[SimpleNamespace], Dict[str, float], int]:
+    """Run one ground-truth-aware oracle episode WITHOUT the env server.
 
-    Mirrors oracle_heuristic_policy from scripts/_policies.py but inlined
-    here so app.py has no cross-module dependency on the scripts/ package
-    (which uses repo-root absolute imports that break in the HF Space's
-    flat module layout).
+    Uses seed_generator.generate_episode + rewards.composite_reward directly
+    with SimpleNamespace stubs for State/Action, so this module does not
+    need models.py or server/* (both of which transitively import
+    openenv.core, which is not installed in the HF Space container).
 
-    Returns (trajectory, reward_breakdown, n_steps). The oracle reads the
-    hidden ground truth from env.state to produce correct label actions,
-    then submits. Partial-match delta is set so the claim equals the 2B
-    side (books_tax - twob_tax), which keeps R3 per-supplier compliant.
+    The stubs provide the minimum attribute surface rewards.py needs:
+      state.gt_invoices             list with .invoice_id, .true_label,
+                                    .true_itc_eligible_inr
+      state.gt_purchase_register    list of dicts (invoice_id, gstin, tax_inr)
+      state.gt_gstr_2b              same shape
+      action.verb, action.payload   per-step
+
+    Partial-match delta = books_tax - twob_tax so per-supplier claim
+    equals the 2B cap, keeping R3 compliant. Truncates at MAX_STEPS - 1
+    so the terminal submit always fits in the 50-step budget.
+
+    Returns (trajectory, reward_breakdown, n_steps).
     """
-    env = ReconcileGST2BEnvironment()
-    env.reset(seed=int(seed), mode="warmup")
+    MAX_STEPS = 50
+    episode = generate_episode(int(seed))
 
-    trajectory: List[ReconcileAction] = []
-    # Step 1: satisfy the R3 query precondition.
-    act = ReconcileAction(verb="get_schema", payload={})
-    env.step(act)
-    trajectory.append(act)
+    # Stub state mirroring ReconcileState's public surface for rewards.py.
+    gt_invoices = [SimpleNamespace(**g) for g in episode["ground_truth"]]
+    state = SimpleNamespace(
+        gt_invoices=gt_invoices,
+        gt_purchase_register=episode["purchase_register"],
+        gt_gstr_2b=episode["gstr_2b"],
+    )
 
-    # Build lookups for partial-match delta computation.
     books_tax = {
         inv["invoice_id"]: float(inv.get("tax_inr", 0.0))
-        for inv in env.state.gt_purchase_register
+        for inv in episode["purchase_register"]
     }
     twob_tax = {
-        inv["invoice_id"]: float(inv.get("tax_inr", 0.0))
-        for inv in env.state.gt_gstr_2b
+        inv["invoice_id"]: float(inv.get("tax_inr", 0.0)) for inv in episode["gstr_2b"]
     }
 
-    # Step 2+: one mark per invoice via the hidden ground truth.
-    for gt in env.state.gt_invoices:
+    # Step 1: satisfy R3 query precondition.
+    trajectory: List[SimpleNamespace] = [SimpleNamespace(verb="get_schema", payload={})]
+
+    for gt in gt_invoices:
+        if len(trajectory) >= MAX_STEPS - 1:
+            break
         verb = _MARK_VERB_FOR_LABEL[gt.true_label]
         payload: Dict[str, Any] = {"invoice_id": gt.invoice_id}
         if verb == "mark_mismatched":
@@ -251,24 +268,16 @@ def _oracle_trajectory(
                 books_tax.get(gt.invoice_id, 0.0) - twob_tax.get(gt.invoice_id, 0.0),
             )
             payload["delta_inr"] = round(delta, 2)
-        action = ReconcileAction(verb=verb, payload=payload)
-        obs = env.step(action)
-        trajectory.append(action)
-        if obs.done or obs.step_budget <= 1:
-            break
+        trajectory.append(SimpleNamespace(verb=verb, payload=payload))
 
-    # Terminal submit if not already done.
-    if not env.state.reward_breakdown:
-        submit = ReconcileAction(verb="submit", payload={})
-        env.step(submit)
-        trajectory.append(submit)
+    trajectory.append(SimpleNamespace(verb="submit", payload={}))
 
-    breakdown = env.state.reward_breakdown or {}
-    return trajectory, breakdown, env.state.step_count
+    breakdown = composite_reward(state, trajectory)
+    return trajectory, dict(breakdown), len(trajectory)
 
 
 def _format_trajectory_md(
-    trajectory: List[ReconcileAction],
+    trajectory: List[SimpleNamespace],
     breakdown: Dict[str, float],
     n_steps: int,
     seed: int,
