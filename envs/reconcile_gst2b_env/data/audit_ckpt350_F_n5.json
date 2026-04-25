@@ -1,0 +1,597 @@
+{
+  "checkpoint": "envs/reconcile_gst2b_env/data/sft_checkpoint/ckpt350_merged",
+  "seeds": [
+    9030,
+    9031,
+    9032,
+    9033,
+    9034
+  ],
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "top_k": 20,
+    "do_sample": true,
+    "use_tools": true
+  },
+  "metrics_avg": {
+    "query_to_mark": 5.29375,
+    "mean_inspection_depth": 0.0,
+    "repeated_query_rate": 0.01,
+    "tool_diversity": 0.2375,
+    "premature_marking_rate": 0.2
+  },
+  "per_seed_metrics": [
+    {
+      "query_to_mark": 20.0,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.05,
+      "tool_diversity": 0.25,
+      "premature_marking_rate": 0.0
+    },
+    {
+      "query_to_mark": 2.0,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.0,
+      "tool_diversity": 0.1875,
+      "premature_marking_rate": 0.0
+    },
+    {
+      "query_to_mark": 0.46875,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.0,
+      "tool_diversity": 0.375,
+      "premature_marking_rate": 1.0
+    },
+    {
+      "query_to_mark": 2.0,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.0,
+      "tool_diversity": 0.1875,
+      "premature_marking_rate": 0.0
+    },
+    {
+      "query_to_mark": 2.0,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.0,
+      "tool_diversity": 0.1875,
+      "premature_marking_rate": 0.0
+    }
+  ],
+  "fail_count": 2,
+  "rollouts": [
+    {
+      "seed": 9030,
+      "total_steps": 21,
+      "termination": "submitted",
+      "parser_misses": 0,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.01,
+        "R2": 0.01,
+        "R3": 0.99,
+        "R4": 0.8236,
+        "total": 0.3364
+      },
+      "trajectory": [
+        {
+          "verb": "get_schema",
+          "payload": {}
+        },
+        {
+          "verb": "list_gstins",
+          "payload": {}
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04ZFABX5725AJZE"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "10RMALT7364UXZ7"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04RQXPZ4889IXZ7"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "11YKMAB9254H5ZD"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "27GITRC6189LWZB"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "16VMRDY6041ESZ0"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "31AVTMZ3608IGZT"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "33XBHNN9675NSZK"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "11VKOAY2000F7ZN"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "27ITKHS2853M2Z6"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "18CXFTV4004VWZH"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "37HGTRO0192HFZ9"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "07NDPLH8776IHZ8"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "37HXTRO0192HFZA"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "08EIDNA1590J7Z9"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "10AXJWQ4993D2ZZ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "08IAXYA0301SBZF"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04ZFABX5725AJZE"
+          }
+        },
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n{\"name\": \"get_schema\", \"arguments\": {}}\n</tool_call>",
+      "raw_last_completion": "<tool_call>\n{\"name\": \"submit\", \"arguments\": {}}\n</tool_call>"
+    },
+    {
+      "seed": 9031,
+      "total_steps": 3,
+      "termination": "submitted",
+      "parser_misses": 0,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.01,
+        "R2": 0.01,
+        "R3": 0.99,
+        "R4": 0.99,
+        "total": 0.353
+      },
+      "trajectory": [
+        {
+          "verb": "get_schema",
+          "payload": {}
+        },
+        {
+          "verb": "list_gstins",
+          "payload": {}
+        },
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n{\"name\": \"get_schema\", \"arguments\": {}}\n</tool_call>",
+      "raw_last_completion": "<tool_call>\n{\"name\": \"submit\", \"arguments\": {}}\n</tool_call>"
+    },
+    {
+      "seed": 9032,
+      "total_steps": 48,
+      "termination": "submitted",
+      "parser_misses": 0,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.1445,
+        "R2": 0.4285,
+        "R3": 0.01,
+        "R4": 0.0784,
+        "total": 0.1753
+      },
+      "trajectory": [
+        {
+          "verb": "get_schema",
+          "payload": {}
+        },
+        {
+          "verb": "list_gstins",
+          "payload": {}
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "01HJTUT8873YIZK"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0051"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "02EZMWT0866EJZB"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0011"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0012"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0023"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "03PGRND8750D3Z5"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0062"
+          }
+        },
+        {
+          "verb": "mark_only_in_2b",
+          "payload": {
+            "invoice_id": "inv_2bonly_0004"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "05QVCPM1135JZZH"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0002"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0043"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "05VMYCR7820HTZT"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0013"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0018"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0039"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "10YVRVS7537LKZE"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0015"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0033"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "11NHOOC1475J7Z1"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0004"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0030"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0031"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "11ULLWA3848R6ZQ"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0038"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0068"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "12AUIQB7876KYZE"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0025"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0027"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0057"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "12RDKWY8122RJZF"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0065"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0067"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "16RZIYN1825NIZK"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0001"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0009"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0036"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "18OGHZM1870FSZO"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0020"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0037"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0040"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "20GLXQE9394EWZP"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0021"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0024"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0064"
+          }
+        },
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n{\"name\": \"get_schema\", \"arguments\": {}}\n</tool_call>",
+      "raw_last_completion": "<tool_call>\n{\"name\": \"submit\", \"arguments\": {}}\n</tool_call>"
+    },
+    {
+      "seed": 9033,
+      "total_steps": 3,
+      "termination": "submitted",
+      "parser_misses": 0,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.01,
+        "R2": 0.01,
+        "R3": 0.99,
+        "R4": 0.99,
+        "total": 0.353
+      },
+      "trajectory": [
+        {
+          "verb": "get_schema",
+          "payload": {}
+        },
+        {
+          "verb": "list_gstins",
+          "payload": {}
+        },
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n{\"name\": \"get_schema\", \"arguments\": {}}\n</tool_call>",
+      "raw_last_completion": "<tool_call>\n{\"name\": \"submit\", \"arguments\": {}}\n</tool_call>"
+    },
+    {
+      "seed": 9034,
+      "total_steps": 3,
+      "termination": "submitted",
+      "parser_misses": 0,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.01,
+        "R2": 0.01,
+        "R3": 0.99,
+        "R4": 0.99,
+        "total": 0.353
+      },
+      "trajectory": [
+        {
+          "verb": "get_schema",
+          "payload": {}
+        },
+        {
+          "verb": "list_gstins",
+          "payload": {}
+        },
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n{\"name\": \"get_schema\", \"arguments\": {}}\n</tool_call>",
+      "raw_last_completion": "<tool_call>\n{\"name\": \"submit\", \"arguments\": {}}\n</tool_call>"
+    }
+  ]
+}

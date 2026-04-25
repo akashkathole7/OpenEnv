@@ -44,6 +44,12 @@ In India alone, ~14M GST-registered businesses run this loop monthly. The task i
 
 *Day 1 on-site result. Trained Qwen3-4B SFT (purple, n=5 mean 0.280, min-max error bar 0.17 - 0.35) sits above the prompted Qwen2.5-3B baseline (blue, 0.18) and below the CI-enforced red-team ceiling (red dashed, 0.45). The 6 red-team attacks (red bars) all score under 0.45 by design. Notably, the `query_only` attack (0.349) scores ABOVE the trained Mode A marking trajectories. This is the reward-landscape inversion documented as Failure Mode 5 in [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md) §1: GRPO advantage signal would point toward the attack, not away from it. Phase 3 GRPO deferred. Source: live-recomputed from `data/audit_F_n5.json` and `tests/envs/test_reconcile_gst2b_reward_hacking.py` via [`scripts/make_day1_figure.py`](scripts/make_day1_figure.py). The same chart is rendered live as Tab 4 in the [HF Space](https://huggingface.co/spaces/akashkathole/reconcile_gst2b_env).*
 
+### Day 1 training progression: step 350 vs step 375 (final), empirical proof of FM5
+
+![Day 1 training-progression bar chart: prompted baseline (0.18), trained SFT step 350 (0.314, light purple), trained SFT step 375 final (0.280, dark purple), with 0.45 red-team ceiling and 0.349 query_only Mode B exploit reference lines](data/figures/day1_training_progression.png)
+
+*Day 1 training progression, n=5 audit on heldout seeds 9030-9034 at GRPO-matching sampling with `tools=` enabled. Step 350 mean (0.314) is HIGHER than step 375 final mean (0.280), but only because 4 of 5 seeds at step 350 collapsed to the Mode B `query_only` attack shape (R_total 0.353), while only 2 of 5 did at step 375. **The last 25 optimizer steps moved the policy distribution from "mostly attack" (1/5 marking) to "mostly marking" (3/5 marking) AND the composite score went DOWN.** This is empirical proof of Failure Mode 5 (reward-landscape inversion) in [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md) §1: under the current arithmetic-reward + R3-R4-saturation design, marking trajectories (Mode A) score lower than the cheap query_only attack (Mode B). Even at n=5 the direction is structurally robust: any seed shifting from Mode B (0.353) to Mode A (0.17 - 0.26) mechanically pulls the mean down. GRPO advantage signal would push the policy back toward Mode B. Source: [`data/audit_ckpt350_F_n5.json`](data/audit_ckpt350_F_n5.json) + [`data/audit_F_n5.json`](data/audit_F_n5.json) via [`scripts/make_day1_progression_figure.py`](scripts/make_day1_progression_figure.py).*
+
 ### Pre-onsite training trace (Qwen3-0.6B + Kaggle T4)
 
 ![Qwen3-0.6B training reward vs red-team attack ceilings](data/figures/three_scales_reward.png)
@@ -99,6 +105,10 @@ PYTHONPATH=src:envs uv run python -m \
 PYTHONPATH=src:envs uv run python -m \
     envs.reconcile_gst2b_env.scripts.make_day1_figure
 # writes data/figures/day1_baseline_comparison.png
+
+PYTHONPATH=src:envs uv run python -m \
+    envs.reconcile_gst2b_env.scripts.make_day1_progression_figure
+# writes data/figures/day1_training_progression.png
 ```
 
 ### Verify the trained number (judges' reproducibility path)
@@ -111,7 +121,8 @@ The Day 1 headline `n=5 mean 0.280` is reproducible end-to-end from the committe
 | [`data/sft_full_run.log`](data/sft_full_run.log) | Full 375-step SFT training log (31:12 wall, train_loss 0.341 aggregate / 0.207 final per-step, monotonic descent). |
 | [`data/sft_summary.json`](data/sft_summary.json) | Trained checkpoint metadata (model, LoRA targets, samples/sec, runtime). |
 | [`data/sft_trajectories.jsonl`](data/sft_trajectories.jsonl) | The 3000-row balanced SFT input (1000 oracle + 1000 inspect_then_label + 1000 supplier_cap_aware, round-robin). |
-| [`data/audit_F_n5.json`](data/audit_F_n5.json) | Headline n=5 audit on heldout seeds 9030-9034 with `tools=` enabled. Per-seed totals + reward breakdown + raw model completions. |
+| [`data/audit_F_n5.json`](data/audit_F_n5.json) | Headline n=5 audit on heldout seeds 9030-9034 at step 375 final with `tools=` enabled. Per-seed totals + reward breakdown + raw model completions. |
+| [`data/audit_ckpt350_F_n5.json`](data/audit_ckpt350_F_n5.json) | Same audit at step 350 (25 optimizer steps before final). Empirical proof of Failure Mode 5: step 350 mean 0.314 is HIGHER than step 375's 0.280 because 4/5 seeds at step 350 are still in Mode B query_only attack; the last 25 steps lifted 3/5 seeds into marking at the cost of composite reward. |
 | [`data/audit_seeds_9031_9034.json`](data/audit_seeds_9031_9034.json) | Pre-`tools=` collapse evidence (the audit-OOD trap chain documented as Failure Mode 4). |
 | [`data/audit_step100_n5.json`](data/audit_step100_n5.json) | Early-stop control (step 100 fresh checkpoint) ruling out the over-training hypothesis: undercooked grammar at step 100, policy collapse only emerges later. |
 

@@ -40,7 +40,20 @@ The n=5 audit at GRPO-matching sampling parameters revealed a **bimodal policy**
 
 The composite weights (0.40 / 0.25 / 0.25 / 0.10) plus R3-R4 saturation make the cheap-to-game cells (query precondition + step efficiency) dominate the expensive-to-improve cells (label F1 + ITC delta) at this policy quality. **GRPO's advantage signal would point toward the attack, not away from it.**
 
-This is not a Phase-2 SFT bug. The SFT teaches the model to mark; the reward function correctly identifies that the model's marks are mostly wrong (high mark_matched bias on a 5-class problem). The structural issue is that "many wrong marks" scores lower than "no marks at all" under the current weighting + R3-R4 saturation behavior — a known pathology of arithmetic composite rewards when the floor of one component (R1 + R2 here) is too easy to reach via avoidance.
+**Empirical evidence for the inversion** (post-Action 7, P2 audit on 2026-04-25):
+
+| Checkpoint | n=5 mean composite | Mode A (marking) seeds | Mode B (query_only attack) seeds |
+|---|---:|:---:|:---:|
+| Step 350 | **0.3141** | 1 of 5 | 4 of 5 |
+| Step 375 (final) | **0.2797** | 3 of 5 | 2 of 5 |
+
+The MORE-trained checkpoint scores LOWER. The last 25 optimizer steps moved 2 seeds from Mode B (R_total 0.353) into Mode A (R_total 0.17 - 0.26), and this is what dragged the n=5 mean down from 0.314 to 0.280. Training is moving the policy in the direction we want (more marking, more genuine R1+R2 reward instead of R3+R4 floor exploitation), and the composite reward is penalizing it.
+
+5 seeds is small for absolute composite estimates, but the directional finding is structurally explained, not a noise artifact: under the current weights, every Mode B → Mode A transition reduces composite reward by ≈ 0.10 - 0.18 (from R_total 0.353 down to the 0.17 - 0.26 Mode A range). At any sample size, more transitions in this direction would deepen the gap. This is a structural property of the arithmetic-composite-reward + R3-R4-saturation design, not a bug in `rewards.py` (Guardrail 1 frozen). The same property is what makes the 6 red-team attacks defensible at <0.45. The post-hackathon agenda is to shape one without sacrificing the other.
+
+Source artifacts: [`data/audit_ckpt350_F_n5.json`](data/audit_ckpt350_F_n5.json) and [`data/audit_F_n5.json`](data/audit_F_n5.json), both at GRPO-matching sampling (T=0.7, top_p=0.95, top_k=20) with `tools=` enabled. Visualized in [`data/figures/day1_training_progression.png`](data/figures/day1_training_progression.png).
+
+This is not a Phase-2 SFT bug. The SFT teaches the model to mark; the reward function correctly identifies that the model's marks are mostly wrong (high mark_matched bias on a 5-class problem). The structural issue is that "many wrong marks" scores lower than "no marks at all" under the current weighting + R3-R4 saturation behavior, a known pathology of arithmetic composite rewards when the floor of one component (R1 + R2 here) is too easy to reach via avoidance.
 
 Three resolutions exist, each with caveats:
 
@@ -72,7 +85,7 @@ Once cell 6 imports cleared, two separate silent hangs appeared inside `trainer.
 
 2. **TRL 1.x `dataset_text_field=None` hang (~1.5h silent, no progress bar).** Our `SFTConfig(..., dataset_text_field=None)` was written against TRL 0.21.x semantics where `None` signaled "use messages format." In TRL 1.x the default is `"text"` and the collator's messages-column auto-detect does the routing. Passing `None` in 1.x produces a silent fallthrough somewhere in `_prepare_dataset` → chat-template auto-patching, hanging before the tqdm progress bar even initializes. Fixed in commit `4b3707d` by removing the field entirely and letting TRL 1.x auto-detect the `messages` column.
 
-The second fix (Path B) is queued for on-site — we did not push-and-pray further Kaggle attempts after the RCA landed.
+The second fix (Path B) is queued for on-site; we did not push-and-pray further Kaggle attempts after the RCA landed.
 
 ## 4. What shipped in this submission
 
@@ -92,7 +105,7 @@ Pipeline that ran:
 - **Phase 2 SFT.** [`scripts/train_sft_warmstart.py`](scripts/train_sft_warmstart.py) on Qwen/Qwen3-4B + LoRA rank 16 + bf16 + 1 epoch over 3000 rows = 375 optimizer steps. Wall time **31:12** (5s/step), final aggregate train_loss **0.341**. Smoke run at `--limit-rows 300` cleared the 5-min gate (first loss line at ~31s) and the step-10 loss-stagnation canary (loss[10]/loss[5] = 0.918 with full-run logging cadence). Full artifacts: [`data/sft_full_run.log`](data/sft_full_run.log), [`data/sft_summary.json`](data/sft_summary.json), [`data/sft_smoke_run.log`](data/sft_smoke_run.log).
 - **LoRA merge.** Final adapter (132 MB) merged into base Qwen3-4B weights using `peft.PeftModel.merge_and_unload()` to produce a full inference-ready checkpoint (8 GB safetensors). Required because `train_grpo_real.py` loads via `AutoModelForCausalLM.from_pretrained(args.model)` directly without PEFT-aware wrapping.
 - **5-metric rollout audit on held-out seeds 9030-9034.** [`scripts/audit_sft_rollout_quality.py`](scripts/audit_sft_rollout_quality.py) at `T=0.7 top_p=0.95 top_k=20` matching `train_grpo_real.py:557-561`. After resolving the 4-bug audit-OOD trap chain (Failure Mode 4 above), n=5 mean composite reward **0.280**, with 3 of 5 seeds emitting 32-46 mark verbs per trajectory (R1 = 0.15, R2 = 0.41 in mark-emitting trajectories) and 2 of 5 seeds collapsing to the 3-step query_only shape (R = `{0.01, 0.01, 0.99, 0.99}` total 0.353). Headline artifact: [`data/audit_F_n5.json`](data/audit_F_n5.json).
-- **Step-100 early-stop control.** Trained a fresh checkpoint to step 100 (`--limit-rows 800`) to test the over-training hypothesis. Result: malformed JSON output (missing commas in tool_call body) and off-vocab verb names like `query_schema`, `list_invoices`. Step 100 is undercooked — hasn't learned tool_call grammar yet. By step 375 grammar is clean; the policy collapse documented in Failure Mode 5 is post-grammar-acquisition. No "less-trained = healthier" sweet spot exists in this curve. Artifact: [`data/audit_step100_n5.json`](data/audit_step100_n5.json).
+- **Step-100 early-stop control.** Trained a fresh checkpoint to step 100 (`--limit-rows 800`) to test the over-training hypothesis. Result: malformed JSON output (missing commas in tool_call body) and off-vocab verb names like `query_schema`, `list_invoices`. Step 100 is undercooked; it hasn't learned tool_call grammar yet. By step 375 grammar is clean; the policy collapse documented in Failure Mode 5 is post-grammar-acquisition. No "less-trained = healthier" sweet spot exists in this curve. Artifact: [`data/audit_step100_n5.json`](data/audit_step100_n5.json).
 
 What was deferred (Phase 3 GRPO):
 
