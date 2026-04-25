@@ -96,6 +96,31 @@ grep -n "SimpleNamespace\|_oracle_trajectory\|_baseline_comparison_figure\|_TRAI
 # If missing, the Space tabs are broken — do NOT push any change that breaks
 # the currently-deployed Space without restoring these first.
 
+# 4b. Confirm TRL + vLLM version pair (added 2026-04-25 per deep research).
+# TRL 1.2.0 (released 2026-04-17) couples to vLLM >=0.18 for GRPO weight-push.
+# A fresh `uv sync --all-extras` on a new A100 box can pull mismatched
+# versions and GRPO weight-push fails silently mid-training.
+PYTHONPATH=src:envs uv run python3 -c "
+import trl
+try:
+    import vllm
+    vllm_ver = vllm.__version__
+except ImportError:
+    vllm_ver = '<not installed>'
+print(f'trl: {trl.__version__} | vllm: {vllm_ver}')
+tr = tuple(int(x) for x in trl.__version__.split('.')[:2])
+if tr >= (1, 2) and vllm_ver != '<not installed>':
+    vl = tuple(int(x) for x in vllm_ver.split('.')[:2])
+    if vl < (0, 18):
+        print(f'WARN: TRL {trl.__version__} expects vllm>=0.18, got {vllm_ver}')
+        print('Fix: uv pip install \"vllm>=0.18\" before any GRPO action')
+    else:
+        print('OK: trl/vllm version pair compatible')
+elif tr >= (1, 2):
+    print('NOTE: vllm not installed; train_grpo_real.py uses use_vllm=False so this is fine.')
+    print('If you flip use_vllm=True later for throughput, install vllm>=0.18 first.')
+"
+
 # 6. Confirm embedded figures exist + regenerator is callable
 ls -la envs/reconcile_gst2b_env/data/figures/
 # expect: three_scales_reward.png + three_scales_components.png
@@ -118,7 +143,7 @@ Ask Aakash these in one batch:
 1. "Which compute UI provides our HF credits? Direct URL? Credit balance?"
 2. "Is this an A100 40GB or something else?"
 3. "Any session time limit / hourly quota?"
-4. **"Do you have a HUGGING_FACE_HUB_TOKEN set in the compute env? Qwen3-4B should download without auth, but Qwen3-1.7B-Instruct sometimes triggers a gate prompt depending on which exact revision Hub serves."** If no token, set one before model load: `export HUGGING_FACE_HUB_TOKEN=<token>` (Aakash creates a Read-scoped token at huggingface.co/settings/tokens; do NOT paste the token into chat).
+4. **HF token: only set if Hub returns 401.** Qwen3-4B, Qwen3-1.7B, and Qwen3-0.6B are confirmed ungated under Apache-2.0 as of 2026-04 (verified by Aakash's 2026-04-25 deep-research pass; the previous draft of this prompt warned about gating that no longer applies — tightened here). Do NOT preemptively set `HUGGING_FACE_HUB_TOKEN` — skip straight to model load. Only if the load actually returns HTTP 401 do you ask Aakash for a Read-scoped token (he creates at huggingface.co/settings/tokens; do NOT paste the token into chat). Token round-trip is wasted Day-1 time when the models are open.
 
 His answers determine: compute provider (Colab notebook / SSH shell / HF Compute dashboard / RunPod-like), model choice (4B default, 1.7B fallback), and pacing (Action 1b below).
 
@@ -188,6 +213,22 @@ PYTHONPATH=src:envs uv run python -m envs.reconcile_gst2b_env.scripts.train_sft_
 Either signal = training loop is alive; keep going even if the loss line itself is delayed by tokenizer pre-processing or accelerate setup. **Step time <30s on A100 after step 3.**
 
 If 5 minutes pass with NEITHER signal AND no additional stdout (just radio silence after the transformers PAD/BOS/EOS warning), THAT is the TRL 1.x silent-hang re-surfacing — STOP, ask Aakash, do not push-and-pray. See LESSONS_LEARNED §3 for the prior diagnosis. The Path B fix in `4b3707d` already removed the known trigger, so a new hang in this position would be a fresh class of bug warranting fresh RCA, not patch-loop-and-retry.
+
+**Loss-stagnation canary at step 10 (added 2026-04-25 per TRL#3910 finding).** This is the second silent-failure shape that the 5-min gate can pass through. Per TRL issue #3910, the `max_length` rename in TRL 1.x can produce: tqdm progress bar runs, per-step `{'loss': ...}` lines log normally, BUT the loss never decreases — the model is effectively training on padding tokens because `max_length` is being misinterpreted somewhere in the dataset prep path.
+
+After step 10 of a healthy SFT run, `loss[10] / loss[1] < 0.97` (i.e., at least a 3% relative drop from step-1 baseline). If `loss[10] / loss[1] > 0.97` (loss flat within 3%), kill the run:
+
+```bash
+pkill -f train_sft_warmstart
+# inspect: did max_length get wired correctly? Compare:
+grep -n "max_length\|max_seq" envs/reconcile_gst2b_env/scripts/train_sft_warmstart.py
+# expect: SFTConfig has max_length=args.max_seq_length (TRL 1.x name).
+# If the script accidentally got reverted to max_seq_length=, that's the bug.
+```
+
+A flat-loss-with-healthy-tqdm run that goes 2 hours produces a checkpoint that scores at random-policy level. Catch it at step 10 and lose 5 minutes, not 2 hours.
+
+**Gradient-checkpointing safety check (added 2026-04-25 per peft#1142, transformers#35826).** `train_sft_warmstart.py` does NOT currently enable `gradient_checkpointing` in SFTConfig (verify with `grep gradient_checkpointing envs/reconcile_gst2b_env/scripts/train_sft_warmstart.py` → expect empty), which side-steps the trap entirely. **If you add `gradient_checkpointing=True` later for memory reasons** (e.g., to fit a larger batch on the same A100), you MUST also pass `gradient_checkpointing_kwargs={"use_reentrant": False}` AND call `model.enable_input_require_grads()` AFTER the PEFT wrap. Without both, the run produces either a step-1 traceback OR — worse — silent flat loss. See Invariant #17 below for the warning-vs-error trap this creates.
 
 ### Action 5 — Phase 2 SFT full run (~2 h on A100)
 
@@ -410,7 +451,7 @@ Then (executing the matched branch above):
     - `Some weights of Qwen3ForCausalLM were not used when initializing` (LoRA wraps base; harmless)
     - `pad_token_id not set` (we set it explicitly; harmless)
     - `[transformers] warmup_ratio is deprecated` (transformers 5.x deprecation; harmless)
-    - `torch.utils.checkpoint: ...` user warnings (gradient checkpointing config; harmless if training runs)
+    - `torch.utils.checkpoint: ...` user warnings — **conditional, NOT unconditionally benign.** Harmless ONLY if `gradient_checkpointing_kwargs={"use_reentrant": False}` is set explicitly in `SFTConfig`/`GRPOConfig` AND `model.enable_input_require_grads()` is called AFTER the PEFT wrap. Otherwise the warning precedes either a step-1 traceback OR silent flat loss. Per peft#1142 + transformers#35826 (verified 2026-04-25). The current `train_sft_warmstart.py` does NOT enable gradient_checkpointing so the warning shouldn't fire on Day 1; if it does fire, that means TRL auto-enabled it for memory reasons and you need to apply both fixes above before continuing. See Action 4's gradient-checkpointing safety check for the grep verification.
     - `Skipping import of cpp extensions due to incompatible torch version` (torchao on torch <2.11 falls back to Python; harmless if A100 has tensor-core fp16/bf16)
     - `pin_memory argument is set as true but no accelerator is found` ONLY if CUDA is unavailable (real signal — check Accelerator setting)
 
