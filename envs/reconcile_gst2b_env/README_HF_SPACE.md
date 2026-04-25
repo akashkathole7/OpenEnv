@@ -32,7 +32,7 @@ tags:
 
 - **Environment innovation (40%):** 16 typed verbs (7 query / 7 mutate / 2 meta), 5 planted mismatch types, 30%-probability directed 3-cycle ring fraud, partially observable, hidden ground truth unit-tested to never leak into observations.
 - **Storytelling (30%):** BLOG, 90-sec video, PITCH, QA_REHEARSAL, this Space with the 3D ring viewer you see below, README front-loads plots per judges' guidance.
-- **Training evidence (20%):** 10-step Qwen3-0.6B GRPO smoke + 150-step eval plateau with per-step metrics (see plots). Trained numbers from on-site A100 (Apr 25-26) land in a follow-up. [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md) covers the honest multi-scale attempt diagnosis.
+- **Training evidence (20%):** Pre-onsite Qwen3-0.6B GRPO 10-step smoke + 150-step eval plateau (plots below). On-site Day 1 (2026-04-25, A100 SXM4-80GB): full 375-step Qwen3-4B SFT, n=5 mean composite reward **0.280** above prompted Qwen2.5-3B baseline 0.18. GRPO Phase 3 deferred per reward-landscape analysis. [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md) §1 covers all 5 documented failure modes.
 - **Reward & pipeline (10%):** 4-component arithmetic reward clamped to `[0.01, 0.99]`, 6 red-team attacks CI-enforced at `<0.45`, 42 tests green, Tier 1+2 GRPO fixes validated in [`data/smoke_test_10step.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/smoke_test_10step.json).
 
 ---
@@ -47,8 +47,10 @@ tags:
 | Reward components | **4** arithmetic, each clamped to `[0.01, 0.99]` |
 | Red-team attacks CI-enforced `<0.45` | **6 / 6 pass**, max `query_only` = 0.349 |
 | Test suite | **42 / 42 green** |
-| Prompted vs raw baseline delta on Qwen2.5-3B-Instruct | **1.18** (95% CI [1.09, 1.27], 180 rollouts) |
-| Documented pre-onsite training run | **Qwen3-0.6B, 10-step smoke + 150-step eval** (plots below) |
+| **Trained Qwen3-4B SFT on A100 SXM4-80GB (Day 1 on-site)** | **n=5 mean composite reward 0.280** |
+| Prompted vs raw baseline delta on Qwen2.5-3B-Instruct | 1.18 (95% CI [1.09, 1.27], 180 rollouts) |
+| Trained-vs-prompted lift | +0.10 (0.280 − 0.18) |
+| Documented pre-onsite training run | Qwen3-0.6B, 10-step smoke + 150-step eval (plots below) |
 | `make reproduce` | bit-identical against committed artifacts |
 
 ---

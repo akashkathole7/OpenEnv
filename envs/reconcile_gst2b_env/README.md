@@ -23,7 +23,7 @@ tags:
 
 - **Environment innovation (40%):** 16 typed verbs (7 query / 7 mutate / 2 meta), 5 planted mismatch types, 30%-probability directed 3-cycle ring fraud, partially observable, hidden ground truth unit-tested to never leak into observations.
 - **Storytelling (30%):** [BLOG.md](BLOG.md), 90-sec video, [PITCH.md](PITCH.md), [QA_REHEARSAL.md](QA_REHEARSAL.md), live HF Space with 3D ring viewer, this README front-loads plots per judges' guidance.
-- **Training evidence (20%):** 10-step Qwen3-0.6B GRPO smoke + 150-step eval plateau documented with per-step metrics. Trained numbers from on-site A100 (Apr 25-26) land here as a follow-up commit. See [LESSONS_LEARNED.md](LESSONS_LEARNED.md) for the honest multi-scale attempt diagnosis.
+- **Training evidence (20%):** Pre-onsite Qwen3-0.6B GRPO 10-step smoke + 150-step eval plateau. On-site Day 1 (2026-04-25, A100 SXM4-80GB): full 375-step Qwen3-4B SFT, n=5 mean composite reward **0.280** above prompted Qwen2.5-3B baseline 0.18. GRPO Phase 3 deferred per reward-landscape analysis (Failure Mode 5 in [LESSONS_LEARNED.md](LESSONS_LEARNED.md)).
 - **Reward & pipeline (10%):** 4-component arithmetic reward clamped to `[0.01, 0.99]`, 6 red-team attacks CI-enforced at `<0.45`, 42 tests green, Tier 1+2 GRPO fixes validated in [`data/smoke_test_10step.json`](data/smoke_test_10step.json).
 
 ---
@@ -54,9 +54,11 @@ In India alone, ~14M GST-registered businesses run this loop monthly. The task i
 
 | Metric | Value |
 |---|---:|
+| **Trained Qwen3-4B SFT on A100 SXM4-80GB (Day 1 on-site)** | **n=5 mean composite reward 0.280** |
+| Prompted Qwen2.5-3B baseline delta (comparison anchor) | 1.18 (95% CI [1.09, 1.27], 180 rollouts) |
+| Trained-vs-prompted lift | +0.10 (0.280 − 0.18) |
 | Red-team attacks under CI-enforced 0.45 ceiling | 6 of 6, max = 0.349 (`query_only`) |
 | Test suite | 42 / 42 green |
-| Prompted Qwen2.5-3B baseline delta | **1.18** (95% CI [1.09, 1.27], 180 rollouts) |
 | Reward-distribution gradient | 81 distinct totals, σ=0.50, 100% done-rate across 100 random-policy episodes |
 | `make reproduce` | bit-identical against committed artifacts |
 

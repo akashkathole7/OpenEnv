@@ -1,0 +1,178 @@
+{
+  "checkpoint": "envs/reconcile_gst2b_env/data/sft_checkpoint_step100/merged",
+  "seeds": [
+    9030,
+    9031,
+    9032,
+    9033,
+    9034
+  ],
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "top_k": 20,
+    "do_sample": true
+  },
+  "metrics_avg": {
+    "query_to_mark": 0.0,
+    "mean_inspection_depth": 0.0,
+    "repeated_query_rate": 0.0,
+    "tool_diversity": 0.0625,
+    "premature_marking_rate": 0.0
+  },
+  "per_seed_metrics": [
+    {
+      "query_to_mark": 0.0,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.0,
+      "tool_diversity": 0.0625,
+      "premature_marking_rate": 0.0
+    },
+    {
+      "query_to_mark": 0.0,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.0,
+      "tool_diversity": 0.0625,
+      "premature_marking_rate": 0.0
+    },
+    {
+      "query_to_mark": 0.0,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.0,
+      "tool_diversity": 0.0625,
+      "premature_marking_rate": 0.0
+    },
+    {
+      "query_to_mark": 0.0,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.0,
+      "tool_diversity": 0.0625,
+      "premature_marking_rate": 0.0
+    },
+    {
+      "query_to_mark": 0.0,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.0,
+      "tool_diversity": 0.0625,
+      "premature_marking_rate": 0.0
+    }
+  ],
+  "fail_count": 3,
+  "rollouts": [
+    {
+      "seed": 9030,
+      "total_steps": 1,
+      "termination": "submit_before_query",
+      "parser_misses": 1,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0,
+        "R4": 0.0,
+        "total": -1.0
+      },
+      "trajectory": [
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n\"name\": \"query_schema\"\n\"arguments\": {\n  \"schema_type\": \"invoice\"\n}\n</tool_call>",
+      "raw_last_completion": "<tool_call>\n\"name\": \"query_schema\"\n\"arguments\": {\n  \"schema_type\": \"invoice\"\n}\n</tool_call>"
+    },
+    {
+      "seed": 9031,
+      "total_steps": 1,
+      "termination": "submit_before_query",
+      "parser_misses": 1,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0,
+        "R4": 0.0,
+        "total": -1.0
+      },
+      "trajectory": [
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n\"name\": \"query_schema\"\n\"arguments\": {}\n<tool_call>",
+      "raw_last_completion": "<tool_call>\n\"name\": \"query_schema\"\n\"arguments\": {}\n<tool_call>"
+    },
+    {
+      "seed": 9032,
+      "total_steps": 1,
+      "termination": "submit_before_query",
+      "parser_misses": 1,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0,
+        "R4": 0.0,
+        "total": -1.0
+      },
+      "trajectory": [
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n\"name\": \"query_schema\"\n\"arguments\": {}\n<tool_call>",
+      "raw_last_completion": "<tool_call>\n\"name\": \"query_schema\"\n\"arguments\": {}\n<tool_call>"
+    },
+    {
+      "seed": 9033,
+      "total_steps": 1,
+      "termination": "submit_before_query",
+      "parser_misses": 1,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0,
+        "R4": 0.0,
+        "total": -1.0
+      },
+      "trajectory": [
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n\"name\": \"query_schema\"\n\"arguments\": {}\n</tool_call>",
+      "raw_last_completion": "<tool_call>\n\"name\": \"query_schema\"\n\"arguments\": {}\n</tool_call>"
+    },
+    {
+      "seed": 9034,
+      "total_steps": 1,
+      "termination": "submit_before_query",
+      "parser_misses": 1,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.0,
+        "R2": 0.0,
+        "R3": 0.0,
+        "R4": 0.0,
+        "total": -1.0
+      },
+      "trajectory": [
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n\"name\": \"query_schema\"\n\"arguments\": {}\n<tool_call>",
+      "raw_last_completion": "<tool_call>\n\"name\": \"query_schema\"\n\"arguments\": {}\n<tool_call>"
+    }
+  ]
+}

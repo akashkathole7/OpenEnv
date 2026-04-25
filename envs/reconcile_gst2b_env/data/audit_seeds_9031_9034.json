@@ -1,0 +1,1151 @@
+{
+  "checkpoint": "envs/reconcile_gst2b_env/data/sft_checkpoint/merged",
+  "seeds": [
+    9031,
+    9032,
+    9033,
+    9034
+  ],
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "top_k": 20,
+    "do_sample": true
+  },
+  "metrics_avg": {
+    "query_to_mark": 42.5,
+    "mean_inspection_depth": 0.0,
+    "repeated_query_rate": 0.5537587412587412,
+    "tool_diversity": 0.15625,
+    "premature_marking_rate": 0.0
+  },
+  "per_seed_metrics": [
+    {
+      "query_to_mark": 26.0,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.19230769230769232,
+      "tool_diversity": 0.1875,
+      "premature_marking_rate": 0.0
+    },
+    {
+      "query_to_mark": 44.0,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.5227272727272727,
+      "tool_diversity": 0.1875,
+      "premature_marking_rate": 0.0
+    },
+    {
+      "query_to_mark": 50.0,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.74,
+      "tool_diversity": 0.125,
+      "premature_marking_rate": 0.0
+    },
+    {
+      "query_to_mark": 50.0,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.76,
+      "tool_diversity": 0.125,
+      "premature_marking_rate": 0.0
+    }
+  ],
+  "fail_count": 3,
+  "rollouts": [
+    {
+      "seed": 9031,
+      "total_steps": 27,
+      "termination": "submitted",
+      "parser_misses": 1,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.01,
+        "R2": 0.01,
+        "R3": 0.99,
+        "R4": 0.7084,
+        "total": 0.3248
+      },
+      "trajectory": [
+        {
+          "verb": "list_gstins",
+          "payload": {}
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "25OTWGB8636CSZX"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "13OREAU6067L4ZP"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "29ZMMVX3020XEZG"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "24EWSYG0066ZUZ4"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "36TAZJS8644I4ZC"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "30CLIZE7791HUZO"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "25DZDCN6454VOZG"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "17RYUHY3262W3ZQ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "09DGUAF0826HKZH"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "08UAXEX9124QKZT"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "12GZCQJ5606G8ZF"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "15HQKKK2171JVZ1"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "32KWRDA3238TPZS"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "11AONGK2165CRZ7"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "28NLWUG1869UCZS"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "28PYQRD9538O9ZO"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "17JVRQO2614LRZ2"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "05WRTVX8296AGZP"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04AQNWC8766F8Z3"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "13OUIAB0705LGZ5"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "13OUIAB0705LGZ5"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "13OUIAB0705LGZ5"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "13OUIAB0705LGZ5"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "13OUIAB0705LGZ5"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "13OUIAB0705LGZ5"
+          }
+        },
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n\"name\": \"list_gstins\",\n\"arguments\": {}\n</tool_call>",
+      "raw_last_completion": "<tool_call>\n\"name\": \"submit\",\n\"arguments\": {\n  \"labels\": [\n    \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\",\n    \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\",\n    \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\",\n    \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\",\n    \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\",\n    \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\",\n    \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\",\n    \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\", \"matched\",\n    \"matched\", \"matched\", \"matched\", \"matched\", \"matched\","
+    },
+    {
+      "seed": 9032,
+      "total_steps": 45,
+      "termination": "submitted",
+      "parser_misses": 1,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.01,
+        "R2": 0.01,
+        "R3": 0.99,
+        "R4": 0.19,
+        "total": 0.273
+      },
+      "trajectory": [
+        {
+          "verb": "list_gstins",
+          "payload": {}
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "11ULLWA3848R6ZQ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "18OGHZM1870FSZO"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "12RDKWY8122RJZF"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "16RZIYN1825NIZK"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "29PIORJ6525FTZO"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "28VLXNW1754OKZT"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "24NZOLS9844X0ZL"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "22YZVBL6310JXZF"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "33YZMXU8161KWZP"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "01HJTUT8873YIZK"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "05QVCPM1135JZZH"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "12AUIQB7876KYZE"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "03PGRND8750D3Z5"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "05VMYCR7820HTZT"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "11ULLWA3868R6ZM"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "02EZMWT0866EJZB"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "10YVRVS7537LKZE"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "32BGNWY5686P5ZN"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04FEWRB3604J9Z4"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "11ULLWA3848R6ZQ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "11ULLWA3868R6ZM"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "11ULLWA3848R6ZQ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "02EZMWT0866EJZB"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "30MQRGO2809IPZ9"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04FEWRB3604J9Z4"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "11ULLWA3848R6ZQ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "11ULLWA3868R6ZM"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "12AUIQB7876KYZE"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "05QVCPM1135JZZH"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "24NZOLS9844X0ZL"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "10YVRVS7537LKZE"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "12AUIQB7876KYZE"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "11ULLWA3868R6ZM"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "29PIORJ6525FTZO"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "22YZVBL6310JXZF"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "24NZOLS9844X0ZL"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "10YVRVS7537LKZE"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "05QVCPM1135JZZH"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "12AUIQB7876KYZE"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "11ULLWA3848R6ZQ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "02EZMWT0866EJZB"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "30MQRGO2809IPZ9"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "11ULLWA3868R6ZM"
+          }
+        },
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>{\"name\": \"list_gstins\", \"arguments\": {}}</tool_call>",
+      "raw_last_completion": "{\"name\": \"list_invoices_by_supplier\", \"arguments\": {\"gstin\": \"11ULLWA3848R6ZQ\"}}}"
+    },
+    {
+      "seed": 9033,
+      "total_steps": 50,
+      "termination": "step_budget_exhausted",
+      "parser_misses": 0,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.01,
+        "R2": 0.01,
+        "R3": 0.99,
+        "R4": 0.01,
+        "total": 0.255
+      },
+      "trajectory": [
+        {
+          "verb": "list_gstins",
+          "payload": {}
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "19HWRYG5349WHZ0"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "12GHQTL7791VMZ3"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "26VNGPI1034KNZ0"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "20ROUGU4764V4ZL"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "28JBQDA5515U7Z6"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "14JIQQD1131HLZV"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "06RCYPN0785W1ZO"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "03LBXIM0096ARZ5"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "01LQGYK9733CYZG"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "06KWYIX0360DLZQ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "10CORJZ8209LLZZ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "12GHQTL7191VMZ9"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "26VNGPI1034KNZ0"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "20ROUGU4764V4ZL"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "06KWYIX0360DLZQ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "03LBXIM0096ARZ5"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "14JIQQD1131HLZV"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "12GHQTL7191VMZ9"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "10CORJZ8209LLZZ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "26VNGPI1034KNZ0"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "20ROUGU4764V4ZL"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "06KWYIX0360DLZQ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "12GHQTL7191VMZ9"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "10CORJZ8209LLZZ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "01LQGYK9733CYZG"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "14JIQQD1131HLZV"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "28JBQDA5515U7Z6"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "06RCYPN0785W1ZO"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "03LBXIM0096ARZ5"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "26VNGPI1034KNZ0"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "14JIQQD1131HLZV"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "20ROUGU4764V4ZL"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "12GHQTL7191VMZ9"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "06KWYIX0360DLZQ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "10CORJZ8209LLZZ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "01LQGYK9733CYZG"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "26VNGPI1034KNZ0"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "12GHQTL7191VMZ9"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "20ROUGU4764V4ZL"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "06KWYIX0360DLZQ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "10CORJZ8209LLZZ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "28JBQDA5515U7Z6"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "06RCYPN0785W1ZO"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "26VNGPI1034KNZ0"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "01LQGYK9733CYZG"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "12GHQTL7191VMZ9"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "06KWYIX0360DLZQ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "10CORJZ8209LLZZ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "28JBQDA5515U7Z6"
+          }
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n\"name\": \"list_gstins\",\n\"arguments\": {}\n</tool_call>",
+      "raw_last_completion": "<tool_call>\n\"name\": \"list_invoices_by_supplier\",\n\"arguments\": {\"gstin\": \"28JBQDA5515U7Z6\"}\n</tool_call>"
+    },
+    {
+      "seed": 9034,
+      "total_steps": 50,
+      "termination": "step_budget_exhausted",
+      "parser_misses": 0,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.01,
+        "R2": 0.01,
+        "R3": 0.99,
+        "R4": 0.01,
+        "total": 0.255
+      },
+      "trajectory": [
+        {
+          "verb": "list_gstins",
+          "payload": {}
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "28MPKYQ5534MHZW"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "02NVZYO0035D0ZY"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "30TOGOF2803KBZP"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "16EVBQU4643LKZH"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "23VTQLE4743I6Z3"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "05XFMUK9150JYZB"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "14ZBHVS7284QWZU"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "14COOPE0997VNZA"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04QGBGP6500RFZW"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04PYZKM9089XMZT"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "36KVKEZ1377B5ZJ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "14COOPE0997VNZA"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "30TOGOF2803KBZP"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "05XFMUK9150JYZB"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04PYZKM9089XMZT"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "14ZBHVS7284QWZU"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "28MPKYQ5534MHZW"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "36KVKEZ1377B5ZJ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "02NVZYO0035D0ZY"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04QGBGP6500RFZW"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "16EVBQU4643LKZH"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "14COOPE0997VNZA"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "30TOGOF2803KBZP"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "05XFMUK9150JYZB"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "14ZBHVS7284QWZU"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04PYZKM9089XMZT"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "36KVKEZ1377B5ZJ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "23VTQLE4743I6Z3"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "02NVZYO0035D0ZY"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "28MPKYQ5534MHZW"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04QGBGP6500RFZW"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "36KVKEZ1377B5ZJ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "14COOPE0997VNZA"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04PYZKM9089XMZT"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "16EVBQU4643LKZH"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "28MPKYQ5534MHZW"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "05XFMUK9150JYZB"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "02NVZYO0035D0ZY"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "14ZBHVS7284QWZU"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04QGBGP6500RFZW"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "02NVZYO0035D0ZY"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "05XFMUK9150JYZB"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "14COOPE0997VNZA"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "28MPKYQ5534MHZW"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "16EVBQU4643LKZH"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "30TOGOF2803KBZP"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04PYZKM9089XMZT"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "36KVKEZ1377B5ZJ"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "05XFMUK9150JYZB"
+          }
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n\"name\": \"list_gstins\",\n\"arguments\": {}\n</tool_call>",
+      "raw_last_completion": "<tool_call>\n\"name\": \"list_invoices_by_supplier\",\n\"arguments\": {\"gstin\": \"05XFMUK9150JYZB\"}\n</tool_call>"
+    }
+  ]
+}

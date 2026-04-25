@@ -20,11 +20,12 @@ Four tabs:
                                  directed-cycle fraud rings; video centerpiece.
   4. Baseline Comparison       — LIVE: composite-reward bar chart across
                                  oracle + 6 red-team attacks + prompted
-                                 baseline + trained target placeholder.
-                                 The 0.45 ceiling line is the CI-enforced
-                                 red-team ceiling. Oracle is live-computed
-                                 at module load; trained bar replaces the
-                                 0.50 placeholder after on-site A100 run.
+                                 baseline + trained Qwen3-4B SFT (Day 1,
+                                 A100 SXM4) at n=5 mean composite reward
+                                 0.280. The 0.45 ceiling line is the
+                                 CI-enforced red-team ceiling. Oracle is
+                                 live-computed at module load; trained
+                                 bar reflects on-site Day 1 measurement.
 
 Launch locally:
     PYTHONPATH=src:envs uv run python envs/reconcile_gst2b_env/app.py
@@ -413,10 +414,11 @@ _REDTEAM_ATTACKS: Dict[str, float] = {
 # Source: data/baseline_metrics_real.json. Delta over raw policy = 1.18 (CI95 [1.09, 1.27]).
 _PROMPTED_BASELINE = 0.18
 
-# Trained Qwen3-4B target from ROUND2 success criterion. Actual trained number
-# lands from the on-site A100 run (2026-04-25 to 2026-04-26) as a follow-up
-# commit that replaces this placeholder with the measured value.
-_TRAINED_PLACEHOLDER = 0.50
+# Trained Qwen3-4B SFT measured on Day 1 on-site (2026-04-25, A100 SXM4-80GB):
+# n=5 mean composite reward 0.280 at GRPO-matching sampling (T=0.7, top_p=0.95,
+# top_k=20) with tools= enabled. Source: data/audit_F_n5.json. GRPO Phase 3
+# deferred per LESSONS_LEARNED §1 Failure Mode 5 (reward-landscape inversion).
+_TRAINED_PLACEHOLDER = 0.280
 
 
 def _compute_oracle_range() -> Dict[str, Any]:
@@ -447,9 +449,9 @@ def _baseline_comparison_figure() -> go.Figure:
 
     All bars score via the same rewards.composite_reward pipeline. Ordered
     by score descending within category; oracle shown with min-max error
-    bar; trained-policy placeholder shown in gray with a target annotation
-    so judges see the on-site-pending cell as intentional scope, not
-    missing work.
+    bar; trained-policy bar reflects Day 1 on-site n=5 mean composite
+    reward (0.280) measured under GRPO-matching sampling with tools=
+    enabled. Source: data/audit_F_n5.json.
     """
     rows = []
     rows.append(
@@ -485,12 +487,12 @@ def _baseline_comparison_figure() -> go.Figure:
     )
     rows.append(
         {
-            "label": "Trained Qwen3-4B<br>(target, on-site Apr 25-26)",
+            "label": "Trained Qwen3-4B SFT<br>(Day 1, A100 SXM4)",
             "score": _TRAINED_PLACEHOLDER,
-            "color": "#bbbbbb",  # gray placeholder
+            "color": "#9467bd",  # purple, distinguishes from oracle/baseline/attack
             "err_above": 0,
             "err_below": 0,
-            "text_pos": "inside",
+            "text_pos": "outside",
         }
     )
 
@@ -499,10 +501,7 @@ def _baseline_comparison_figure() -> go.Figure:
     colors = [r["color"] for r in rows]
     err_above = [r["err_above"] for r in rows]
     err_below = [r["err_below"] for r in rows]
-    texts = [
-        f"target {s:.2f}" if r["color"] == "#bbbbbb" else f"{s:.3f}"
-        for r, s in zip(rows, scores)
-    ]
+    texts = [f"{s:.3f}" for s in scores]
     text_positions = [r["text_pos"] for r in rows]
 
     fig = go.Figure()

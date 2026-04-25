@@ -1,0 +1,28 @@
+{
+  "model": "Qwen/Qwen3-4B",
+  "input_jsonl": "envs/reconcile_gst2b_env/data/sft_trajectories.jsonl",
+  "n_examples": 3000,
+  "epochs": 1,
+  "trainable_params": 33030144,
+  "trainable_pct": 0.8145,
+  "lora_rank": 16,
+  "lora_targets": [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj",
+    "gate_proj",
+    "up_proj",
+    "down_proj"
+  ],
+  "learning_rate": 2e-05,
+  "max_seq_length": 2048,
+  "metrics": {
+    "train_runtime": 1872.8123,
+    "train_samples_per_second": 1.602,
+    "train_steps_per_second": 0.2,
+    "total_flos": 1.3516340723712e+17,
+    "train_loss": 0.340978832244873
+  },
+  "final_checkpoint": "envs/reconcile_gst2b_env/data/sft_checkpoint/final"
+}

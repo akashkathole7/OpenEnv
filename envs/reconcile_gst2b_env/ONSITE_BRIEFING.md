@@ -392,12 +392,12 @@ Memorise. If a judge asks "what's the baseline?" the answer is **#5**. If a judg
 2. **5 mismatch types** planted: gstin_typo, invoice_number_prefix_drift, tax_slab_off_by_one, supplier_late_filing, amendment_after_2b_freeze.
 3. **16 typed tool verbs** (7 query + 7 mutate + 2 meta).
 4. **4 reward components**, weights 0.40/0.25/0.25/0.10, each clamped `[0.01, 0.99]`.
-5. **Prompting baseline**: Qwen2.5-3B on 30 heldout seeds lifts total from −1.0 to 0.18 (delta 1.18, CI95 [1.09, 1.27]). *This number gets replaced on-site with the trained Qwen3-4B number.*
+5. **Prompting baseline (comparison anchor)**: Qwen2.5-3B on 30 heldout seeds lifts total from −1.0 to 0.18 (delta 1.18, CI95 [1.09, 1.27]). **Trained Qwen3-4B SFT on A100 SXM4-80GB (Day 1 on-site)**: n=5 mean composite reward **0.280** at GRPO-matching sampling (T=0.7, top_p=0.95, top_k=20) with `tools=` enabled. Trained-vs-prompted lift: +0.10. Source: `data/audit_F_n5.json`.
 6. **6 red-team attacks** all score < 0.45, max is `query_only = 0.349`. CI-enforced.
 7. **81 distinct totals**, σ = 0.50, 100% done-rate on 100 random-policy episodes. (Reward has gradient.)
 8. **42 tests** green. `openenv validate --verbose` passes.
 9. **0.30 probability** of a directed 3-cycle ring being planted per episode.
-10. **Three distinct Qwen3 failure modes** across 0.6B / 1.7B / 4B: pin R1+R2 / pin all / pin R4. Environment is correctly hard.
+10. **Five documented failure modes** across pre-onsite Kaggle (3) and on-site A100 (2). Pre-onsite: 0.6B pins R1+R2 / 1.7B pins all (entropy collapse) / 4B pins R4 (over-query). On-site Day 1: audit-OOD trap chain (4 sequential audit/eval bugs that fabricated false collapse signatures); reward-landscape inversion (query_only attack at 0.353 outscores marking trajectory at max 0.26, blocking GRPO without modifying frozen `rewards.py`). All five documented honestly in `LESSONS_LEARNED.md` §1. Environment is correctly hard, and the reward design is auditable enough to expose its own structural asymmetry.
 11. **Stack compliance**: OpenEnv + TRL + PEFT. Unsloth drop-in ready. RLVR-style reward (verifier-based, no learned reward model). LoRA config: rank 16, alpha 32 (2×rank per Thinking Machines direction), target_modules span both attention (q/k/v/o) and MLP (gate/up/down) per Daniel Han workshop guidance.
 
 ---

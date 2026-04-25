@@ -19,8 +19,9 @@
 | Reward components | **4**, each clamped to `[0.01, 0.99]` | `rewards.py` |
 | Red-team attacks CI-enforced `<0.45` | **6 / 6 pass** (max `query_only` = 0.349) | `tests/envs/test_reconcile_gst2b_reward_hacking.py` |
 | Test suite | **42 / 42 green** | `tests/envs/test_reconcile_gst2b_*.py` |
+| Trained Qwen3-4B SFT on A100 SXM4-80GB (Day 1 on-site) | **n=5 mean composite reward 0.280** | `data/audit_F_n5.json` |
 | Prompted vs raw baseline delta on Qwen2.5-3B-Instruct | **1.18** (95% CI [1.09, 1.27], 180 rollouts) | `data/baseline_metrics_real.json` |
-| Pre-onsite training attempts | **3** (0.6B / 1.7B / 4B) with distinct failure-mode documentation | `data/training_log_qwen3_*.json` |
+| Pre-onsite training attempts + on-site Day 1 | **5 documented failure modes** across 0.6B / 1.7B / 4B / audit-OOD chain / reward-landscape inversion | `LESSONS_LEARNED.md` §1 |
 | `make reproduce` | **bit-identical** against committed artifacts | `Makefile:30` |
 | 90-second demo video | 🎥 [youtube.com/watch?v=rglR1hGgdb8](https://www.youtube.com/watch?v=rglR1hGgdb8) | on YouTube |
 
