@@ -113,7 +113,33 @@ If any of 2, 3, 4, 5, 6 fail, STOP and ask Aakash. Do not "fix" invariants unila
 
 ### Action 1 — Claim Scaler compute credits (5 min)
 
-Ask Aakash: "Which compute UI provides our HF credits? Direct URL? Credit balance? Is this an A100 40GB or something else? Any session time limit?" His answers determine whether you're running on a Colab-like notebook, an SSH shell, or an HF Spaces compute endpoint. If A100 is not available, switch to Qwen3-1.7B per Mode section and keep going.
+Ask Aakash these in one batch:
+
+1. "Which compute UI provides our HF credits? Direct URL? Credit balance?"
+2. "Is this an A100 40GB or something else?"
+3. "Any session time limit / hourly quota?"
+4. **"Do you have a HUGGING_FACE_HUB_TOKEN set in the compute env? Qwen3-4B should download without auth, but Qwen3-1.7B-Instruct sometimes triggers a gate prompt depending on which exact revision Hub serves."** If no token, set one before model load: `export HUGGING_FACE_HUB_TOKEN=<token>` (Aakash creates a Read-scoped token at huggingface.co/settings/tokens; do NOT paste the token into chat).
+
+His answers determine: compute provider (Colab notebook / SSH shell / HF Compute dashboard / RunPod-like), model choice (4B default, 1.7B fallback), and pacing (Action 1b below).
+
+### Action 1b — Compute-budget triage (5 min, after claiming credits)
+
+Multiply Aakash's available time by 1.2x safety factor. Fit check:
+
+| Phase | Wall time |
+|---|---:|
+| Phase 2 SFT full (Action 5) | ~2h |
+| Phase 3 GRPO (Action 6) | ~2h |
+| Phase 4 eval + docs + push (Action 7) | ~1.5h |
+| Slack for retries / first-run failures | ~1h |
+| **TOTAL needed** | **~6.5h** |
+
+Decision tree:
+
+- **Available ≥ 6.5h:** run plan as written.
+- **Available 4-6.5h:** drop GRPO `--total-steps` from 200 to 120 (saves ~45 min) and Phase 2 to 0.5 epochs (saves ~45 min). Document the compute-constrained scope in `LESSONS_LEARNED.md` §5 commit message.
+- **Available <4h:** SKIP Phase 3 entirely. Ship SFT-only results — eval the SFT checkpoint with `--model-path data/sft_checkpoint/final` and call it the trained number. Update docs honestly: "first on-site SFT warm-start; GRPO polish deferred to post-hackathon validation". This is the emergency-fallback path; it still beats vaporware.
+- **Available <2h:** abort training entirely, ship pre-onsite state. Honest fallback per ONSITE_BRIEFING §emergency.
 
 ### Action 2 — Phase 0 sanity (15 min, already mostly in State-verification)
 
@@ -154,7 +180,14 @@ PYTHONPATH=src:envs uv run python -m envs.reconcile_gst2b_env.scripts.train_sft_
     2>&1 | tee envs/reconcile_gst2b_env/data/sft_smoke_run.log
 ```
 
-**Gate:** first `{'loss': ...}` line within 3 minutes of `=== SFT training ===`. Step time <30s on A100 after step 3. If first loss line does NOT appear in 5 min, STOP and ask Aakash — the TRL 1.x hang may be re-surfacing in a different form and warrants fresh RCA, not more push-and-pray (see LESSONS_LEARNED §3).
+**Gate (loosened from prior 3-min draft after Aakash's 2026-04-24 audit):** within **5 minutes** of `=== SFT training ===`, you should see AT LEAST ONE of:
+
+- (a) first `{'loss': ...}` line, OR
+- (b) a tqdm-style progress bar opening like `0%|          | 0/375 [00:00<?, ?it/s]`
+
+Either signal = training loop is alive; keep going even if the loss line itself is delayed by tokenizer pre-processing or accelerate setup. **Step time <30s on A100 after step 3.**
+
+If 5 minutes pass with NEITHER signal AND no additional stdout (just radio silence after the transformers PAD/BOS/EOS warning), THAT is the TRL 1.x silent-hang re-surfacing — STOP, ask Aakash, do not push-and-pray. See LESSONS_LEARNED §3 for the prior diagnosis. The Path B fix in `4b3707d` already removed the known trigger, so a new hang in this position would be a fresh class of bug warranting fresh RCA, not patch-loop-and-retry.
 
 ### Action 5 — Phase 2 SFT full run (~2 h on A100)
 
@@ -179,6 +212,37 @@ PYTHONPATH=src:envs uv run python -m envs.reconcile_gst2b_env.scripts.train_sft_
 
 **Pass gates:** final train loss < 0.8; `adapter_model.safetensors` exists in `data/sft_checkpoint/final/`; `sft_summary.json` written.
 
+**LoRA merge footgun verification (added 2026-04-24).** `train_grpo_real.py` calls `AutoModelForCausalLM.from_pretrained(args.model)` directly. If `args.model` points at the LoRA adapter directory without the base weights merged in, Phase 3 will silently load only the adapter config and produce broken outputs. Before launching Action 6, verify the SFT output directory contents:
+
+```bash
+ls envs/reconcile_gst2b_env/data/sft_checkpoint/final/
+```
+
+You should see EITHER:
+- (a) `adapter_model.safetensors` + `adapter_config.json` (LoRA-only — needs merge OR PEFT-aware load in Phase 3), OR
+- (b) `model.safetensors` + `config.json` of full model size (LoRA already merged into base — Phase 3 can load directly).
+
+**If only (a) is present**, do ONE of these before Action 6:
+
+```bash
+# Option 1: merge LoRA into base weights, write merged checkpoint to a new dir
+PYTHONPATH=src:envs uv run python -c "
+from peft import PeftModel
+from transformers import AutoModelForCausalLM, AutoTokenizer
+base = AutoModelForCausalLM.from_pretrained('Qwen/Qwen3-4B', torch_dtype='auto', device_map='auto')
+model = PeftModel.from_pretrained(base, 'envs/reconcile_gst2b_env/data/sft_checkpoint/final')
+merged = model.merge_and_unload()
+merged.save_pretrained('envs/reconcile_gst2b_env/data/sft_checkpoint/merged')
+AutoTokenizer.from_pretrained('Qwen/Qwen3-4B').save_pretrained('envs/reconcile_gst2b_env/data/sft_checkpoint/merged')
+print('merged checkpoint at envs/reconcile_gst2b_env/data/sft_checkpoint/merged')
+"
+# Then in Action 6 use --model envs/reconcile_gst2b_env/data/sft_checkpoint/merged
+```
+
+OR add `peft_config` handling in `train_grpo_real.py` to wrap the base model with the LoRA adapter (more invasive — only if Aakash signs off; touches a load-bearing script).
+
+Per Guardrail #11, if Phase 2 used 4-bit quantization, do NOT merge by upcasting the dequantized 4-bit weights — re-download the original 16-bit base weights and merge into those. ~30% quality damage from naive merge per Daniel Han.
+
 **Mandatory rollout audit before Phase 3:** sample 5 rollouts on held-out seeds 9030-9034 against the SFT checkpoint. Check query-to-mark ratio. If queries per invoice < 2, retrain with reduced oracle weight (subsample 500 oracle + 1250 inspect + 1250 supplier = 3000 rows) before Phase 3. This catches the "reward rising but quality not" failure mode from [`ONSITE_BRIEFING.md`](ONSITE_BRIEFING.md) self-serve-guide Q52.
 
 ### Action 6 — Phase 3 GRPO polish (~2 h on A100)
@@ -199,9 +263,26 @@ Tier 1+2 fixes are already baked into `train_grpo_real.py`: `enable_thinking=Fal
 
 ### Action 7 — Measure, update docs, push, redeploy (~1.5 h)
 
+**Commit strategy: 2 commits total, NOT 16.** This was a real concern raised in Aakash's 2026-04-24 audit — the previous draft of this section split into 16 atomic sub-steps which would have produced commit fragmentation that hurts the git log narrative for judges. Batched approach:
+
+- **Commit 1** in main repo (after steps 1-10): `onsite: land trained Qwen3-4B numbers (SFT + GRPO on A100)`
+- **Commit 2** in `hf_space_clone/` (after step 13): `sync: trained numbers from on-site A100 run`
+- Push after each commit. Verify Space rebuild (step 16) is the only post-push action.
+
 Eval gap per `ONSITE_BRIEFING.md` Phase 4: neither `real_baseline.py` nor `hero_baseline.py` can eval a trained checkpoint without edits. Pick Path A (add `--model-path` to `real_baseline.py`, ~30 min, TDD against a new test file) or Path B (new `scripts/eval_trained.py`, ~45 min). Path A preferred.
 
-Then:
+**Trained-number decision tree (RUN THIS BEFORE STEP 1).** Realistic outcomes span a wide band; the prompt has explicit instructions for each so you don't panic on partial success or fake numbers on a low result.
+
+| Trained total on 30 heldout seeds | Branch | Action |
+|---|---|---|
+| **> 0.45** (clears red-team ceiling) | full success | Update all docs with measured number as primary metric. README/EXEC_SUMMARY/BLOG/ROUND2 numbers swap. Tab 4 `_TRAINED_PLACEHOLDER` swaps + color goes solid. |
+| **[0.30, 0.45)** | partial success | **SCORE-POSITIVE narrative.** Update docs as: "first trained run lifts R1 from 0.01 floor to 0.XX, R2 from 0.01 to 0.YY; red-team ceiling not yet cleared, documented as next target in LESSONS_LEARNED §7." Tab 4 placeholder swaps to the measured number; gray color stays (visually communicates "below ceiling, work in progress"). |
+| **[0.18, 0.30)** | low but non-zero lift | Update docs honestly with number + note "first GRPO completed; second run with checkpoint-from-step-100 + extended GRPO pending post-hackathon". DO NOT claim red-team clearance. Tab 4 swaps; gray stays. |
+| **< 0.18** (below prompted Qwen2.5-3B baseline) | something broke | DO NOT update docs with this number as primary. Revert to prompted baseline (0.18) as primary metric in README. Commit the training artifacts to `data/` regardless (transparency: real run, real outcome). Document the regression honestly in LESSONS_LEARNED §1 as a fourth observed failure mode. This is emergency-fallback territory but still ships. |
+| **Phase 3 GRPO failed entirely (Phase 2 SFT done)** | SFT-only ship | Eval the SFT checkpoint via `--model-path data/sft_checkpoint/final` (or `merged` if you ran the merge step). If SFT-only total > 0.30, ship as the trained number with framing "first SFT warm-start lifted from prompted 0.18 to X.XX; GRPO polish deferred to post-hackathon validation." Tab 4 swaps. LESSONS_LEARNED §5 updates accordingly. |
+
+Then (executing the matched branch above):
+
 1. Run trained eval on 30 heldout seeds → `data/trained_eval.json`
 2. Run trained eval on hero seeds 9500/9501/9502 → `data/trained_hero.json`
 3. Edit `EXEC_SUMMARY.md` bullet 5 (replace Qwen2.5-3B prompting baseline with trained Qwen3-4B number)
@@ -237,6 +318,16 @@ Then:
 14. **Tab 4 placeholder constant.** `app.py` has `_TRAINED_PLACEHOLDER = 0.50` used only to draw the gray bar in Baseline Comparison. Update it to the measured trained number in Action 7 step 9. Until then, leave it at 0.50 so the Space keeps rendering a valid chart.
 15. **HF Space has NO openenv package installed.** `app.py` deliberately uses `SimpleNamespace` stubs + `composite_reward` directly — do NOT add imports of `models.py` or `server/*` into `app.py` unless you also pip-install openenv in `hf_space_clone/requirements.txt`. The current 6 deps (gradio, networkx, plotly, numpy, pandas, pydantic) are sufficient and pinned.
 16. **HF Space does NOT accept binary files in git.** Pushing any `*.png` / `*.jpg` / etc. to `hf_space_clone/` will be rejected by HF's pre-receive hook (Xet storage required). README references images via `raw.githubusercontent.com/akashkathole7/OpenEnv/...` from the fork, which is sufficient. Only text files go to `hf_space_clone/`.
+17. **Expected training-time warnings — DO NOT halt or treat as errors.** During Phase 2/3 startup you will see ALL of:
+    - `[transformers] The tokenizer has new PAD/BOS/EOS tokens that differ from the model config and generation config. ... Updated tokens: {'bos_token_id': None, 'pad_token_id': 151643}.` (Qwen3 quirk; harmless)
+    - `Some weights of Qwen3ForCausalLM were not used when initializing` (LoRA wraps base; harmless)
+    - `pad_token_id not set` (we set it explicitly; harmless)
+    - `[transformers] warmup_ratio is deprecated` (transformers 5.x deprecation; harmless)
+    - `torch.utils.checkpoint: ...` user warnings (gradient checkpointing config; harmless if training runs)
+    - `Skipping import of cpp extensions due to incompatible torch version` (torchao on torch <2.11 falls back to Python; harmless if A100 has tensor-core fp16/bf16)
+    - `pin_memory argument is set as true but no accelerator is found` ONLY if CUDA is unavailable (real signal — check Accelerator setting)
+
+    Only halt on: actual Python tracebacks, `CUDA out of memory`, shape mismatch errors, or the TRL 1.x silent-hang signature (5+ min stdout silence after `=== SFT training ===` AND no tqdm progress bar). Aakash specifically called this out in the 2026-04-24 audit because the previous prompt didn't list these and a fresh Claude could panic on benign warnings.
 
 ## Judge demo windows
 
