@@ -63,6 +63,14 @@ Every registered Indian business with B2B purchases reconciles its purchase regi
 
 ## Results
 
+### Day 1 on-site (2026-04-25, A100 SXM4-80GB): trained Qwen3-4B SFT vs all references
+
+![Day 1 baseline-comparison bar chart: trained Qwen3-4B SFT (purple, 0.280) vs oracle, 6 red-team attacks, prompted Qwen2.5-3B baseline, and 0.45 red-team ceiling](https://raw.githubusercontent.com/akashkathole7/OpenEnv/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/figures/day1_baseline_comparison.png)
+
+*Day 1 on-site result. Trained Qwen3-4B SFT (purple, n=5 mean 0.280, min-max error bar 0.17 - 0.35) sits above the prompted Qwen2.5-3B baseline (blue, 0.18) and below the CI-enforced red-team ceiling (red dashed, 0.45). The 6 red-team attacks (red bars) all score under 0.45 by design. The `query_only` attack (0.349) scores ABOVE the trained Mode A marking trajectories. This is the reward-landscape inversion documented as Failure Mode 5 in [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md) §1: GRPO advantage signal would point toward the attack, not away from it. Phase 3 GRPO deferred. Same chart as Tab 4 in this Space; live-recomputed via [`scripts/make_day1_figure.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/make_day1_figure.py).*
+
+### Pre-onsite training trace (Qwen3-0.6B + Kaggle T4)
+
 ![Qwen3-0.6B training reward vs red-team attack ceilings](https://raw.githubusercontent.com/akashkathole7/OpenEnv/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/figures/three_scales_reward.png)
 
 *Qwen3-0.6B + LoRA + GRPO on Kaggle T4. Per-step training reward is bimodal around 0.174 (rollouts emitting a tool call) and 0.107 (clipped rollouts), reflecting the 0.25 tool-call frequency at this scale. 150-step eval composite pins at 0.353, within 0.004 of the `query_only` red-team attack signature (0.349). Pure GRPO drifts the policy into attack-signature territory without SFT warm-start. 1.7B and 4B runs were attempted on Kaggle but the logs were lost across session resets; see [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md).*
@@ -100,11 +108,12 @@ Expected: 42 tests pass in ~3 seconds, including the 6 red-team attack ceilings.
 
 | You are | Read this |
 |---|---|
-| Screener with 3-5 minutes | This README + the two plots above |
+| Screener with 3-5 minutes | This README + the Day 1 baseline-comparison chart above |
 | Reviewer with 10 minutes | [JUDGE_TOUR.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/JUDGE_TOUR.md) |
-| Reviewer with 30 minutes | [BLOG.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/BLOG.md) + [ROUND2_PROBLEM_STATEMENT.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/ROUND2_PROBLEM_STATEMENT.md) |
+| Reviewer with 30 minutes | [BLOG.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/BLOG.md) §6 closing block (Day 1 outcome) + [ROUND2_PROBLEM_STATEMENT.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/ROUND2_PROBLEM_STATEMENT.md) |
+| Reviewer reproducing the trained number | "Verify the trained number" section below + [`scripts/audit_sft_rollout_quality.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/audit_sft_rollout_quality.py) + [`data/audit_F_n5.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/audit_F_n5.json) |
 | Researcher | [rewards.py](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/rewards.py) + [tests/envs/](https://github.com/akashkathole7/OpenEnv/tree/scaffold/reconcile-gst2b/tests/envs) |
-| Fellow finalist | [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md) |
+| Fellow finalist | [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md) §1, all 5 documented failure modes including FM4 (audit-OOD trap chain) and FM5 (reward-landscape inversion) from Day 1 on-site |
 
 ---
 
@@ -166,13 +175,35 @@ Any reward-function change that lifts any attack above 0.45 fails CI. The test i
 
 Qwen3-0.6B + LoRA rank 16 + GRPO on Kaggle T4. 10-step smoke + 150-step eval, plotted above. Trained policy plateaus at 0.353, within 0.004 of the `query_only` red-team attack signature. Pure GRPO without SFT warm-start drifts into attack-signature territory at this scale.
 
-Two additional attempts on Kaggle (Qwen3-1.7B 15-step partial, Qwen3-4B step-0 eval) were observed live with the reported qualitative signatures (1.7B: zero tool-call entropy collapse; 4B: budget-exhausting over-query). The corresponding JSON logs were lost across Kaggle session resets and were never committed. See [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md) for the honest diagnosis and what changes for the on-site A100 run.
+Two additional attempts on Kaggle (Qwen3-1.7B 15-step partial, Qwen3-4B step-0 eval) were observed live with the reported qualitative signatures (1.7B: zero tool-call entropy collapse; 4B: budget-exhausting over-query). The corresponding JSON logs were lost across Kaggle session resets and were never committed. See [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md) §1 for the honest diagnosis and what changed for the on-site run.
 
-## On-site training strategy (Apr 25-26, Scaler HF compute credits)
+## Day 1 on-site outcome (2026-04-25, A100 SXM4-80GB)
 
-1. **Synthetic expert trajectories** (2 h, CPU). Use the ground-truth-aware heuristic policy as an oracle; 3 policy variants already staged in [`scripts/_policies.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/_policies.py).
-2. **Tool-SFT warm-start** (4 h, A100). LoRA-SFT Qwen3-4B (or 1.7B fallback) on the 3000-row balanced union. Target: teach `mark_*` action preference over `get_*` exploration.
-3. **GRPO polish** (4 h, A100). Continue training from the SFT checkpoint using [`train_grpo_real.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/train_grpo_real.py) (Tier 1+2 reward shaping already baked in). Target: composite total > 0.45 on held-out seeds 9030-9039, clearly separating from both the `query_only` attack (0.349) and the prompted baseline (0.179).
+Pipeline that ran:
+
+1. **Phase 1 trajectory verification** (5 s, CPU). 3000-row balanced trajectory file (1000 oracle + 1000 inspect_then_label + 1000 supplier_cap_aware, round-robin interleaved) verified against the env. Mean total 0.690, mean R3 0.791.
+2. **Phase 2 SFT** (31:12, A100). [`train_sft_warmstart.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/train_sft_warmstart.py) on Qwen/Qwen3-4B + LoRA rank 16 + bf16 + 1 epoch over 3000 rows = 375 optimizer steps. Final aggregate train_loss 0.341 (final per-step 0.207, monotonic descent). Full log: [`data/sft_full_run.log`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/sft_full_run.log).
+3. **5-metric rollout audit** on held-out seeds 9030-9034 at GRPO-matching sampling. After resolving a 4-bug audit-OOD trap chain (Failure Mode 4), n=5 mean composite reward **0.280** with 3/5 seeds emitting 32-46 mark verbs per trajectory. Diagnostic tool: [`scripts/audit_sft_rollout_quality.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/audit_sft_rollout_quality.py). Headline data: [`data/audit_F_n5.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/audit_F_n5.json).
+4. **Phase 3 GRPO deferred.** Reward-landscape inversion (Failure Mode 5): the `query_only` attack at 0.353 scores ABOVE the trained Mode A marking trajectories at max 0.26. GRPO advantage would push toward the attack. Resolution requires either modifying the frozen `rewards.py` (Guardrail 1) or multi-hour reward-shaping validation in the trainer.
+
+Two failure modes surfaced past Phase 2 and are the substantive findings of Day 1 (full text in [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md) §1 + [BLOG.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/BLOG.md) §6 closing block):
+
+- **Failure Mode 4: audit-script OOD trap chain.** Four sequential bugs in audit infrastructure (greedy decoding, fresh-context prompts, format false-alarm, missing `tools=` parameter) each fabricated a different false collapse signature before real model behavior could be observed. Lesson: diagnostic infrastructure is as load-bearing as the model itself.
+- **Failure Mode 5: reward-landscape inversion at Phase 2 → Phase 3 boundary.** The same arithmetic-reward + multi-component-clamping design that makes the 6 red-team attacks defensible (the central claim of this submission) also creates an exploit-favoring asymmetry at this policy quality. Documented as the post-hackathon agenda.
+
+## Verify the trained number (judges' reproducibility path)
+
+Day 1 headline `n=5 mean 0.280` is reproducible end-to-end from these artifacts:
+
+| Artifact | Purpose |
+|---|---|
+| [`scripts/audit_sft_rollout_quality.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/audit_sft_rollout_quality.py) | The diagnostic tool that produced the n=5 mean. |
+| [`data/sft_full_run.log`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/sft_full_run.log) | Full 375-step SFT training log, 31:12 wall. |
+| [`data/sft_summary.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/sft_summary.json) | Trained checkpoint metadata. |
+| [`data/sft_trajectories.jsonl`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/sft_trajectories.jsonl) | The 3000-row balanced SFT input. |
+| [`data/audit_F_n5.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/audit_F_n5.json) | Headline n=5 audit. Per-seed totals + reward breakdown + raw model completions. |
+| [`data/audit_seeds_9031_9034.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/audit_seeds_9031_9034.json) | Pre-`tools=` collapse evidence (Failure Mode 4 audit-OOD chain). |
+| [`data/audit_step100_n5.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/audit_step100_n5.json) | Early-stop control ruling out the over-training hypothesis. |
 
 ---
 

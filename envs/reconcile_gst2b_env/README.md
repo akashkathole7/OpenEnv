@@ -23,7 +23,7 @@ tags:
 
 - **Environment innovation (40%):** 16 typed verbs (7 query / 7 mutate / 2 meta), 5 planted mismatch types, 30%-probability directed 3-cycle ring fraud, partially observable, hidden ground truth unit-tested to never leak into observations.
 - **Storytelling (30%):** [BLOG.md](BLOG.md), 90-sec video, [PITCH.md](PITCH.md), [QA_REHEARSAL.md](QA_REHEARSAL.md), live HF Space with 3D ring viewer, this README front-loads plots per judges' guidance.
-- **Training evidence (20%):** Pre-onsite Qwen3-0.6B GRPO 10-step smoke + 150-step eval plateau. On-site Day 1 (2026-04-25, A100 SXM4-80GB): full 375-step Qwen3-4B SFT, n=5 mean composite reward **0.280** above prompted Qwen2.5-3B baseline 0.18. GRPO Phase 3 deferred per reward-landscape analysis (Failure Mode 5 in [LESSONS_LEARNED.md](LESSONS_LEARNED.md)).
+- **Training evidence (20%):** Pre-onsite Qwen3-0.6B GRPO 10-step smoke + 150-step eval plateau. On-site Day 1 (2026-04-25, A100 SXM4-80GB): full 375-step Qwen3-4B SFT, **n=5 mean composite reward 0.280** above prompted Qwen2.5-3B baseline 0.18 (chart below). 5 documented failure modes total: 3 pre-onsite Qwen3-scale + Failure Mode 4 (audit-OOD trap chain) + Failure Mode 5 (reward-landscape inversion); GRPO Phase 3 deferred per FM5. See [LESSONS_LEARNED.md](LESSONS_LEARNED.md) §1 + [BLOG.md](BLOG.md) §6 closing block.
 - **Reward & pipeline (10%):** 4-component arithmetic reward clamped to `[0.01, 0.99]`, 6 red-team attacks CI-enforced at `<0.45`, 42 tests green, Tier 1+2 GRPO fixes validated in [`data/smoke_test_10step.json`](data/smoke_test_10step.json).
 
 ---
@@ -37,6 +37,14 @@ In India alone, ~14M GST-registered businesses run this loop monthly. The task i
 ---
 
 ## Results
+
+### Day 1 on-site (2026-04-25, A100 SXM4-80GB): trained Qwen3-4B SFT vs all references
+
+![Day 1 baseline-comparison bar chart: trained Qwen3-4B SFT (purple, 0.280) vs oracle, 6 red-team attacks, prompted Qwen2.5-3B baseline, and 0.45 red-team ceiling](data/figures/day1_baseline_comparison.png)
+
+*Day 1 on-site result. Trained Qwen3-4B SFT (purple, n=5 mean 0.280, min-max error bar 0.17 - 0.35) sits above the prompted Qwen2.5-3B baseline (blue, 0.18) and below the CI-enforced red-team ceiling (red dashed, 0.45). The 6 red-team attacks (red bars) all score under 0.45 by design. Notably, the `query_only` attack (0.349) scores ABOVE the trained Mode A marking trajectories. This is the reward-landscape inversion documented as Failure Mode 5 in [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md) §1: GRPO advantage signal would point toward the attack, not away from it. Phase 3 GRPO deferred. Source: live-recomputed from `data/audit_F_n5.json` and `tests/envs/test_reconcile_gst2b_reward_hacking.py` via [`scripts/make_day1_figure.py`](scripts/make_day1_figure.py). The same chart is rendered live as Tab 4 in the [HF Space](https://huggingface.co/spaces/akashkathole/reconcile_gst2b_env).*
+
+### Pre-onsite training trace (Qwen3-0.6B + Kaggle T4)
 
 ![Qwen3-0.6B training reward vs red-team attack ceilings](data/figures/three_scales_reward.png)
 
@@ -87,6 +95,36 @@ Expected: 42 tests pass in ~3 seconds, including the 6 red-team attack ceilings.
 PYTHONPATH=src:envs uv run python -m \
     envs.reconcile_gst2b_env.scripts.make_training_figures
 # writes data/figures/three_scales_{reward,components}.png
+
+PYTHONPATH=src:envs uv run python -m \
+    envs.reconcile_gst2b_env.scripts.make_day1_figure
+# writes data/figures/day1_baseline_comparison.png
+```
+
+### Verify the trained number (judges' reproducibility path)
+
+The Day 1 headline `n=5 mean 0.280` is reproducible end-to-end from the committed artifacts:
+
+| Artifact | Purpose |
+|---|---|
+| [`scripts/audit_sft_rollout_quality.py`](scripts/audit_sft_rollout_quality.py) | The diagnostic tool that produced the n=5 mean. Supports `--use-tools`, multi-turn accumulation, GRPO-matching sampling args, off-vocab guard. |
+| [`data/sft_full_run.log`](data/sft_full_run.log) | Full 375-step SFT training log (31:12 wall, train_loss 0.341 aggregate / 0.207 final per-step, monotonic descent). |
+| [`data/sft_summary.json`](data/sft_summary.json) | Trained checkpoint metadata (model, LoRA targets, samples/sec, runtime). |
+| [`data/sft_trajectories.jsonl`](data/sft_trajectories.jsonl) | The 3000-row balanced SFT input (1000 oracle + 1000 inspect_then_label + 1000 supplier_cap_aware, round-robin). |
+| [`data/audit_F_n5.json`](data/audit_F_n5.json) | Headline n=5 audit on heldout seeds 9030-9034 with `tools=` enabled. Per-seed totals + reward breakdown + raw model completions. |
+| [`data/audit_seeds_9031_9034.json`](data/audit_seeds_9031_9034.json) | Pre-`tools=` collapse evidence (the audit-OOD trap chain documented as Failure Mode 4). |
+| [`data/audit_step100_n5.json`](data/audit_step100_n5.json) | Early-stop control (step 100 fresh checkpoint) ruling out the over-training hypothesis: undercooked grammar at step 100, policy collapse only emerges later. |
+
+Run command (after merging the LoRA adapter into base Qwen3-4B):
+
+```bash
+PYTHONPATH=src:envs uv run python -m \
+    envs.reconcile_gst2b_env.scripts.audit_sft_rollout_quality \
+    --checkpoint envs/reconcile_gst2b_env/data/sft_checkpoint/merged \
+    --seeds 9030 9031 9032 9033 9034 \
+    --max-steps 50 \
+    --temperature 0.7 --top-p 0.95 --top-k 20 \
+    --use-tools
 ```
 
 ---
@@ -95,11 +133,12 @@ PYTHONPATH=src:envs uv run python -m \
 
 | You are | Read this |
 |---|---|
-| Screener with 3-5 minutes | This README + the two plots above |
+| Screener with 3-5 minutes | This README + the Day 1 baseline-comparison chart above |
 | Reviewer with 10 minutes | [JUDGE_TOUR.md](JUDGE_TOUR.md) (guided repo walk) |
-| Reviewer with 30 minutes | [BLOG.md](BLOG.md) + [ROUND2_PROBLEM_STATEMENT.md](ROUND2_PROBLEM_STATEMENT.md) + the two plots |
+| Reviewer with 30 minutes | [BLOG.md](BLOG.md) (especially §6 closing block on Day 1 outcome) + [ROUND2_PROBLEM_STATEMENT.md](ROUND2_PROBLEM_STATEMENT.md) + the plots |
+| Reviewer reproducing the trained number | [`scripts/audit_sft_rollout_quality.py`](scripts/audit_sft_rollout_quality.py) + [`data/sft_full_run.log`](data/sft_full_run.log) + [`data/audit_F_n5.json`](data/audit_F_n5.json) (see "Verify the trained number" section above) |
 | Researcher | [PRD.md](PRD.md) + [rewards.py](rewards.py) + [tests/envs/test_reconcile_gst2b_*.py](../../tests/envs/) |
-| Fellow finalist | [LESSONS_LEARNED.md](LESSONS_LEARNED.md) (what didn't work on Kaggle, and why the submission ships anyway) |
+| Fellow finalist | [LESSONS_LEARNED.md](LESSONS_LEARNED.md) §1, all 5 documented failure modes including FM4 (audit-OOD trap chain) and FM5 (reward-landscape inversion) from on-site Day 1 |
 
 ---
 
