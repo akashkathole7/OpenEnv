@@ -6,26 +6,28 @@
 
 """Gradio UI for reconcile_gst2b_env.
 
-Four tabs:
-  1. Schema + Label Diff       — placeholder (honest: lands with on-site
-                                 trained-checkpoint eval, see
-                                 ONSITE_DAY1_PROMPT.md)
-  2. Rollout Replay            — LIVE: runs a ground-truth-aware oracle
+Four tabs (default landing tab is Tab 4 via gr.Tabs(selected=4)):
+  1. On-site Findings + Pointer: explainer pointing judges to LESSONS_LEARNED
+                                 §1 (FM4 audit-OOD trap chain, FM5 reward-
+                                 landscape inversion) and to Tab 4 for the
+                                 live trained-policy chart.
+  2. Rollout Replay            : LIVE, runs a ground-truth-aware oracle
                                  against the env and shows the full verb
                                  trace + final reward breakdown. Lets
                                  judges see the 16-verb surface + the
                                  4-component composite in action without
                                  leaving the Space.
-  3. Circular-Ring Viewer      — LIVE: 3D supplier graph with planted
+  3. Circular-Ring Viewer      : LIVE, 3D supplier graph with planted
                                  directed-cycle fraud rings; video centerpiece.
-  4. Baseline Comparison       — LIVE: composite-reward bar chart across
-                                 oracle + 6 red-team attacks + prompted
-                                 baseline + trained Qwen3-4B SFT (Day 1,
-                                 A100 SXM4) at n=5 mean composite reward
-                                 0.280. The 0.45 ceiling line is the
-                                 CI-enforced red-team ceiling. Oracle is
-                                 live-computed at module load; trained
-                                 bar reflects on-site Day 1 measurement.
+  4. Baseline Comparison       : LIVE (default landing), composite-reward
+                                 bar chart across oracle + 6 red-team
+                                 attacks + prompted baseline + trained
+                                 Qwen3-4B SFT + P3 GRPO (Day 1, A100 SXM4)
+                                 at n=5 mean composite reward 0.305. The
+                                 0.45 ceiling line is the CI-enforced
+                                 red-team ceiling. Oracle is live-computed
+                                 at module load; trained bar reflects
+                                 on-site Day 1 measurement.
 
 Launch locally:
     PYTHONPATH=src:envs uv run python envs/reconcile_gst2b_env/app.py
@@ -85,7 +87,7 @@ def _supplier_graph_figure(
     if G.number_of_nodes() == 0:
         fig = go.Figure()
         fig.update_layout(
-            title=f"{title} — no non-trivial edges in this episode",
+            title=f"{title}: no non-trivial edges in this episode",
             height=560,
         )
         return fig
@@ -200,7 +202,7 @@ def _ring_view(seed: int) -> Tuple[go.Figure, str]:
     episode = generate_episode(int(seed))
     episode["_seed"] = int(seed)
     G, ring_gstins = _build_supplier_graph(episode)
-    title = f"supplier graph — seed {seed}" + (
+    title = f"supplier graph: seed {seed}" + (
         f" (RING of {len(ring_gstins)} GSTINs)" if ring_gstins else ""
     )
     fig = _supplier_graph_figure(G, ring_gstins, title)
@@ -324,7 +326,7 @@ def _format_trajectory_md(
     tail_n = 3 if total_steps > head_n + 3 else 0
 
     lines: List[str] = []
-    lines.append(f"## Episode seed `{seed}` — oracle rollout")
+    lines.append(f"## Episode seed `{seed}`: oracle rollout")
     lines.append("")
     lines.append(
         f"**Steps taken**: {n_steps} of 50 budget  ·  **Trajectory length**: {total_steps} verbs"
@@ -348,7 +350,7 @@ def _format_trajectory_md(
     verdict = (
         "✅ clears the 0.45 red-team attack ceiling"
         if total > 0.45
-        else "⚠️ below the 0.45 red-team ceiling — this is why pure GRPO needs SFT warm-start"
+        else "⚠️ below the 0.45 red-team ceiling: this is why pure GRPO needs SFT warm-start"
     )
     lines.append(f"**Verdict**: {verdict}")
     lines.append("")
@@ -589,12 +591,33 @@ def _baseline_comparison_summary() -> str:
 
 
 _PLACEHOLDER_MD = """
-### Coming in a follow-up
+### Where the on-site Day 1 result lives
 
-This tab will render once on-site trained-checkpoint eval lands (see
-[ONSITE_DAY1_PROMPT.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/ONSITE_DAY1_PROMPT.md)).
-Tabs 2 (Rollout Replay), 3 (Circular-Ring Viewer), and 4 (Baseline Comparison)
-are live now.
+The Day 1 SFT + P3 GRPO trained Qwen3-4B audit landed at **n=5 mean composite
+reward 0.305** (above prompted Qwen2.5-3B baseline 0.18, below red-team
+ceiling 0.45). Tab 4 (Baseline Comparison) is the landing tab and renders
+this number live as a solid purple bar.
+
+The substantive on-site research findings are documented in
+[LESSONS_LEARNED.md §1](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md):
+
+- **Failure Mode 4 (audit-OOD trap chain)**: 4 sequential bugs in the audit
+  infrastructure (greedy decoding, fresh-context prompts, format false-alarm,
+  missing `tools=` parameter) each fabricated a different false collapse
+  signature before the real model behavior could be observed. Empirically
+  confirmed across both SFT and GRPO training stages (the same fresh-context
+  eval callback reported flat 0.354 across all 100 GRPO steps).
+- **Failure Mode 5 (reward-landscape inversion)**: a structurally distinct
+  research finding: under the arithmetic-composite + R3-R4-saturation
+  design, marking trajectories (Mode A) score lower than the cheap
+  query_only attack (Mode B). The MORE-trained checkpoint can score LOWER
+  (step 350 mean 0.314 vs step 375 mean 0.280). Partially mitigated by P3
+  Tier 2c length-shaping bonus (lift +0.025 to 0.305); full bimodal flip
+  is post-hackathon agenda.
+
+This tab is intentionally a pointer; the live charts are on
+[Tab 4 (Baseline Comparison)](#baseline-tab) above. Schema + per-class label
+diff visualization is deferred as scope.
 """.strip()
 
 
@@ -609,30 +632,32 @@ def build_demo() -> gr.Blocks:
         gr.Markdown(
             "# reconcile_gst2b_env\n"
             "**Multi-turn enterprise compliance workflow RL on OpenEnv.** "
-            "Instantiated on Indian GST Input-Tax-Credit reconciliation — "
-            "~14M businesses, monthly, still manual. Targeting **Scaler AI Labs — "
+            "Instantiated on Indian GST Input-Tax-Credit reconciliation: "
+            "~14M businesses, monthly, still manual. Targeting **Scaler AI Labs, "
             "Multi-App RL Environment for Enterprise Workflows** sub-theme.\n\n"
             "**16 typed tool verbs · 5 labels · 4-component arithmetic reward · "
             "6 red-team attacks CI-enforced <0.45 · 42 tests · `make reproduce` "
             "bit-identical**\n\n"
-            "👇 **Live demo: select Tab 3 (Circular-Ring Viewer)**, pick hero seed "
-            "**9502**, click **Render** to see a planted directed-cycle fraud ring "
-            "in 3D. Full README + training evidence in the **Files** tab."
+            "👇 **Default tab is Tab 4 (Baseline Comparison)**: composite-reward "
+            "bar chart with the on-site Day 1 trained Qwen3-4B SFT + P3 GRPO at "
+            "**n=5 mean 0.305**. For the 3D fraud-ring visual, select **Tab 3 "
+            "(Circular-Ring Viewer)**, pick hero seed **9502**, click **Render**. "
+            "Full README + training evidence + Day 1 charts in the **Files** tab."
         )
 
-        with gr.Tabs():
-            with gr.Tab("1 · Schema + Label Diff"):
-                gr.Markdown("### Schema + Label Diff\n" + _PLACEHOLDER_MD)
+        with gr.Tabs(selected=4):
+            with gr.Tab("1 · On-site Findings + Pointer", id=1):
+                gr.Markdown(_PLACEHOLDER_MD)
 
-            with gr.Tab("2 · Rollout Replay", elem_id="rollout-tab"):
+            with gr.Tab("2 · Rollout Replay", id=2, elem_id="rollout-tab"):
                 gr.Markdown(
-                    "### Rollout Replay — run 1 episode, see the 16-verb surface in action\n"
+                    "### Rollout Replay: run 1 episode, see the 16-verb surface in action\n"
                     "Click **Run 1 Episode (oracle)** to drive a ground-truth-aware "
                     "oracle agent through one full reconciliation episode on the seed "
                     "of your choice. Output shows (a) the final 4-component reward "
                     "breakdown and (b) the verb trace (query verbs 🔍, mutate verbs ✏️, "
                     "meta 🏁). The oracle reads the hidden ground truth to pick "
-                    "correct labels — use this as the upper-bound reference for what a "
+                    "correct labels; use this as the upper-bound reference for what a "
                     "well-behaved RL policy converges toward. A random policy on the "
                     "same seed would score closer to the red-team attack band "
                     "(see the figures in Files → README.md)."
@@ -674,7 +699,7 @@ def build_demo() -> gr.Blocks:
                     outputs=[replay_output],
                 )
 
-            with gr.Tab("3 · Circular-Ring Viewer", elem_id="ring-tab"):
+            with gr.Tab("3 · Circular-Ring Viewer", id=3, elem_id="ring-tab"):
                 gr.Markdown(
                     "### Circular-Ring Viewer\n"
                     "3D supplier → counterparty graph. Ring nodes + edges in "
@@ -721,15 +746,18 @@ def build_demo() -> gr.Blocks:
                     outputs=[graph_plot, summary_md],
                 )
 
-            with gr.Tab("4 · Baseline Comparison", elem_id="baseline-tab"):
+            with gr.Tab("4 · Baseline Comparison", id=4, elem_id="baseline-tab"):
                 gr.Markdown(
-                    "### Baseline Comparison — where every policy sits on the reward axis\n"
+                    "### Baseline Comparison: where every policy sits on the reward axis\n"
                     "One chart. All composite-reward totals. Oracle, 6 CI-enforced "
                     "red-team attacks, the prompted Qwen2.5-3B baseline, and the "
-                    "on-site-pending Trained Qwen3-4B target. The dashed line at "
-                    "0.45 is the red-team attack ceiling enforced in CI. The gray "
-                    "bar is intentional scope (on-site A100 run, Apr 25-26), not "
-                    "missing work — see the LESSONS_LEARNED link below the chart."
+                    "on-site-trained Qwen3-4B SFT + P3 GRPO (Day 1, A100 SXM4-80GB, "
+                    "n=5 mean 0.305). The dashed line at 0.45 is the red-team "
+                    "attack ceiling enforced in CI. The trained Qwen3-4B bar "
+                    "(solid purple) shows the measured Day 1 result, lifted from "
+                    "0.280 SFT-only baseline by the P3 length-shaping mitigation. "
+                    "See the LESSONS_LEARNED link below the chart for the FM4 + "
+                    "FM5 research findings behind these numbers."
                 )
                 baseline_plot = gr.Plot(label="composite reward across policies")
                 baseline_summary = gr.Markdown()
