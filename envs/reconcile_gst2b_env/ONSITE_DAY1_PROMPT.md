@@ -243,7 +243,76 @@ OR add `peft_config` handling in `train_grpo_real.py` to wrap the base model wit
 
 Per Guardrail #11, if Phase 2 used 4-bit quantization, do NOT merge by upcasting the dequantized 4-bit weights — re-download the original 16-bit base weights and merge into those. ~30% quality damage from naive merge per Daniel Han.
 
-**Mandatory rollout audit before Phase 3:** sample 5 rollouts on held-out seeds 9030-9034 against the SFT checkpoint. Check query-to-mark ratio. If queries per invoice < 2, retrain with reduced oracle weight (subsample 500 oracle + 1250 inspect + 1250 supplier = 3000 rows) before Phase 3. This catches the "reward rising but quality not" failure mode from [`ONSITE_BRIEFING.md`](ONSITE_BRIEFING.md) self-serve-guide Q52.
+**Mandatory rollout-quality audit before Phase 3 (expanded per Aakash's 2026-04-25 audit).** Sample 5 rollouts on held-out seeds 9030-9034 against the SFT checkpoint. Compute the following 5 trajectory-quality metrics and check each against its threshold. If ANY metric fails, retrain with reduced oracle weight (subsample 500 oracle + 1250 inspect + 1250 supplier = 3000 rows) before Phase 3 — query-to-mark alone is necessary but not sufficient.
+
+| Metric | Definition | Pass threshold | Why |
+|---|---|---|---|
+| **query-to-mark ratio** | total query verbs / total mark_* verbs | ≥ 0.5 (≥ 1 query per ~2 marks) | basic anti-shortcut; was the only metric in earlier draft |
+| **mean inspection depth** | avg distinct query verbs called per invoice that gets marked | ≥ 1.5 | anti-shortcut; ensures the model looks at multiple tools before deciding |
+| **repeated query rate** | fraction of query calls that re-query a (verb, payload) pair already in trajectory | ≤ 0.3 | detects budget-wasting loops |
+| **tool diversity** | distinct verbs used / 16 total verbs | ≥ 0.30 (≥ 5 of 16 verbs) | richer reasoning; flags `get_schema` + `mark_matched` monoculture |
+| **premature marking rate** | fraction of mark_* with zero prior `get_invoice`/`get_2b_row` on that invoice_id | ≤ 0.3 | exploit-signature detector; high value = labeling without inspection |
+
+Compute the metrics with this snippet (paste into the eval cell, point at the SFT checkpoint output):
+
+```python
+# trajectories: list[list[dict]], one inner list per held-out seed,
+# each inner list is [{"verb": "...", "payload": {...}}, ...] in order.
+import collections
+QUERY_VERBS = {"get_schema","list_gstins","fuzzy_search_gstin","get_invoice",
+               "list_invoices_by_supplier","get_2b_row","get_hsn_slab"}
+MARK_VERBS = {"mark_matched","mark_mismatched","mark_only_in_books",
+              "mark_only_in_2b","mark_partial_match"}
+
+def audit(trajectories):
+    results = []
+    for traj in trajectories:
+        verbs = [a["verb"] for a in traj]
+        n_q = sum(1 for v in verbs if v in QUERY_VERBS)
+        n_m = sum(1 for v in verbs if v in MARK_VERBS)
+        # mean inspection depth: avg distinct query verbs called per marked invoice
+        marked_invs = [a["payload"].get("invoice_id") for a in traj if a["verb"] in MARK_VERBS]
+        inspections_per_inv = collections.defaultdict(set)
+        for a in traj:
+            if a["verb"] in {"get_invoice","get_2b_row","list_invoices_by_supplier"}:
+                inv = a["payload"].get("invoice_id") or a["payload"].get("gstin")
+                if inv: inspections_per_inv[inv].add(a["verb"])
+        depths = [len(inspections_per_inv.get(i, set())) for i in marked_invs]
+        # repeated query rate
+        seen = set()
+        repeated = 0
+        for a in traj:
+            if a["verb"] in QUERY_VERBS:
+                key = (a["verb"], tuple(sorted((a["payload"] or {}).items())))
+                if key in seen: repeated += 1
+                seen.add(key)
+        # premature marking
+        inspected = collections.defaultdict(set)
+        premature = 0
+        for a in traj:
+            if a["verb"] in {"get_invoice","get_2b_row"}:
+                inv = a["payload"].get("invoice_id")
+                if inv: inspected[inv].add(a["verb"])
+            elif a["verb"] in MARK_VERBS:
+                inv = a["payload"].get("invoice_id")
+                if inv and not inspected[inv]: premature += 1
+        results.append({
+            "query_to_mark": n_q / max(n_m, 1),
+            "mean_inspection_depth": sum(depths) / max(len(depths), 1),
+            "repeated_query_rate": repeated / max(n_q, 1),
+            "tool_diversity": len(set(verbs)) / 16,
+            "premature_marking_rate": premature / max(n_m, 1),
+        })
+    # aggregate across seeds
+    keys = results[0].keys()
+    return {k: sum(r[k] for r in results) / len(results) for k in keys}
+
+# Decision: if any metric fails its threshold, retrain SFT with reweighted
+# oracle subset (500/1250/1250) before Phase 3. Catches the "reward rising
+# but quality not" failure mode (ONSITE_BRIEFING.md self-serve-guide Q52).
+```
+
+If all 5 thresholds pass on the SFT checkpoint, proceed to Action 6. If any fail, the model has learned an exploit shape and Phase 3 GRPO will reinforce it — fix the data, not the trainer.
 
 ### Action 6 — Phase 3 GRPO polish (~2 h on A100)
 
@@ -259,7 +328,25 @@ Tier 1+2 fixes are already baked into `train_grpo_real.py`: `enable_thinking=Fal
 
 **Pass gates:** eval total on hero seeds > 0.45 (clears red-team ceiling). R1 ≥ 0.25, R2 ≥ 0.30, R3 = 0.99 on ≥50% of hero seeds, R4 ≥ 0.40.
 
-**Rollout-length canary** (per Lewis Tunstall's Scaler workshop, folded into `ONSITE_BRIEFING.md`): mean rollout length should stabilize 8-20 steps per episode. If it climbs monotonically toward 50, the model is hacking budget-exhaust; stop and diagnose.
+**Hard-stop on reward-hacking signature (added 2026-04-25 per Aakash's audit).** This is the abort criterion the previous draft only described qualitatively. Watch the per-eval breakdown logged to `data/grpo_checkpoint/curves.json`. If at any eval checkpoint:
+
+> **R1 < 0.05 AND R2 < 0.05 AND R3 ≥ 0.90 AND R4 ≥ 0.40 (i.e., R3+R4 saturate while R1+R2 stay near 0.01 floor)**
+
+then GRPO is optimizing the `query_only` attack shape — driving up the cheap-to-game cells (R3 query-precondition + R4 step-efficiency) while the reasoning cells stay pinned. This is exactly the 0.353 plateau signature documented in BLOG.md §6 and LESSONS_LEARNED.md §1. **STOP GRPO immediately**, do NOT just train longer hoping it climbs out:
+
+```bash
+# Kill the running GRPO process
+pkill -f train_grpo_real
+```
+
+The fix is upstream of GRPO, not inside it. Two options in priority order:
+
+1. **Re-run Phase 2 SFT with reweighted oracle subset** (500 oracle + 1250 inspect_then_label + 1250 supplier_cap_aware). This drops the oracle's `get_schema → mark_matched_everything` exploit pattern from 33% to 17% of training mix. Then re-launch Phase 3 from the new SFT checkpoint.
+2. **If (1) doesn't move the metrics**, skip Phase 3 entirely and ship the SFT-only checkpoint (per Action 1b's <4h fallback). SFT-only with R1/R2 above floor still beats GRPO that lands at the attack signature.
+
+Do NOT attempt to "fix" `train_grpo_real.py` mid-run by tweaking weights, betas, or the format-bonus magnitude. Those touch invariants and would invalidate the red-team CI contract. Data-fix > trainer-fix > don't-fix.
+
+**Rollout-length canary** (per Lewis Tunstall's Scaler workshop, folded into `ONSITE_BRIEFING.md`): mean rollout length should stabilize 8-20 steps per episode. If it climbs monotonically toward 50, the model is hacking budget-exhaust; stop and diagnose. This is a complementary signal to the hard-stop above — both are exploit indicators but at different levels (rollout-length = budget hacking, R1/R2 floor = reasoning-cell hacking).
 
 ### Action 7 — Measure, update docs, push, redeploy (~1.5 h)
 
