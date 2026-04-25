@@ -1,0 +1,1028 @@
+{
+  "checkpoint": "envs/reconcile_gst2b_env/data/grpo_p3_checkpoint/merged",
+  "seeds": [
+    9030,
+    9031,
+    9032,
+    9033,
+    9034
+  ],
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "top_k": 20,
+    "do_sample": true,
+    "use_tools": true
+  },
+  "metrics_avg": {
+    "query_to_mark": 0.8661031366294525,
+    "mean_inspection_depth": 0.00909090909090909,
+    "repeated_query_rate": 0.0,
+    "tool_diversity": 0.3375,
+    "premature_marking_rate": 0.5954545454545455
+  },
+  "per_seed_metrics": [
+    {
+      "query_to_mark": 0.08888888888888889,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.0,
+      "tool_diversity": 0.3125,
+      "premature_marking_rate": 1.0
+    },
+    {
+      "query_to_mark": 2.0,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.0,
+      "tool_diversity": 0.1875,
+      "premature_marking_rate": 0.0
+    },
+    {
+      "query_to_mark": 0.13636363636363635,
+      "mean_inspection_depth": 0.045454545454545456,
+      "repeated_query_rate": 0.0,
+      "tool_diversity": 0.4375,
+      "premature_marking_rate": 0.9772727272727273
+    },
+    {
+      "query_to_mark": 2.0,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.0,
+      "tool_diversity": 0.1875,
+      "premature_marking_rate": 0.0
+    },
+    {
+      "query_to_mark": 0.10526315789473684,
+      "mean_inspection_depth": 0.0,
+      "repeated_query_rate": 0.0,
+      "tool_diversity": 0.5625,
+      "premature_marking_rate": 1.0
+    }
+  ],
+  "fail_count": 2,
+  "rollouts": [
+    {
+      "seed": 9030,
+      "total_steps": 50,
+      "termination": "submitted",
+      "parser_misses": 0,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.0538,
+        "R2": 0.1425,
+        "R3": 0.99,
+        "R4": 0.01,
+        "total": 0.3057
+      },
+      "trajectory": [
+        {
+          "verb": "get_schema",
+          "payload": {}
+        },
+        {
+          "verb": "list_gstins",
+          "payload": {}
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "04ZFABX5725AJZE"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "01LMPPY9965Q6Z8"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0006"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0026"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0035"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0041"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0044"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0050"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0052"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0053"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0055"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0057"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0058"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0059"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0061"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0064"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0065"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0069"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0070"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0071"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0072"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0073"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0074"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0076"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0077"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0078"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0079"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0080"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0081"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0083"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0084"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0085"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0086"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0088"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0089"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0090"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0092"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0093"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0094"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0096"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0097"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0098"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0099"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0100"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0101"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0102"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0103"
+          }
+        },
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n{\"name\": \"get_schema\", \"arguments\": {}}\n</tool_call>",
+      "raw_last_completion": "<tool_call>\n{\"name\": \"submit\", \"arguments\": {}}\n</tool_call>"
+    },
+    {
+      "seed": 9031,
+      "total_steps": 3,
+      "termination": "submitted",
+      "parser_misses": 0,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.01,
+        "R2": 0.01,
+        "R3": 0.99,
+        "R4": 0.99,
+        "total": 0.353
+      },
+      "trajectory": [
+        {
+          "verb": "get_schema",
+          "payload": {}
+        },
+        {
+          "verb": "list_gstins",
+          "payload": {}
+        },
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n{\"name\": \"get_schema\", \"arguments\": {}}\n</tool_call>",
+      "raw_last_completion": "<tool_call>\n{\"name\": \"submit\", \"arguments\": {}}\n</tool_call>"
+    },
+    {
+      "seed": 9032,
+      "total_steps": 50,
+      "termination": "step_budget_exhausted",
+      "parser_misses": 0,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.1306,
+        "R2": 0.6082,
+        "R3": 0.01,
+        "R4": 0.01,
+        "total": 0.2078
+      },
+      "trajectory": [
+        {
+          "verb": "get_schema",
+          "payload": {}
+        },
+        {
+          "verb": "list_gstins",
+          "payload": {}
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "01HJTUT8873YIZK"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0051"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "02EZMWT0866EJZB"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0011"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0012"
+          }
+        },
+        {
+          "verb": "mark_only_in_books",
+          "payload": {
+            "invoice_id": "inv_0023"
+          }
+        },
+        {
+          "verb": "get_2b_row",
+          "payload": {
+            "invoice_id": "inv_0024"
+          }
+        },
+        {
+          "verb": "get_invoice",
+          "payload": {
+            "invoice_id": "inv_0024"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0024"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0025"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0026"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0027"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0028"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0029"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0030"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0031"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0032"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0033"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0034"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0035"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0036"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0037"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0038"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0039"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0040"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0041"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0042"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0043"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0044"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0045"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0046"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0047"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0048"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0049"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0050"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0051"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0052"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0053"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0054"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0055"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0056"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0057"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0058"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0059"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0060"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0061"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0062"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0063"
+          }
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n{\"name\": \"get_schema\", \"arguments\": {}}\n</tool_call>",
+      "raw_last_completion": "<tool_call>\n{\"name\": \"mark_matched\", \"arguments\": {\"invoice_id\": \"inv_0063\"}}\n</tool_call>"
+    },
+    {
+      "seed": 9033,
+      "total_steps": 3,
+      "termination": "submitted",
+      "parser_misses": 0,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.01,
+        "R2": 0.01,
+        "R3": 0.99,
+        "R4": 0.99,
+        "total": 0.353
+      },
+      "trajectory": [
+        {
+          "verb": "get_schema",
+          "payload": {}
+        },
+        {
+          "verb": "list_gstins",
+          "payload": {}
+        },
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n{\"name\": \"get_schema\", \"arguments\": {}}\n</tool_call>",
+      "raw_last_completion": "<tool_call>\n{\"name\": \"submit\", \"arguments\": {}}\n</tool_call>"
+    },
+    {
+      "seed": 9034,
+      "total_steps": 43,
+      "termination": "submitted",
+      "parser_misses": 0,
+      "off_vocab_misses": 0,
+      "off_vocab_attempted": [],
+      "reward_breakdown": {
+        "R1": 0.1639,
+        "R2": 0.8389,
+        "R3": 0.01,
+        "R4": 0.2604,
+        "total": 0.3038
+      },
+      "trajectory": [
+        {
+          "verb": "get_schema",
+          "payload": {}
+        },
+        {
+          "verb": "list_gstins",
+          "payload": {}
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "16EVBQU4643LKZH"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0019"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0028"
+          }
+        },
+        {
+          "verb": "list_invoices_by_supplier",
+          "payload": {
+            "gstin": "05XFMUK9150JYZB"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0012"
+          }
+        },
+        {
+          "verb": "mark_mismatched",
+          "payload": {
+            "invoice_id": "inv_0022",
+            "reason": "value"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0026"
+          }
+        },
+        {
+          "verb": "mark_partial_match",
+          "payload": {
+            "invoice_id": "inv_0027",
+            "delta_inr": 3151.54
+          }
+        },
+        {
+          "verb": "mark_only_in_books",
+          "payload": {
+            "invoice_id": "inv_0009"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0010"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0011"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0013"
+          }
+        },
+        {
+          "verb": "mark_mismatched",
+          "payload": {
+            "invoice_id": "inv_0014",
+            "reason": "value"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0015"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0016"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0017"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0018"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0020"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0021"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0023"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0024"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0025"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0029"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0030"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0031"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0032"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0033"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0034"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0035"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0036"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0037"
+          }
+        },
+        {
+          "verb": "mark_only_in_books",
+          "payload": {
+            "invoice_id": "inv_0000"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0001"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0002"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0003"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0004"
+          }
+        },
+        {
+          "verb": "mark_only_in_2b",
+          "payload": {
+            "invoice_id": "inv_0005"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0006"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0007"
+          }
+        },
+        {
+          "verb": "mark_matched",
+          "payload": {
+            "invoice_id": "inv_0008"
+          }
+        },
+        {
+          "verb": "submit",
+          "payload": {}
+        }
+      ],
+      "raw_first_completion": "<tool_call>\n{\"name\": \"get_schema\", \"arguments\": {}}\n</tool_call>",
+      "raw_last_completion": "<tool_call>\n{\"name\": \"submit\", \"arguments\": {}}\n</tool_call>"
+    }
+  ]
+}

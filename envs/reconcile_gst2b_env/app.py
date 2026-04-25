@@ -414,11 +414,13 @@ _REDTEAM_ATTACKS: Dict[str, float] = {
 # Source: data/baseline_metrics_real.json. Delta over raw policy = 1.18 (CI95 [1.09, 1.27]).
 _PROMPTED_BASELINE = 0.18
 
-# Trained Qwen3-4B SFT measured on Day 1 on-site (2026-04-25, A100 SXM4-80GB):
-# n=5 mean composite reward 0.280 at GRPO-matching sampling (T=0.7, top_p=0.95,
-# top_k=20) with tools= enabled. Source: data/audit_F_n5.json. GRPO Phase 3
-# deferred per LESSONS_LEARNED §1 Failure Mode 5 (reward-landscape inversion).
-_TRAINED_PLACEHOLDER = 0.280
+# Trained Qwen3-4B SFT + P3 GRPO with Tier 2c length-shaping bonus, measured
+# on Day 1 on-site (2026-04-25, A100 SXM4-80GB): n=5 mean composite reward
+# 0.305 at GRPO-matching sampling (T=0.7, top_p=0.95, top_k=20) with tools=
+# enabled. SFT baseline was 0.280; GRPO P3 lifts +0.025. Source:
+# data/audit_grpo_p3_F_n5.json. See LESSONS_LEARNED §1 FM5 for the
+# reward-landscape inversion finding and shaping mitigation.
+_TRAINED_PLACEHOLDER = 0.305
 
 
 def _compute_oracle_range() -> Dict[str, Any]:
@@ -487,7 +489,7 @@ def _baseline_comparison_figure() -> go.Figure:
     )
     rows.append(
         {
-            "label": "Trained Qwen3-4B SFT<br>(Day 1, A100 SXM4)",
+            "label": "Trained Qwen3-4B SFT + GRPO<br>(Day 1, A100 SXM4)",
             "score": _TRAINED_PLACEHOLDER,
             "color": "#9467bd",  # purple, distinguishes from oracle/baseline/attack
             "err_above": 0,

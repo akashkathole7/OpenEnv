@@ -1,0 +1,87 @@
+{
+  "steps": [
+    0,
+    20,
+    40,
+    60,
+    80,
+    100
+  ],
+  "R1": [
+    0.0102,
+    0.01,
+    0.01,
+    0.01,
+    0.01,
+    0.01
+  ],
+  "R2": [
+    0.0157,
+    0.01,
+    0.01,
+    0.01,
+    0.01,
+    0.01
+  ],
+  "R3": [
+    0.99,
+    0.99,
+    0.99,
+    0.99,
+    0.99,
+    0.99
+  ],
+  "R4": [
+    0.99,
+    0.99,
+    0.99,
+    0.99,
+    0.99,
+    0.99
+  ],
+  "total": [
+    0.3545,
+    0.353,
+    0.353,
+    0.353,
+    0.353,
+    0.353
+  ],
+  "config": {
+    "model": "envs/reconcile_gst2b_env/data/sft_checkpoint/merged",
+    "lora_rank": 16,
+    "lora_targets": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "lr": 1e-05,
+    "total_steps": 100,
+    "eval_every": 20,
+    "checkpoint_every": 30,
+    "num_generations": 2,
+    "max_completion_length": 448,
+    "per_device_batch": 1,
+    "grad_accum": 4,
+    "eval_seeds": [
+      9030,
+      9031,
+      9032,
+      9033,
+      9034,
+      9035,
+      9036,
+      9037,
+      9038,
+      9039
+    ],
+    "train_seeds_range": [
+      0,
+      59
+    ]
+  }
+}

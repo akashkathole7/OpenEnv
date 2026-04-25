@@ -32,7 +32,7 @@ tags:
 
 - **Environment innovation (40%):** 16 typed verbs (7 query / 7 mutate / 2 meta), 5 planted mismatch types, 30%-probability directed 3-cycle ring fraud, partially observable, hidden ground truth unit-tested to never leak into observations.
 - **Storytelling (30%):** BLOG, 90-sec video, PITCH, QA_REHEARSAL, this Space with the 3D ring viewer you see below, README front-loads plots per judges' guidance.
-- **Training evidence (20%):** Pre-onsite Qwen3-0.6B GRPO 10-step smoke + 150-step eval plateau (plots below). On-site Day 1 (2026-04-25, A100 SXM4-80GB): full 375-step Qwen3-4B SFT, n=5 mean composite reward **0.280** above prompted Qwen2.5-3B baseline 0.18. GRPO Phase 3 deferred per reward-landscape analysis. [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md) §1 covers all 5 documented failure modes.
+- **Training evidence (20%):** Pre-onsite Qwen3-0.6B GRPO 10-step smoke + 150-step eval plateau (plots below). On-site Day 1 (2026-04-25, A100 SXM4-80GB): full 375-step Qwen3-4B SFT (n=5 mean 0.280) + **100-step P3 GRPO with Tier 2c length-shaping bonus, n=5 mean 0.305 (+0.025 lift)** above prompted Qwen2.5-3B baseline 0.18. [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md) §1 covers all 5 documented failure modes including the FM4 audit-OOD trap chain (generalizes across SFT/GRPO/eval/audit code paths) and FM5 reward-landscape inversion (partially mitigated by P3 shaping).
 - **Reward & pipeline (10%):** 4-component arithmetic reward clamped to `[0.01, 0.99]`, 6 red-team attacks CI-enforced at `<0.45`, 42 tests green, Tier 1+2 GRPO fixes validated in [`data/smoke_test_10step.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/smoke_test_10step.json).
 
 ---
@@ -47,9 +47,11 @@ tags:
 | Reward components | **4** arithmetic, each clamped to `[0.01, 0.99]` |
 | Red-team attacks CI-enforced `<0.45` | **6 / 6 pass**, max `query_only` = 0.349 |
 | Test suite | **42 / 42 green** |
-| **Trained Qwen3-4B SFT on A100 SXM4-80GB (Day 1 on-site)** | **n=5 mean composite reward 0.280** |
+| **Trained Qwen3-4B SFT + P3 GRPO on A100 SXM4-80GB (Day 1 on-site)** | **n=5 mean composite reward 0.305** |
+| SFT-only baseline (pre-GRPO) | 0.280 (n=5 mean) |
 | Prompted vs raw baseline delta on Qwen2.5-3B-Instruct | 1.18 (95% CI [1.09, 1.27], 180 rollouts) |
-| Trained-vs-prompted lift | +0.10 (0.280 − 0.18) |
+| Trained-vs-prompted lift | +0.125 (0.305 − 0.18) |
+| GRPO P3 vs SFT lift | +0.025 (0.305 − 0.280) |
 | Documented pre-onsite training run | Qwen3-0.6B, 10-step smoke + 150-step eval (plots below) |
 | `make reproduce` | bit-identical against committed artifacts |
 
@@ -74,6 +76,12 @@ Every registered Indian business with B2B purchases reconciles its purchase regi
 ![Day 1 training-progression bar chart: prompted baseline (0.18), trained SFT step 350 (0.314, light purple), trained SFT step 375 final (0.280, dark purple), with 0.45 red-team ceiling and 0.349 query_only Mode B exploit reference lines](https://raw.githubusercontent.com/akashkathole7/OpenEnv/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/figures/day1_training_progression.png)
 
 *Day 1 training progression, n=5 audit on heldout seeds 9030-9034 at GRPO-matching sampling with `tools=` enabled. Step 350 mean (0.314) is HIGHER than step 375 final mean (0.280), but only because 4 of 5 seeds at step 350 collapsed to the Mode B `query_only` attack shape (R_total 0.353), while only 2 of 5 did at step 375. **The last 25 optimizer steps moved the policy distribution from "mostly attack" (1/5 marking) to "mostly marking" (3/5 marking) AND the composite score went DOWN.** This is empirical proof of Failure Mode 5 (reward-landscape inversion) in [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md) §1: under the current arithmetic-reward + R3-R4-saturation design, marking trajectories (Mode A) score lower than the cheap query_only attack (Mode B). Even at n=5 the direction is structurally robust: any seed shifting from Mode B (0.353) to Mode A (0.17 - 0.26) mechanically pulls the mean down. GRPO advantage signal would push the policy back toward Mode B. Source: [data/audit_ckpt350_F_n5.json](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/audit_ckpt350_F_n5.json) + [data/audit_F_n5.json](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/audit_F_n5.json) via [`scripts/make_day1_progression_figure.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/make_day1_progression_figure.py).*
+
+### P3 GRPO with Tier 2c length-shaping bonus: train reward + audit-OOD visualization
+
+![P3 GRPO reward curve: top pane shows train reward over 100 steps with rolling mean; bottom pane visualizes the FM4 audit-OOD bug by contrasting the buggy fresh-context eval callback (flat at 0.354) with the true post-training audit (n=5 mean 0.305 with tools= enabled)](https://raw.githubusercontent.com/akashkathole7/OpenEnv/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/figures/grpo_reward_curve.png)
+
+*Two-pane visualization of the P3 GRPO outcome. **Top pane:** TRL train-reward across 100 steps under the Tier 2c length-shaping bonus (`+0.10` if `n_marks >= 10` AND `distinct_verbs >= 4`, gates verified to fire on no red-team attack). 10-step rolling mean trends from ~0.18 (start) to ~0.23 (end), confirming GRPO is moving the policy in the shaped direction. **Bottom pane:** the buggy fresh-context eval callback in `train_grpo_real.py:_eval_episode` (Failure Mode 4) reports a flat 0.354 across all 6 logged eval steps, identical to the step-0 baseline, regardless of training progress. The true post-training audit (n=5, with `tools=` enabled, multi-turn accumulation) lands at **0.305** (+0.025 lift over the SFT baseline 0.280). The gap between the buggy callback's 0.354 and the true audit's 0.305 is the empirical measure of FM4: the audit-OOD bug masks ALL training progress, not just SFT, making the broken callback a non-signal regardless of training stage. Source: [`data/grpo_p3_run.log`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/grpo_p3_run.log) + [`data/grpo_p3_curves.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/grpo_p3_curves.json) + [`data/audit_grpo_p3_F_n5.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/audit_grpo_p3_F_n5.json) via [`scripts/make_grpo_curve_figure.py`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/make_grpo_curve_figure.py).*
 
 ### Pre-onsite training trace (Qwen3-0.6B + Kaggle T4)
 
@@ -211,6 +219,9 @@ Day 1 headline `n=5 mean 0.280` is reproducible end-to-end from these artifacts:
 | [`data/audit_ckpt350_F_n5.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/audit_ckpt350_F_n5.json) | Same audit at step 350 (25 steps before final). Empirical FM5 proof: 0.314 mean comes from 4/5 Mode B collapse, while step 375 trades reward for marking. |
 | [`data/audit_seeds_9031_9034.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/audit_seeds_9031_9034.json) | Pre-`tools=` collapse evidence (Failure Mode 4 audit-OOD chain). |
 | [`data/audit_step100_n5.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/audit_step100_n5.json) | Early-stop control ruling out the over-training hypothesis. |
+| [`data/audit_grpo_p3_F_n5.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/audit_grpo_p3_F_n5.json) | **Headline post-GRPO audit (n=5 mean 0.305).** SFT-merged + 100 GRPO steps with Tier 2c length-shaping bonus. |
+| [`data/grpo_p3_run.log`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/grpo_p3_run.log) | 100-step GRPO training log with per-step rewards. |
+| [`data/grpo_p3_curves.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/grpo_p3_curves.json) | Buggy eval callback's flat trace, kept as empirical FM4 confirmation across training stages. |
 
 ---
 
