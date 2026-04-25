@@ -17,6 +17,8 @@ tags:
 
 🎥 [90-second demo video](https://www.youtube.com/watch?v=rglR1hGgdb8) · 🚀 [Live HF Space](https://huggingface.co/spaces/akashkathole/reconcile_gst2b_env) · 📝 [BLOG.md](BLOG.md) · 📋 [ROUND2_PROBLEM_STATEMENT.md](ROUND2_PROBLEM_STATEMENT.md) · 🧪 [JUDGE_TOUR.md](JUDGE_TOUR.md) · 📓 [Training notebook](scripts/kaggle_phase2_sft.ipynb) ([Colab](https://colab.research.google.com/github/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/kaggle_phase2_sft.ipynb))
 
+[![Open Demo Notebook In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/colab_demo.ipynb) Judge-runnable demo: env import + oracle episode + trained-checkpoint audit (n=5 mean 0.305) + embedded plots, all under 5 minutes on free Colab T4 (no training required).
+
 ---
 
 ## TL;DR: what landed against the judging rubric

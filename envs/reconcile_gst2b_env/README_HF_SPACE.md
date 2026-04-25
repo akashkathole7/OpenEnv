@@ -26,6 +26,8 @@ tags:
 
 🎥 [90-second demo video](https://www.youtube.com/watch?v=rglR1hGgdb8) · 🧑‍💻 [GitHub repo](https://github.com/akashkathole7/OpenEnv/tree/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env) · 📝 [BLOG.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/BLOG.md) · 📋 [ROUND2_PROBLEM_STATEMENT.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/ROUND2_PROBLEM_STATEMENT.md) · 🧪 [JUDGE_TOUR.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/JUDGE_TOUR.md) · 📓 [Training notebook](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/kaggle_phase2_sft.ipynb) ([Colab](https://colab.research.google.com/github/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/kaggle_phase2_sft.ipynb))
 
+[![Open Demo Notebook In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/colab_demo.ipynb) Judge-runnable demo: env import + oracle episode + trained-checkpoint audit (n=5 mean 0.305) + embedded plots, all under 5 minutes on free Colab T4 (no training required).
+
 ---
 
 ## TL;DR: what landed against the judging rubric
