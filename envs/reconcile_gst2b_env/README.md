@@ -32,7 +32,7 @@ tags:
 
 ---
 
-## Why it matters (30-second hook)
+## Why it matters
 
 Every registered Indian business with B2B purchases reconciles its purchase register against a regulator-generated return (GSTR-2B) monthly. It's rule-heavy, error-sensitive (over-claim triggers audit; under-claim forfeits money), still done by hand by junior accountants, and the regulator publishes the correctness rules. That makes it a cleaner RL target than "general web agent": wrong answers have crisp, auditable, regulator-specified correctness. An agent that clears this generalizes to every two-sided document reconciliation against a schema.
 
