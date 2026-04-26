@@ -5,7 +5,7 @@
 **Submission author:** Aakash Kathole (solo)
 **Repo:** [github.com/akashkathole7/OpenEnv](https://github.com/akashkathole7/OpenEnv) · branch `scaffold/reconcile-gst2b`
 **Live Space:** [huggingface.co/spaces/akashkathole/reconcile_gst2b_env](https://huggingface.co/spaces/akashkathole/reconcile_gst2b_env)
-**90-second demo video:** [youtube.com/watch?v=rglR1hGgdb8](https://www.youtube.com/watch?v=rglR1hGgdb8)
+**90-second demo video:** [youtube.com/watch?v=K-sZ8c1TMjw](https://www.youtube.com/watch?v=K-sZ8c1TMjw)
 
 > **Day 1 on-site update (2026-04-25):** the §6 "Post-training strategy" and "On-site compute plan" sections below describe the pre-onsite plan as it was written for Round 2 submission. The actual on-site Day 1 outcome (n=5 mean 0.305 post-P3 GRPO with Tier 2c length-shaping; 5 documented failure modes including FM4 audit-OOD trap chain and FM5 reward-landscape inversion) is recorded in [BLOG.md](BLOG.md) §6 closing block and [LESSONS_LEARNED.md](LESSONS_LEARNED.md) §1. The pre-onsite text below is preserved as historical context for the Round 2 problem statement.
 
@@ -26,7 +26,7 @@
 | Prompted vs raw baseline delta on Qwen2.5-3B-Instruct | **1.18** (95% CI [1.09, 1.27], 180 rollouts) | `data/baseline_metrics_real.json` |
 | Pre-onsite training attempts + on-site Day 1 | **5 documented failure modes** across 0.6B / 1.7B / 4B / audit-OOD chain / reward-landscape inversion | `LESSONS_LEARNED.md` §1 |
 | `make reproduce` | **bit-identical** against committed artifacts | `Makefile:30` |
-| 90-second demo video | 🎥 [youtube.com/watch?v=rglR1hGgdb8](https://www.youtube.com/watch?v=rglR1hGgdb8) | on YouTube |
+| 90-second demo video | 🎥 [youtube.com/watch?v=K-sZ8c1TMjw](https://www.youtube.com/watch?v=K-sZ8c1TMjw) | on YouTube |
 
 ---
 

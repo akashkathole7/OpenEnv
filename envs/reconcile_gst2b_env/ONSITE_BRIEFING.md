@@ -34,7 +34,7 @@
 
 **Result timing — important for your pacing.** Per Scaler's finale email: results are *not* announced at the venue. Judging is asynchronous; results stream on Scaler's YouTube Live on **2026-05-02** (roughly one week after on-site). This means: there is no Day-2 submission cutoff that forces fake numbers. If a phase bricks, an honest "trained checkpoint exists but eval surface needs completion" beats a scrambled pipeline. See the emergency fallback section.
 
-**Submission slot.** Round 2, Theme #3.1 "Professional World Modeling", Scaler AI Labs sub-theme "Multi-App Enterprise Workflow". Pre-recorded 90-second demo already linked across docs: https://www.youtube.com/watch?v=rglR1hGgdb8
+**Submission slot.** Round 2, Theme #3.1 "Professional World Modeling", Scaler AI Labs sub-theme "Multi-App Enterprise Workflow". Pre-recorded 90-second demo already linked across docs: https://www.youtube.com/watch?v=K-sZ8c1TMjw
 
 **The project.** `reconcile_gst2b_env` — an OpenEnv RL environment for Indian GST Input-Tax-Credit reconciliation against the monthly GSTR-2B regulator return. Everything is committed, tested, and deployed to a Hugging Face Space. What remains for on-site is *real GRPO training on proper compute*, which was not possible in Round 1 (only T4 smoke runs were feasible). Your job is to shepherd that training run and update the docs with real numbers.
 
@@ -107,7 +107,7 @@ ls envs/reconcile_gst2b_env/data/
 **Minimum requirements — verify all four are still satisfied before pitch:**
 1. OpenEnv latest release: check `pyproject.toml` and `openenv.yaml` on-site.
 2. Minimal TRL training script in Colab: `scripts/train_grpo_real.py` exists, runs on T4.
-3. Mini-blog OR <2min YouTube video: both exist (BLOG.md + https://www.youtube.com/watch?v=rglR1hGgdb8).
+3. Mini-blog OR <2min YouTube video: both exist (BLOG.md + https://www.youtube.com/watch?v=K-sZ8c1TMjw).
 4. OpenEnv-compliant env on HF Spaces: live; verify the Space loads on Day 1 before demo.
 
 **Unsloth honesty note.** Docs say "Unsloth drop-in ready for Phase 2 SFT / Phase 3 GRPO efficiency." The pre-staged scripts currently use HF transformers + PEFT + TRL, NOT Unsloth. If a judge presses, the truthful answer is: *"Unsloth is drop-in compatible via a single import swap in the trainer; we intentionally did not wire it in Round 1 to keep the pipeline minimal and debuggable. On-site we will wire it if A100 memory is tight."* Do not claim Unsloth is currently in the loop.
@@ -368,7 +368,7 @@ These are load-bearing. Breaking any of them invalidates the submission's integr
 7. **Preserve the honest collapse narrative in BLOG.md §6.** The story is "we diagnosed 3 failure modes and fixed them." Deleting or softening this *loses* the judge-appeal; it does not gain anything.
 8. **Branch is `scaffold/reconcile-gst2b`.** Do not merge to main on-site. PRs against `main` come later.
 9. **HF Space requirements.txt has 6 pinned deps** (gradio, networkx, plotly, numpy, pandas, pydantic). If you add a runtime import to `app.py`, add it here too or the Space build breaks.
-10. **The 90-second demo URL `https://www.youtube.com/watch?v=rglR1hGgdb8`** is linked in 5+ docs. Do not change it unless Aakash uploads a new video.
+10. **The 90-second demo URL `https://www.youtube.com/watch?v=K-sZ8c1TMjw`** is linked in 5+ docs. Do not change it unless Aakash uploads a new video.
 11. **QLoRA merge footgun — quantified ~30% quality damage.** If Phase 2 uses 4-bit quantization (QLoRA) and Phase 3 saves a merged model, do NOT naively upcast 4-bit → 16-bit and merge the LoRA adapters in one step. Daniel Han (Unsloth; Scaler workshop 2026-04-22) put the damage at **~30%** of model quality. The correct flow: download the original 16-bit base weights, merge the LoRA adapter into *those*, not into the dequantized 4-bit copy. Unsloth handles this automatically; vanilla PEFT does not. **Phase 4 guard rail:** before running your eval script on the GRPO checkpoint, run it once on the SFT checkpoint and sanity-check output generations — not just "does it load". A broken merge produces outputs that parse-as-JSON but are semantically garbage, which the env scorer will read as low R1/R2 and you will mis-attribute as "training failed" rather than "merge broke the model". Self-serve guide Q16 covers this too.
 12. **EXEC_SUMMARY.md line 8 currently says "41 tests green" — the real count is 42.** This is a pre-existing stale number. Do not fix it unilaterally on-site; flag to Aakash. If you update EXEC_SUMMARY with trained numbers in Phase 4, you can silently fix this as part of that edit.
 

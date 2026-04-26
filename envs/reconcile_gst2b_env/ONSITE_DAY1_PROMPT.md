@@ -439,7 +439,7 @@ Then (executing the matched branch above):
 7. **Preserve the honest collapse narrative in BLOG.md §6.** Story is "we diagnosed and fixed." Deleting/softening loses judge appeal, gains nothing.
 8. **Branch is `scaffold/reconcile-gst2b`. Do not merge to main on-site.** PRs against `main` come later.
 9. **HF Space `requirements.txt` has 6 pinned deps** (gradio, networkx, plotly, numpy, pandas, pydantic). If you add a runtime import to `app.py`, add it here too.
-10. **90-second demo URL `https://www.youtube.com/watch?v=rglR1hGgdb8`** is linked in 5+ docs. Do not change unless Aakash uploads a new video.
+10. **90-second demo URL `https://www.youtube.com/watch?v=K-sZ8c1TMjw`** is linked in 5+ docs. Do not change unless Aakash uploads a new video.
 11. **QLoRA merge footgun.** If Phase 2 ends up using 4-bit quantization, download original 16-bit base weights and merge the LoRA into THOSE, not the dequantized 4-bit copy. ~30% quality damage from the naive path per Daniel Han.
 12. **No fake numbers.** Emergency fallback is honest-partial ("trained checkpoint exists, eval surface needs completion") over vaporware. Judges reward honesty per the collapse narrative.
 13. **Kaggle is out of scope on Day 1.** `scripts/kaggle_phase2_sft.ipynb` is a historical artifact. Do not re-attempt Kaggle runs; on-site A100 is the clean environment.

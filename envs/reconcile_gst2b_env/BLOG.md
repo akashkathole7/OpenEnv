@@ -1,6 +1,6 @@
 # ReconcileEnv-GST2B: training a 3B model to do India's monthly ITC reconciliation, on a free Colab T4
 
-> 📹 **90-second demo**: https://www.youtube.com/watch?v=rglR1hGgdb8
+> 📹 **90-second demo**: https://www.youtube.com/watch?v=K-sZ8c1TMjw
 > &nbsp;&nbsp;Ring viewer · hero metrics · triple-failure-mode evidence across three Qwen3 scales.
 
 ## 1. The problem, for a non-Indian reader
