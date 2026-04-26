@@ -7,6 +7,8 @@
 **Live Space:** [huggingface.co/spaces/akashkathole/reconcile_gst2b_env](https://huggingface.co/spaces/akashkathole/reconcile_gst2b_env)
 **90-second demo video:** [youtube.com/watch?v=rglR1hGgdb8](https://www.youtube.com/watch?v=rglR1hGgdb8)
 
+> **Day 1 on-site update (2026-04-25):** the §6 "Post-training strategy" and "On-site compute plan" sections below describe the pre-onsite plan as it was written for Round 2 submission. The actual on-site Day 1 outcome (n=5 mean 0.305 post-P3 GRPO with Tier 2c length-shaping; 5 documented failure modes including FM4 audit-OOD trap chain and FM5 reward-landscape inversion) is recorded in [BLOG.md](BLOG.md) §6 closing block and [LESSONS_LEARNED.md](LESSONS_LEARNED.md) §1. The pre-onsite text below is preserved as historical context for the Round 2 problem statement.
+
 ---
 
 ## At a glance

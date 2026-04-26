@@ -15,9 +15,11 @@ tags:
 
 **An OpenEnv environment for the monthly GSTR-2B reconciliation that ~14M Indian businesses perform by hand. 16 typed tool verbs, 4-component arithmetic reward, 6 red-team attacks all scoring under a CI-enforced 0.45 ceiling.**
 
-🎥 [90-second demo video](https://www.youtube.com/watch?v=rglR1hGgdb8) · 🚀 [Live HF Space](https://huggingface.co/spaces/akashkathole/reconcile_gst2b_env) · 📝 [BLOG.md](BLOG.md) · 📋 [ROUND2_PROBLEM_STATEMENT.md](ROUND2_PROBLEM_STATEMENT.md) · 🧪 [JUDGE_TOUR.md](JUDGE_TOUR.md) · 📓 [Training notebook](scripts/kaggle_phase2_sft.ipynb) ([Colab](https://colab.research.google.com/github/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/kaggle_phase2_sft.ipynb))
+🎥 [90-second demo video](https://www.youtube.com/watch?v=rglR1hGgdb8) · 🚀 [Live HF Space](https://huggingface.co/spaces/akashkathole/reconcile_gst2b_env) · 📝 [BLOG.md](BLOG.md) · 🔬 [LESSONS_LEARNED.md](LESSONS_LEARNED.md) (5 failure modes incl. FM4 audit-OOD chain + FM5 reward inversion) · 📋 [ROUND2_PROBLEM_STATEMENT.md](ROUND2_PROBLEM_STATEMENT.md) · 🧪 [JUDGE_TOUR.md](JUDGE_TOUR.md) · 📓 [Training notebook](scripts/kaggle_phase2_sft.ipynb) ([Colab](https://colab.research.google.com/github/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/scripts/kaggle_phase2_sft.ipynb))
 
 [![Open Demo Notebook In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/colab_demo.ipynb) Judge-runnable demo: env import + oracle episode + trained-checkpoint audit (n=5 mean 0.305) + embedded plots, all under 5 minutes on free Colab T4 (no training required).
+
+🎤 [Slide deck (PDF)](data/slides/reconcile_gst2b_pitch_deck.pdf) · [HTML version](data/slides/reconcile_gst2b_pitch_deck.html) — 9-slide judge-readable summary of problem, environment, reward design, Day 1 results, and the FM4 + FM5 research findings.
 
 ---
 
@@ -42,9 +44,9 @@ In India alone, ~14M GST-registered businesses run this loop monthly. The task i
 
 ### Day 1 on-site (2026-04-25, A100 SXM4-80GB): trained Qwen3-4B SFT vs all references
 
-![Day 1 baseline-comparison bar chart: trained Qwen3-4B SFT (purple, 0.280) vs oracle, 6 red-team attacks, prompted Qwen2.5-3B baseline, and 0.45 red-team ceiling](data/figures/day1_baseline_comparison.png)
+![Day 1 SFT-only intermediate: trained Qwen3-4B after 375-step SFT (purple, 0.280) vs oracle, 6 red-team attacks, prompted Qwen2.5-3B baseline, and 0.45 red-team ceiling. Final shipped headline 0.305 charted in P3 GRPO panel below](data/figures/day1_baseline_comparison.png)
 
-*Day 1 on-site result. Trained Qwen3-4B SFT (purple, n=5 mean 0.280, min-max error bar 0.17 - 0.35) sits above the prompted Qwen2.5-3B baseline (blue, 0.18) and below the CI-enforced red-team ceiling (red dashed, 0.45). The 6 red-team attacks (red bars) all score under 0.45 by design. Notably, the `query_only` attack (0.349) scores ABOVE the trained Mode A marking trajectories. This is the reward-landscape inversion documented as Failure Mode 5 in [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md) §1: GRPO advantage signal would point toward the attack, not away from it. Phase 3 GRPO deferred. Source: live-recomputed from `data/audit_F_n5.json` and `tests/envs/test_reconcile_gst2b_reward_hacking.py` via [`scripts/make_day1_figure.py`](scripts/make_day1_figure.py). The same chart is rendered live as Tab 4 in the [HF Space](https://huggingface.co/spaces/akashkathole/reconcile_gst2b_env).*
+*Day 1 SFT-only intermediate result. Trained Qwen3-4B after 375-step SFT (purple, n=5 mean 0.280, min-max error bar 0.17 - 0.35) sits above the prompted Qwen2.5-3B baseline (blue, 0.18) and below the CI-enforced red-team ceiling (red dashed, 0.45). The same n=5 audit re-run after 100 P3 GRPO steps with Tier 2c length-shaping landed at **0.305 (the shipped Day 1 headline; +0.025 lift over this SFT-only intermediate)**, charted in the P3 GRPO panel below. The 6 red-team attacks (red bars) all score under 0.45 by design. Notably, the `query_only` attack (0.349) scores ABOVE the SFT-only Mode A marking trajectories, the reward-landscape inversion documented as Failure Mode 5 in [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md) §1, which is exactly why the P3 Tier 2c mitigation was designed. Source: live-recomputed from `data/audit_F_n5.json` and `tests/envs/test_reconcile_gst2b_reward_hacking.py` via [`scripts/make_day1_figure.py`](scripts/make_day1_figure.py). The same chart is rendered live as Tab 4 in the [HF Space](https://huggingface.co/spaces/akashkathole/reconcile_gst2b_env), with the trained bar at the post-GRPO 0.305 value.*
 
 ### Day 1 training progression: step 350 vs step 375 (final), empirical proof of FM5
 
@@ -127,7 +129,7 @@ PYTHONPATH=src:envs uv run python -m \
 
 ### Verify the trained number (judges' reproducibility path)
 
-The Day 1 headline `n=5 mean 0.280` is reproducible end-to-end from the committed artifacts:
+The Day 1 headline `n=5 mean 0.305` (post-P3 GRPO with Tier 2c length-shaping) is reproducible end-to-end from the committed artifacts; the SFT-only intermediate `n=5 mean 0.280` is also reproducible from `data/audit_F_n5.json` as the pre-GRPO reference point:
 
 | Artifact | Purpose |
 |---|---|
@@ -161,7 +163,7 @@ PYTHONPATH=src:envs uv run python -m \
 
 | You are | Read this |
 |---|---|
-| Screener with 3-5 minutes | This README + the Day 1 baseline-comparison chart above |
+| Screener with 3-5 minutes | This README + the **P3 GRPO reward curve + audit-OOD visualization** chart above (showing the shipped 0.305 headline and the FM4 audit-OOD bug visualization) |
 | Reviewer with 10 minutes | [JUDGE_TOUR.md](JUDGE_TOUR.md) (guided repo walk) |
 | Reviewer with 30 minutes | [BLOG.md](BLOG.md) (especially §6 closing block on Day 1 outcome) + [ROUND2_PROBLEM_STATEMENT.md](ROUND2_PROBLEM_STATEMENT.md) + the plots |
 | Reviewer reproducing the trained number | [`scripts/audit_sft_rollout_quality.py`](scripts/audit_sft_rollout_quality.py) + [`data/sft_full_run.log`](data/sft_full_run.log) + [`data/audit_F_n5.json`](data/audit_F_n5.json) (see "Verify the trained number" section above) |
