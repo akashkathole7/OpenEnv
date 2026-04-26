@@ -2,7 +2,7 @@
 
 Honest engineering notes from the pre-onsite window (2026-04-22 to 2026-04-24) plus the on-site Day 1 A100 SXM4-80GB run (2026-04-25). What we tried, what failed, what we diagnosed, what ships with this submission, and what's corrected for follow-up validation post-hackathon.
 
-This doc exists because the judges' criteria explicitly reward "messy but ambitious with real training evidence" over polished-but-boring, and because the [ONSITE_BRIEFING.md](ONSITE_BRIEFING.md) invariant "do NOT fake numbers" is load-bearing for the red-team CI contract. It is not a retrospective on mistakes, it is the engineering trail behind the shipped artifacts.
+This doc exists because the judges' criteria explicitly reward "messy but ambitious with real training evidence" over polished-but-boring, and because the project's "no fake numbers" principle is load-bearing for the red-team CI contract. It is not a retrospective on mistakes, it is the engineering trail behind the shipped artifacts.
 
 ## 1. Three Qwen3-scale attempts, one survived commit
 
@@ -103,7 +103,7 @@ The second fix (Path B) is queued for on-site; we did not push-and-pray further 
 - Two labeled PNG plots in [`data/figures/`](data/figures/) embedded in both READMEs, showing the documented Qwen3-0.6B training trace and per-component breakdown vs red-team attacks.
 - Reconstructed [`data/smoke_test_10step.json`](data/smoke_test_10step.json) from the committed `smoke.log` so every doc reference resolves.
 - Prompted Qwen2.5-3B baseline numbers ([`data/baseline_metrics_real.json`](data/baseline_metrics_real.json)): delta 1.18 over raw policy, 95% CI [1.09, 1.27], 180 rollouts. This is the honest pre-training evidence.
-- Live HF Space with the 3D ring viewer, 90-second demo video, BLOG / PITCH / JUDGE_TOUR / ROUND2_PROBLEM_STATEMENT / EXEC_SUMMARY / QA_REHEARSAL docs.
+- Live HF Space with the 3D ring viewer, 90-second demo video, BLOG / JUDGE_TOUR / ROUND2_PROBLEM_STATEMENT / EXEC_SUMMARY / 9-slide pitch deck (PDF + HTML).
 
 ## 5. What ran on-site (Day 1, A100 SXM4-80GB, 2026-04-25)
 
@@ -111,7 +111,7 @@ Hugging Face Spaces compute upgrade to A100 SXM4-80GB (Pro subscription required
 
 Pipeline that ran:
 
-- **Phase 1 verification.** 3000-row balanced trajectory file (1000 oracle + 1000 inspect_then_label + 1000 supplier_cap_aware, round-robin interleaved) verified locally (mean total 0.690, mean R3 0.791). Did not regenerate on-site per ONSITE_DAY1_PROMPT.md guidance.
+- **Phase 1 verification.** 3000-row balanced trajectory file (1000 oracle + 1000 inspect_then_label + 1000 supplier_cap_aware, round-robin interleaved) verified locally (mean total 0.690, mean R3 0.791). Did not regenerate on-site (kept the pre-onsite balanced subsample as the SFT input).
 - **Phase 2 SFT.** [`scripts/train_sft_warmstart.py`](scripts/train_sft_warmstart.py) on Qwen/Qwen3-4B + LoRA rank 16 + bf16 + 1 epoch over 3000 rows = 375 optimizer steps. Wall time **31:12** (5s/step), final aggregate train_loss **0.341**. Smoke run at `--limit-rows 300` cleared the 5-min gate (first loss line at ~31s) and the step-10 loss-stagnation canary (loss[10]/loss[5] = 0.918 with full-run logging cadence). Full artifacts: [`data/sft_full_run.log`](data/sft_full_run.log), [`data/sft_summary.json`](data/sft_summary.json), [`data/sft_smoke_run.log`](data/sft_smoke_run.log).
 - **LoRA merge.** Final adapter (132 MB) merged into base Qwen3-4B weights using `peft.PeftModel.merge_and_unload()` to produce a full inference-ready checkpoint (8 GB safetensors). Required because `train_grpo_real.py` loads via `AutoModelForCausalLM.from_pretrained(args.model)` directly without PEFT-aware wrapping.
 - **5-metric rollout audit on held-out seeds 9030-9034.** [`scripts/audit_sft_rollout_quality.py`](scripts/audit_sft_rollout_quality.py) at `T=0.7 top_p=0.95 top_k=20` matching `train_grpo_real.py:557-561`. After resolving the 4-bug audit-OOD trap chain (Failure Mode 4 above), n=5 mean composite reward **0.280**, with 3 of 5 seeds emitting 32-46 mark verbs per trajectory (R1 = 0.15, R2 = 0.41 in mark-emitting trajectories) and 2 of 5 seeds collapsing to the 3-step query_only shape (R = `{0.01, 0.01, 0.99, 0.99}` total 0.353). Headline artifact: [`data/audit_F_n5.json`](data/audit_F_n5.json).
@@ -132,6 +132,6 @@ What ships:
 
 ## 6. Why this shipped as-is instead of a vaporware trained number
 
-Per [ONSITE_BRIEFING.md](ONSITE_BRIEFING.md) emergency fallback: *"Do NOT fake numbers. If trained numbers are worse than the prompting baseline, the honest story is: 'we ran out of compute on-site; the pre-staged SFT warm-start script is in the repo for post-hackathon validation.' Judges reward honesty per the collapse narrative already in [BLOG.md](BLOG.md) §6."* The red-team tests are CI-enforced, the reward design is auditable, the prompted baseline is a real 1.18-delta improvement over raw, the on-site SFT lifts that to 0.280 mean composite reward, and P3 GRPO with Tier 2c length-shaping bonus lifts further to 0.305 (the shipped Day 1 headline), and the documented 0.6B + on-site 4B failure modes are real training evidence.
+The project's emergency-fallback principle was honest-partial over fake numbers: if on-site training landed worse than the prompting baseline, ship the honest story (pre-staged SFT warm-start script in the repo, post-hackathon validation queued) rather than fabricate. Judges reward honesty per the collapse narrative already in [BLOG.md](BLOG.md) §6. The red-team tests are CI-enforced, the reward design is auditable, the prompted baseline is a real 1.18-delta improvement over raw, the on-site SFT lifts that to 0.280 mean composite reward, and P3 GRPO with Tier 2c length-shaping bonus lifts further to 0.305 (the shipped Day 1 headline), and the documented 0.6B + on-site 4B failure modes are real training evidence.
 
 The judges' 2026 India-hackathon criteria doc says explicitly: *"A messy but ambitious environment with real training evidence beats a polished but boring one."* This submission is ambitious in the environment (16 verbs, 5 mismatch types, directed-ring fraud, per-supplier Rule 36(4), hidden ground truth invariant), real in the training evidence (pre-onsite Kaggle 0.6B plateau + on-site A100 4B SFT at 0.280, lifted to 0.305 by P3 GRPO Tier 2c length-shaping mitigation), and honest in the scope (the full bimodal Mode A / Mode B flip remains post-hackathon agenda; current shaping lifts the mean +0.025 but does not yet flip the 2/5 query_only attack seeds).

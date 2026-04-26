@@ -170,7 +170,6 @@ Same held-out seeds (9030–9039), 4-component breakdown, `curves.json` persiste
 - [EXEC_SUMMARY.md](EXEC_SUMMARY.md), 10-line ≤-senior-reviewer summary
 - [PRD.md](PRD.md), product-requirements view with done-gates + success criteria
 - [JUDGE_TOUR.md](JUDGE_TOUR.md), guided 10-minute repo walk
-- [QA_REHEARSAL.md](QA_REHEARSAL.md), 22 pre-answered judge probes with rebuttals
 - `data/smoke_test_10step.json` · `data/training_log_qwen3_1_7b_partial.json` · `data/training_log_qwen3_4b_partial.json`, three pre-onsite training attempts with structured failure-mode analysis
 - `tests/envs/test_reconcile_gst2b_*.py`, 42 tests covering env contract, reward math, red-team battery, concurrent sessions, hardened-mode termination
 

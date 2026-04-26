@@ -35,7 +35,7 @@ tags:
 ## TL;DR: what landed against the judging rubric
 
 - **Environment innovation (40%):** 16 typed verbs (7 query / 7 mutate / 2 meta), 5 planted mismatch types, 30%-probability directed 3-cycle ring fraud, partially observable, hidden ground truth unit-tested to never leak into observations.
-- **Storytelling (30%):** BLOG, 90-sec video, PITCH, QA_REHEARSAL, this Space with the 3D ring viewer you see below, README front-loads plots per judges' guidance.
+- **Storytelling (30%):** BLOG, 90-sec video, 9-slide pitch deck (PDF), this Space with the 3D ring viewer you see below, README front-loads plots per judges' guidance.
 - **Training evidence (20%):** Pre-onsite Qwen3-0.6B GRPO 10-step smoke + 150-step eval plateau (plots below). On-site Day 1 (2026-04-25, A100 SXM4-80GB): full 375-step Qwen3-4B SFT (n=5 mean 0.280) + **100-step P3 GRPO with Tier 2c length-shaping bonus, n=5 mean 0.305 (+0.025 lift)** above prompted Qwen2.5-3B baseline 0.18. [LESSONS_LEARNED.md](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/LESSONS_LEARNED.md) §1 covers all 5 documented failure modes including the FM4 audit-OOD trap chain (generalizes across SFT/GRPO/eval/audit code paths) and FM5 reward-landscape inversion (partially mitigated by P3 shaping).
 - **Reward & pipeline (10%):** 4-component arithmetic reward clamped to `[0.01, 0.99]`, 6 red-team attacks CI-enforced at `<0.45`, 42 tests green, Tier 1+2 GRPO fixes validated in [`data/smoke_test_10step.json`](https://github.com/akashkathole7/OpenEnv/blob/scaffold/reconcile-gst2b/envs/reconcile_gst2b_env/data/smoke_test_10step.json).
 

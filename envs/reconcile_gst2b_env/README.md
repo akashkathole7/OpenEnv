@@ -26,7 +26,7 @@ tags:
 ## TL;DR: what landed against the judging rubric
 
 - **Environment innovation (40%):** 16 typed verbs (7 query / 7 mutate / 2 meta), 5 planted mismatch types, 30%-probability directed 3-cycle ring fraud, partially observable, hidden ground truth unit-tested to never leak into observations.
-- **Storytelling (30%):** [BLOG.md](BLOG.md), 90-sec video, [PITCH.md](PITCH.md), [QA_REHEARSAL.md](QA_REHEARSAL.md), live HF Space with 3D ring viewer, this README front-loads plots per judges' guidance.
+- **Storytelling (30%):** [BLOG.md](BLOG.md), 90-sec video, 9-slide pitch deck (PDF), live HF Space with 3D ring viewer, this README front-loads plots per judges' guidance.
 - **Training evidence (20%):** Pre-onsite Qwen3-0.6B GRPO 10-step smoke + 150-step eval plateau. On-site Day 1 (2026-04-25, A100 SXM4-80GB): full 375-step Qwen3-4B SFT (n=5 mean 0.280) + **100-step P3 GRPO with Tier 2c length-shaping bonus (n=5 mean 0.305, +0.025 lift)** above prompted Qwen2.5-3B baseline 0.18 (charts below). 5 documented failure modes total: 3 pre-onsite Qwen3-scale + Failure Mode 4 (audit-OOD trap chain, generalizes across SFT/GRPO/eval/audit code paths) + Failure Mode 5 (reward-landscape inversion, partially mitigated by P3 shaping but not fully flipped). See [LESSONS_LEARNED.md](LESSONS_LEARNED.md) §1 + [BLOG.md](BLOG.md) §6 closing block.
 - **Reward & pipeline (10%):** 4-component arithmetic reward clamped to `[0.01, 0.99]`, 6 red-team attacks CI-enforced at `<0.45`, 42 tests green, Tier 1+2 GRPO fixes validated in [`data/smoke_test_10step.json`](data/smoke_test_10step.json).
 
@@ -232,11 +232,11 @@ Our [`rewards.py`](rewards.py) implements exactly that pattern, in functional fo
 
 The structural `−1.0` for submit-before-query lives outside the composite (it's a terminal penalty applied by the env server, not a rubric score), which matches the OpenEnv pattern where terminal reward and per-step rubric can diverge.
 
-**Why functional composition and not class inheritance (yet):** the per-component clamp to `[0.01, 0.99]` was the hardest design decision in this submission (0.0/1.0 boundaries fail many validators, and the clamp is what makes the red-team battery defensible under the CI contract). A v2 refactor into `Rubric` subclasses is mechanical and preserves behavior bit-for-bit; we avoided it in this round because `rewards.py` is invariant #1 in [`ONSITE_BRIEFING.md`](ONSITE_BRIEFING.md) (any change risks regressing the 6 red-team test ceilings). The composable-rubrics philosophy is honored in the component independence (each R1-R4 is a pure function of `(state, trajectory)` with no shared state), in the per-component audit trail (`composite_reward()` returns `{"R1": ..., "R2": ..., "R3": ..., "R4": ..., "total": ...}`), and in the CI contract (6 red-team attacks each verify that at least two independent components carry the defense).
+**Why functional composition and not class inheritance (yet):** the per-component clamp to `[0.01, 0.99]` was the hardest design decision in this submission (0.0/1.0 boundaries fail many validators, and the clamp is what makes the red-team battery defensible under the CI contract). A v2 refactor into `Rubric` subclasses is mechanical and preserves behavior bit-for-bit; we avoided it in this round because `rewards.py` is frozen by design (any change risks regressing the 6 red-team test ceilings). The composable-rubrics philosophy is honored in the component independence (each R1-R4 is a pure function of `(state, trajectory)` with no shared state), in the per-component audit trail (`composite_reward()` returns `{"R1": ..., "R2": ..., "R3": ..., "R4": ..., "total": ...}`), and in the CI contract (6 red-team attacks each verify that at least two independent components carry the defense).
 
 ## Scope fence (what I deliberately cut)
 
-See [scope_card.md](scope_card.md). **IN**: B2B domestic supply of goods, GST 2.0 slabs, GSTR-2B matching. **OUT**: RCM, ISD, SEZ, imports, composition dealers, e-invoicing, e-way bill. **Synthetic**: HSN→slab mapping (labeled as such at table head). The env is deliberately narrow so the RL problem stays well-defined; regime expansion is a natural v2 (ISD first, RCM second).
+**IN**: B2B domestic supply of goods, GST 2.0 slabs, GSTR-2B matching. **OUT**: RCM, ISD, SEZ, imports, composition dealers, e-invoicing, e-way bill. **Synthetic**: HSN→slab mapping (labeled as such at table head). The env is deliberately narrow so the RL problem stays well-defined; regime expansion is a natural v2 (ISD first, RCM second).
 
 ## Citations
 
