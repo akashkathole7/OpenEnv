@@ -23,6 +23,12 @@ tags:
 
 ---
 
+## In one paragraph (no jargon)
+
+Every month, a junior accountant in India opens two spreadsheets — the company's purchase register on one side, the regulator's GSTR-2B return on the other — and spends a day matching invoices line by line, claiming tax credit on the clean matches, and flagging the rest. About 14 million businesses run this loop, by hand, every month. This environment teaches an LLM to do that work end-to-end: read the invoices, call the right reconciliation tools, claim the right amount, and stop. The reward is purely arithmetic (no LLM judge), it's clamped so boundary-gaming fails, and 6 adversarial agents are wired into CI to keep the reward honest. Train an LLM here and it gets measurably better at a task that real businesses pay people to do.
+
+---
+
 ## TL;DR: what landed against the judging rubric
 
 - **Environment innovation (40%):** 16 typed verbs (7 query / 7 mutate / 2 meta), 5 planted mismatch types, 30%-probability directed 3-cycle ring fraud, partially observable, hidden ground truth unit-tested to never leak into observations.
@@ -78,11 +84,11 @@ In India alone, ~14M GST-registered businesses run this loop monthly. The task i
 
 | Metric | Value |
 |---|---:|
-| **Trained Qwen3-4B SFT + P3 GRPO on A100 SXM4-80GB (Day 1 on-site)** | **n=5 mean composite reward 0.305** |
-| SFT-only baseline (pre-GRPO) | 0.280 (n=5 mean) |
+| **Trained Qwen3-4B (SFT + P3 GRPO) on A100 SXM4-80GB, Day 1 on-site** | **n=5 mean composite reward 0.305** |
+| **↳ Lift over prompted Qwen2.5-3B baseline** | **+0.125 (0.305 − 0.18), i.e. the trained agent scores 1.7× the baseline** |
 | Prompted Qwen2.5-3B baseline (comparison anchor) | 0.18 (delta 1.18 over raw, CI95 [1.09, 1.27], 180 rollouts) |
-| Trained-vs-prompted lift | +0.125 (0.305 − 0.18) |
-| GRPO P3 vs SFT lift | +0.025 (0.305 − 0.280) |
+| SFT-only intermediate (pre-GRPO) | 0.280 (n=5 mean) |
+| Incremental GRPO P3 vs SFT lift | +0.025 (0.305 − 0.280) |
 | Red-team attacks under CI-enforced 0.45 ceiling | 6 of 6, max = 0.349 (`query_only`) |
 | Test suite | 42 / 42 green |
 | Reward-distribution gradient | 81 distinct totals, σ=0.50, 100% done-rate across 100 random-policy episodes |
